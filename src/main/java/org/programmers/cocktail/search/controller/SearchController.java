@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,8 +35,8 @@ public class SearchController {
         return "<h3>insert</h3>";
     }
 
-    @GetMapping("/search/cocktails/{userInput}")
-    public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@PathVariable String userInput) {
+    @GetMapping("/search/cocktails")
+    public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@RequestParam String userInput) {
 
         // 검색결과 설정
         String keyword = userInput;
@@ -65,9 +66,22 @@ public class SearchController {
 
         if(cocktailSearchList.isEmpty()) {
             System.out.println("No matching results found in Local DB and Extenal API");
+            // 결과가 없는 경우 204 상태코드 반환
             return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(cocktailSearchList);
+    }
+
+    @GetMapping("/search/cocktails/{cocktailId}")
+    public ResponseEntity<Cocktails> getCocktailInfoById(@PathVariable String cocktailId){
+        Optional<Cocktails> cocktailByIdOptional = cocktailsJpaRepository.findById(Long.parseLong(cocktailId));
+        if(cocktailByIdOptional.isPresent()) {
+            Cocktails cocktailById = cocktailByIdOptional.get();
+            return ResponseEntity.ok(cocktailById);
+        }
+
+        // 결과가 없는 경우 204 상태코드 반환
+        return ResponseEntity.noContent().build();
     }
 }
