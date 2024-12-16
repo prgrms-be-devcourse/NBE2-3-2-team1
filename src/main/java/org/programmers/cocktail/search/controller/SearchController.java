@@ -2,10 +2,12 @@ package org.programmers.cocktail.search.controller;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.search.repository.CocktailsJpaRepository;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +33,9 @@ public class SearchController {
 
         return "<h3>insert</h3>";
     }
-//    List<Cocktails>
 
     @GetMapping("/search/cocktails/{userInput}")
-    public List<Cocktails> getCocktailSearchResults(@PathVariable String userInput) {
+    public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@PathVariable String userInput) {
 
         // 검색결과 설정
         String keyword = userInput;
@@ -45,7 +46,7 @@ public class SearchController {
         if(!cocktailSearchList.isEmpty()) {
             //DB에 결과가 있는 경우 반환
             System.out.println("Data exists in Local DB");
-            return cocktailSearchList;
+            return ResponseEntity.ok(cocktailSearchList);
         }
         //2. (DB에 결과가 없는경우) API에서 검색
         System.out.println("No data in local DB. Fetching Data from Extenal API...");
@@ -64,9 +65,9 @@ public class SearchController {
 
         if(cocktailSearchList.isEmpty()) {
             System.out.println("No matching results found in Local DB and Extenal API");
+            return ResponseEntity.noContent().build();
         }
 
-        return cocktailSearchList;
+        return ResponseEntity.ok(cocktailSearchList);
     }
-
 }
