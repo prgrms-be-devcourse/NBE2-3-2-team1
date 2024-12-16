@@ -1,4 +1,5 @@
 package org.programmers.cocktail.admin.dto;
 
-public class AdminDto {
+public class DashboardUserResponse {
+
 }

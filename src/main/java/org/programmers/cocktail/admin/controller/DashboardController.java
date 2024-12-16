@@ -1,4 +1,4 @@
 package org.programmers.cocktail.admin.controller;
 
-public class AdminController {
+public class DashboardController {
 }

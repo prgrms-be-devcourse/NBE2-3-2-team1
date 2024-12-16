@@ -29,12 +29,12 @@ public class Comments {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cocktail_id")
+    @JoinColumn(name = "cocktail_id", nullable = false)
     @ToString.Exclude
     private Cocktails cocktails;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
     private Users users;
 
