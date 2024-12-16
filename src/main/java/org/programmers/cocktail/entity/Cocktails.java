@@ -1,6 +1,7 @@
 package org.programmers.cocktail.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,16 +26,22 @@ public class Cocktails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String ingredients;
 
+    @Column(nullable = false)
     private String recipes;
 
+    @Column(nullable = true)
     private String image_url;
 
+    @Column(nullable = false)// 초기 default값은 0
     private Long hits;
 
+    @Column(nullable = false)// 초기 default값은 0
     private Long likes;
 
     @OneToMany(mappedBy = "cocktails", cascade = CascadeType.ALL, orphanRemoval = true)
