@@ -4,14 +4,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
-import org.programmers.cocktail.search.repository.CocktailsJpaRepository;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
 
     @Autowired
-    CocktailsJpaRepository cocktailsJpaRepository;
+    CocktailsRepository cocktailsRepository;
 
     @Autowired
     CocktailExternalApiService cocktailExternalApiService;
@@ -33,7 +31,7 @@ public class SearchController {
         String keyword = userInput;
 
         //1. DB에 검색결과 있는지 확인
-        List<Cocktails> cocktailSearchList = cocktailsJpaRepository.findByNameContaining(keyword);
+        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
 
         if(!cocktailSearchList.isEmpty()) {
             //DB에 결과가 있는 경우 반환
@@ -49,11 +47,11 @@ public class SearchController {
 
         for(Cocktails cocktail : cocktailSearchList){
             System.out.println("new cocktail added to Local DB");
-            cocktailsJpaRepository.save(cocktail);
+            cocktailsRepository.save(cocktail);
         }
 
         // 2-2) DB에 저장된 데이터를 가져와서 반환
-        cocktailSearchList = cocktailsJpaRepository.findByNameContaining(keyword);
+        cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
 
         if(cocktailSearchList.isEmpty()) {
             System.out.println("No matching results found in Local DB and Extenal API");
@@ -66,7 +64,7 @@ public class SearchController {
 
     @GetMapping("/search/cocktails/{cocktailId}")
     public ResponseEntity<Cocktails> getCocktailInfoById(@PathVariable String cocktailId){
-        Optional<Cocktails> cocktailByIdOptional = cocktailsJpaRepository.findById(Long.parseLong(cocktailId));
+        Optional<Cocktails> cocktailByIdOptional = cocktailsRepository.findById(Long.parseLong(cocktailId));
         if(cocktailByIdOptional.isPresent()) {
             Cocktails cocktailById = cocktailByIdOptional.get();
             return ResponseEntity.ok(cocktailById);
