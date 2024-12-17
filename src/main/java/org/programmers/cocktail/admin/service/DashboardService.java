@@ -3,10 +3,10 @@ package org.programmers.cocktail.admin.service;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.programmers.cocktail.admin.repository.DashboardRepository;
-import org.programmers.cocktail.admin.repository.DashboardUserRepository;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.entity.Users;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
+import org.programmers.cocktail.repository.users.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +14,28 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DashboardService {
 
-    private final DashboardRepository dashboardRepository;
+    private final UsersRepository usersRepository;
 
-    private final DashboardUserRepository dashboardUserRepository;
+    private final CocktailsRepository cocktailsRepository;
 
     @Autowired
-    public DashboardService(DashboardRepository dashboardRepository,
-        DashboardUserRepository dashboardUserRepository) {
-        this.dashboardRepository = dashboardRepository;
-        this.dashboardUserRepository = dashboardUserRepository;
+    public DashboardService(UsersRepository usersRepository,
+        CocktailsRepository cocktailsRepository) {
+
+        this.usersRepository = usersRepository;
+        this.cocktailsRepository = cocktailsRepository;
     }
 
     public List<Cocktails> getCocktailsByLikesDesc() {
-        return dashboardRepository.findAllByOrderByLikesDesc();
+        return cocktailsRepository.findAllByOrderByLikesDesc();
     }
 
     public int getUserCount() {
-        return dashboardUserRepository.findAll().size();
+        return usersRepository.findAll().size();
     }
 
     public Optional<Users> getUserById(Long id) {
-        return dashboardUserRepository.findById(id);
+        return usersRepository.findById(id);
     }
 
 }
