@@ -1,5 +1,6 @@
 package org.programmers.cocktail.admin.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Optional;
 import org.programmers.cocktail.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
