@@ -44,6 +44,9 @@ public class Users {
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CocktailLists> cocktailLists = new ArrayList<>();
 
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CocktailLikes> cocktailLikes = new ArrayList<>();
+
     @Builder
     public Users(String email, String name, String password) {
         this.email = email;

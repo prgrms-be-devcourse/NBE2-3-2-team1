@@ -34,7 +34,9 @@ public class CocktailExternalApiService {
         for (JsonNode drinkNode : drinksNode) {
             String name = drinkNode.get("strDrink").asText();
             StringBuilder ingredientsBuilder = new StringBuilder();
-            String recipe = drinkNode.get("strInstructions").asText();
+            String recipes = drinkNode.get("strInstructions").asText();
+            String category = drinkNode.get("strCategory").asText();
+            String alcoholic = drinkNode.get("strAlcoholic").asText();
             String image_url = drinkNode.get("strDrinkThumb").asText();
             // 재료와 측정값 결합
             for (int i = 1; i <= 15; i++) {
@@ -52,7 +54,7 @@ public class CocktailExternalApiService {
             String ingredients = ingredientsBuilder.toString().replaceAll(", $", "");
 
             // ProcessedCocktail 객체 생성
-            cocktails.add(new Cocktails(name, ingredients, recipe, image_url, 0L, 0L));
+            cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
         }
         return cocktails;
     }

@@ -9,7 +9,9 @@ import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,17 +25,6 @@ public class SearchController {
 
     @Autowired
     CocktailExternalApiService cocktailExternalApiService;
-
-    // 디버기용 - 삭제 예정
-    @RequestMapping("/insert")
-    public String insert() {
-
-        Cocktails cocktail1  = new Cocktails("applematini", "bean, vodka, pumpkin", "pour,stir,mix", "image.png", 0L, 0L);
-
-        cocktailsJpaRepository.save(cocktail1);
-
-        return "<h3>insert</h3>";
-    }
 
     @GetMapping("/search/cocktails")
     public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@RequestParam String userInput) {
@@ -84,4 +75,5 @@ public class SearchController {
         // 결과가 없는 경우 204 상태코드 반환
         return ResponseEntity.noContent().build();
     }
+
 }
