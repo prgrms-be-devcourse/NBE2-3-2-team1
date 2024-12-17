@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class DashboardUserResponse {
+
     private Long id;
     private String name;
     private String email;

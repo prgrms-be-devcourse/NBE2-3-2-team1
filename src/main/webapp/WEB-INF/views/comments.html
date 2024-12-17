@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>DashStack - 포스트 개요</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="dashboard">
+        <!-- 사이드바 -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="images/logo.png" alt="DashStack 로고">
+                <span>DashStack</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-menu active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>대시보드</span>
+                </div>
+                <a class="sidebar-menu" href="calendar.html">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>캘린더</span>
+                </a>
+                <div class="sidebar-menu">
+                    <i class="fas fa-comments"></i>
+                    <span>메신저</span>
+                </div>
+                <div class="sidebar-menu">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>송장</span>
+                </div>
+                <div class="sidebar-menu">
+                    <i class="fas fa-cog"></i>
+                    <span>설정</span>
+                </div>
+                <div class="sidebar-menu">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>로그아웃</span>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 상단바 -->
+        <header class="topbar">
+            <div class="search">
+                <i class="fas fa-search"></i>
+                <input type="search" placeholder="검색">
+            </div>
+            <div class="user-info">
+                <div>
+                    <div>Moni Roy</div>
+                    <div class="user-role">관리자</div>
+                </div>
+                <img src="images/profile.jpg" alt="프로필 이미지" class="profile-image">
+            </div>
+        </header>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="main-content">
+
+            <!-- 포스트 개요 컨테이너 -->
+            <div class="post-overview-container" style="background: #fff; margin-top: 20px; border-radius:8px; padding:20px; box-sizing:border-box;">
+                <div class="post-header">
+                    <h2>포스트 개요</h2>
+                </div>
+
+                <div class="post-table-wrapper">
+                    <table class="post-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>이름</th>
+                                <th>주소</th>
+                                <th>날짜</th>
+                                <th>유형</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>00001</td>
+                                <td>크리스틴 브룩스</td>
+                                <td>089 Kutch Green Apt. 448</td>
+                                <td>14 Feb 2019</td>
+                                <td>전자제품</td>
+                                <td><span class="status completed">완료</span></td>
+                            </tr>
+                            <tr>
+                                <td>00002</td>
+                                <td>로지 피어슨</td>
+                                <td>979 Immanuel Ferry Suite 526</td>
+                                <td>14 Feb 2019</td>
+                                <td>도서</td>
+                                <td><span class="status processing">진행 중</span></td>
+                            </tr>
+                            <tr>
+                                <td>00003</td>
+                                <td>다렐 캘드웰</td>
+                                <td>8587 Frida Ports</td>
+                                <td>14 Feb 2019</td>
+                                <td>의약품</td>
+                                <td><span class="status rejected">거절</span></td>
+                            </tr>
+                            <tr>
+                                <td>00004</td>
+                                <td>길버트 존스턴</td>
+                                <td>768 Destiny Lake Suite 600</td>
+                                <td>14 Feb 2019</td>
+                                <td>모바일</td>
+                                <td><span class="status processing">진행 중</span></td>
+                            </tr>
+                            <tr>
+                                <td>00005</td>
+                                <td>앨런 케인</td>
+                                <td>042 Mylene Throughway</td>
+                                <td>14 Feb 2019</td>
+                                <td>시계</td>
+                                <td><span class="status completed">완료</span></td>
+                            </tr>
+                            <tr>
+                                <td>00006</td>
+                                <td>앨프리드 머리</td>
+                                <td>543 Weimann Mountain</td>
+                                <td>14 Feb 2019</td>
+                                <td>의약품</td>
+                                <td><span class="status completed">완료</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="prev-date-btn" style="background-color: #ffffff; color: #007bff; border: 1px solid #007bff;">이전 날짜</button>
+                    <button class="next-date-btn">다음 날짜</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

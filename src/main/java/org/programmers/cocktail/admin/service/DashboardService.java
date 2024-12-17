@@ -2,7 +2,6 @@ package org.programmers.cocktail.admin.service;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.programmers.cocktail.admin.dto.DashboardCocktailResponse;
 import org.programmers.cocktail.admin.repository.DashboardCocktailRepository;
 import org.programmers.cocktail.admin.repository.DashboardUserRepository;
 import org.programmers.cocktail.entity.Cocktails;
