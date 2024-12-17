@@ -30,4 +30,5 @@ public class DashboardService {
     public int getUserCount() {
         return dashboardUserRepository.findAll().size();
     }
+
 }
