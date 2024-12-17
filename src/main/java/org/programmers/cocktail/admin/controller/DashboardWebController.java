@@ -1,5 +1,6 @@
 package org.programmers.cocktail.admin.controller;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import org.programmers.cocktail.admin.dto.DashboardCocktailResponse;
 import org.programmers.cocktail.admin.service.DashboardService;
