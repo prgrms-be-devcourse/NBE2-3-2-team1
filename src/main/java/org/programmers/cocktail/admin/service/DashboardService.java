@@ -1,10 +1,12 @@
 package org.programmers.cocktail.admin.service;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.programmers.cocktail.admin.repository.DashboardCocktailRepository;
 import org.programmers.cocktail.admin.repository.DashboardUserRepository;
 import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.entity.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,10 @@ public class DashboardService {
 
     public int getUserCount() {
         return dashboardUserRepository.findAll().size();
+    }
+
+    public Optional<Users> getUserById(Long id) {
+        return dashboardUserRepository.findById(id);
     }
 
 }
