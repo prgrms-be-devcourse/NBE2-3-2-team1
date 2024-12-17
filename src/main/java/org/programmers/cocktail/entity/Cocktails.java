@@ -29,11 +29,17 @@ public class Cocktails {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 600)
     private String ingredients;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 600)
     private String recipes;
+
+    @Column(nullable = true)
+    private String category;
+
+    @Column(nullable = true)
+    private String alcoholic;
 
     @Column(nullable = true)
     private String image_url;
@@ -51,10 +57,12 @@ public class Cocktails {
     private List<CocktailLists> cocktailLists = new ArrayList<>();
 
     @Builder
-    public Cocktails(String name, String ingredients, String recipes, String image_url, Long hits, Long likes) {
+    public Cocktails(String name, String ingredients, String recipes, String category, String alcoholic, String image_url, Long hits, Long likes) {
         this.name = name;
         this.ingredients = ingredients;
         this.recipes = recipes;
+        this.category = category;
+        this.alcoholic = alcoholic;
         this.image_url = image_url;
         this.hits = hits;
         this.likes = likes;
