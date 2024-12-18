@@ -25,5 +25,4 @@ public class CocktailsRepositoryImpl implements CocktailsRepositoryCustom {
             .from(cocktails)
             .fetchOne();
     }
-
 }
