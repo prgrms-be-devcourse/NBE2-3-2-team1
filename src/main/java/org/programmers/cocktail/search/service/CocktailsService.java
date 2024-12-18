@@ -2,14 +2,11 @@ package org.programmers.cocktail.search.service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
-import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service

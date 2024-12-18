@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity(name = "users")
@@ -20,6 +21,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @Getter
+@Setter
 public class Users {
 
     @Id

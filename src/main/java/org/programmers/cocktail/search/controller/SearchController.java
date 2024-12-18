@@ -1,14 +1,14 @@
 package org.programmers.cocktail.search.controller;
 
 import java.util.List;
-import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
-import org.programmers.cocktail.entity.Users;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.programmers.cocktail.search.dto.CocktailsTO;
+import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
+import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,7 @@ public class SearchController {
     CocktailsService cocktailsService;
 
     @Autowired
-    UsersRepository usersRepository;
+    UsersService usersService;
 
     @Autowired
     CocktailExternalApiService cocktailExternalApiService;
@@ -51,13 +51,13 @@ public class SearchController {
         }
 
         // 2. userid 정보가져오기
-        Optional<Users> userInfoOptional = usersRepository.findByEmail(session);
-        if(!userInfoOptional.isPresent()){
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
             return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
         }
 
         //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
-        Boolean isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfoOptional.get().getId(), Long.parseLong(cocktailId));
+        Boolean isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
 
         if(!isCocktailListsPresent){
             return ResponseEntity.ok(NO_DB_INFO);     // CocktailList 정보 가져올 수 없음
