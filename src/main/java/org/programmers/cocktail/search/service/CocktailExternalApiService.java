@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
+import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,10 @@ public class CocktailExternalApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Cocktails> fetchCocktailData(String cocktailName) {
+    @Autowired
+    private CocktailsRepositoryImpl cocktailsRepository;
+
+    public List<CocktailsTO> fetchCocktailData(String cocktailName) {
         // API 호출
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
@@ -56,6 +61,6 @@ public class CocktailExternalApiService {
             // ProcessedCocktail 객체 생성
             cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
         }
-        return cocktails;
+        return cocktailsRepository.convertToCocktailsTOList(cocktails);
     }
 }

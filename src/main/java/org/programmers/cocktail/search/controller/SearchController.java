@@ -2,13 +2,13 @@ package org.programmers.cocktail.search.controller;
 
 import java.util.List;
 import java.util.Optional;
-import org.programmers.cocktail.entity.CocktailLists;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.entity.Users;
-import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryCustom;
-import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
+import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
+import org.programmers.cocktail.search.service.CocktailListsService;
+import org.programmers.cocktail.search.service.CocktailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,16 +25,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class SearchController {
 
     @Autowired
-    CocktailsRepository cocktailsRepository;
+    CocktailsService cocktailsService;
 
     @Autowired
     UsersRepository usersRepository;
 
     @Autowired
-    CocktailListsRepositoryCustom cocktailListsRepositoryCustom ;
+    CocktailExternalApiService cocktailExternalApiService;
 
     @Autowired
-    CocktailExternalApiService cocktailExternalApiService;
+    CocktailListsService cocktailListsService;
 
     @GetMapping("/favorites/cocktails/{cocktailId}")
     @ResponseBody
@@ -57,8 +57,9 @@ public class SearchController {
         }
 
         //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
-        Optional<CocktailLists> cocktailListsOptional = cocktailListsRepositoryCustom.findByUserIdAndCocktailId(userInfoOptional.get().getId(), Long.parseLong(cocktailId));
-        if(!cocktailListsOptional.isPresent()){
+        Boolean isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfoOptional.get().getId(), Long.parseLong(cocktailId));
+
+        if(!isCocktailListsPresent){
             return ResponseEntity.ok(NO_DB_INFO);     // CocktailList 정보 가져올 수 없음
         }
 
@@ -67,13 +68,13 @@ public class SearchController {
 
     @GetMapping("/search/cocktails")
     @ResponseBody
-    public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@RequestParam String userInput) {
+    public ResponseEntity<List<CocktailsTO>> getCocktailSearchResults(@RequestParam String userInput) {
 
         // 검색결과 설정
         String keyword = userInput;
 
         //1. DB에 검색결과 있는지 확인
-        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
+        List<CocktailsTO> cocktailSearchList = cocktailsService.findByNameContaining(keyword);
 
         if(!cocktailSearchList.isEmpty()) {
             //DB에 결과가 있는 경우 반환
@@ -86,14 +87,13 @@ public class SearchController {
         // 2-1) 외부 API에서 가져온 cocktail 정보를 DB에 저장
         cocktailSearchList = cocktailExternalApiService.fetchCocktailData(keyword);
 
-
-        for(Cocktails cocktail : cocktailSearchList){
-            System.out.println("new cocktail added to Local DB");
-            cocktailsRepository.save(cocktail);
+        for(CocktailsTO cocktail : cocktailSearchList){
+            System.out.println("new cocktail adding to Local DB");
+            cocktailsService.insertNewCocktailDB(cocktail);
         }
 
         // 2-2) DB에 저장된 데이터를 가져와서 반환
-        cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
+        cocktailSearchList = cocktailsService.findByNameContaining(keyword);
 
         if(cocktailSearchList.isEmpty()) {
             System.out.println("No matching results found in Local DB and Extenal API");
@@ -106,10 +106,10 @@ public class SearchController {
 
     @RequestMapping("/search/cocktails/{cocktailId}")
     public String getCocktailInfoById(@PathVariable String cocktailId, Model model) {
-        Optional<Cocktails> cocktailByIdOptional = cocktailsRepository.findById(Long.parseLong(cocktailId));
-        if (cocktailByIdOptional.isPresent()) {
-            model.addAttribute("cocktailById", cocktailByIdOptional.get());
-        }
-        return "favorites"; //
+        Cocktails cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
+        model.addAttribute("cocktailById", cocktailsById);
+
+        // 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
+        return "favorites";
     }
 }
