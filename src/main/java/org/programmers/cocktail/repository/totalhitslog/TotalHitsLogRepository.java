@@ -1,4 +1,8 @@
 package org.programmers.cocktail.repository.totalhitslog;
 
-public interface TotalHitsLogRepository {
+import org.programmers.cocktail.entity.TotalHitsLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TotalHitsLogRepository extends JpaRepository<TotalHitsLog, Long> {
+    
 }
