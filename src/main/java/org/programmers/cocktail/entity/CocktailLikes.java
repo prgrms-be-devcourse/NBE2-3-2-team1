@@ -24,8 +24,12 @@ public class CocktailLikes {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
+    private Users users;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cocktail_id", nullable = false)
     @ToString.Exclude
     private Cocktails cocktails;
-
 }

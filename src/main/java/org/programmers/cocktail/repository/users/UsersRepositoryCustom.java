@@ -1,12 +1,10 @@
-package org.programmers.cocktail.login.repository;
+package org.programmers.cocktail.repository.users;
 
-import java.util.List;
 import org.programmers.cocktail.entity.Users;
-import org.programmers.cocktail.login.dto.UserRegisterDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface LoginRepository extends JpaRepository<Users, String> {
+public interface UsersRepositoryCustom extends JpaRepository<Users, Long> {
 
     @Query(value = "select u from users u where u.email = :email")
     Users findByEmail(String email);

@@ -29,7 +29,7 @@ public class Users {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 30, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -43,6 +43,9 @@ public class Users {
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CocktailLists> cocktailLists = new ArrayList<>();
+
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CocktailLikes> cocktailLikes = new ArrayList<>();
 
     @Builder
     public Users(String email, String name, String password) {

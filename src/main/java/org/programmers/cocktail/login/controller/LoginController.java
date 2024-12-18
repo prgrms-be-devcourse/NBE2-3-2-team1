@@ -1,12 +1,17 @@
 package org.programmers.cocktail.login.controller;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import org.programmers.cocktail.entity.CocktailLists;
+import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.entity.Users;
+import org.programmers.cocktail.login.dto.CocktailsDto;
 import org.programmers.cocktail.login.dto.UserRegisterDto;
-import org.programmers.cocktail.login.repository.LoginRepository;
 import org.programmers.cocktail.login.service.LoginService;
+import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     @Autowired
-    private LoginRepository loginRepository;
+    private CocktailListsRepository cocktailListsRepository;
+
+    @Autowired
+    private CocktailsRepository cocktailsRepository;
 
     @Autowired
     private LoginService loginService;
@@ -56,7 +64,75 @@ public class LoginController {
 //    }
 
 
-    @RequestMapping("/login_form")
+    @PostMapping("/login/mypageUserInformation")
+    public UserRegisterDto mypageUserInformation(
+        @RequestParam("email") String email
+    ) {
+
+        Users users = loginService.findByEmail( email );
+
+        UserRegisterDto to = new UserRegisterDto();
+        to.setId( users.getId() );
+        to.setEmail( users.getEmail() );
+        to.setName( users.getName() );
+        to.setPassword( users.getPassword() );
+
+        return to;
+    }
+
+
+    @PostMapping("/login/mypageUsersFavoriteCocktail")
+    public List<CocktailsDto> mypageUsersFavoriteCocktail(
+        @RequestParam("email") String email
+    ) {
+
+        Users users = loginService.findByEmail( email );
+        List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
+        List<Cocktails> cocktails = cocktailsRepository.findAll();
+
+
+        List<CocktailsDto> cocktailsDtos = new ArrayList<>();
+
+        for ( Cocktails cocktail : cocktails ) {
+            CocktailsDto cocktailsTo = new CocktailsDto();
+            cocktailsTo.setId(cocktail.getId());
+            cocktailsTo.setName(cocktail.getName());
+            //System.out.println("cocktailsTo.setName(cocktail.getName()): " + cocktailsTo.getName()); // 잘 들어감
+            cocktailsTo.setImage_url(cocktail.getImage_url());
+            cocktailsDtos.add(cocktailsTo);
+            //System.out.println("cocktailsDtos: "+ cocktailsDtos); // 잘 들어감
+        }
+
+        for (CocktailsDto c : cocktailsDtos) {
+            System.out.println("CocktailsDto1: " + c);
+        }
+
+        List<CocktailsDto> ct = new ArrayList<>();
+
+        for (CocktailLists cl : cocktailLists) {
+            System.out.println("cl: " + cl );
+            if ( users.getId().equals( cl.getUsers().getId() ) ) {
+                System.out.println("cl.getUsers().getId(): " + cl.getUsers().getId());
+                System.out.println("cl.getCocktails().getId(): "+ cl.getCocktails().getId());
+                for (CocktailsDto c : cocktailsDtos) {
+                    System.out.println("CocktailsDto2: " + c );
+
+                    if (cl.getCocktails().getId().equals(c.getId())) {
+                        System.out.println("cl.getCocktails().getId():" + cl.getCocktails().getId());
+
+                        System.out.println( c.getName() + ", " + c.getImage_url() );
+
+                        ct.add( c );
+
+                    }
+                }
+            }
+        }
+
+        return ct;
+    }
+
+    @PostMapping("/login_form")
     public String login_form() {
         return "login_form";
     }
@@ -141,3 +217,4 @@ public class LoginController {
 
 
 }
+
