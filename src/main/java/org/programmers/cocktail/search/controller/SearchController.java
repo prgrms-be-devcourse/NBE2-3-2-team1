@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.programmers.cocktail.entity.CocktailLists;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.entity.Users;
-import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
+import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryCustom;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
@@ -31,7 +31,7 @@ public class SearchController {
     UsersRepository usersRepository;
 
     @Autowired
-    CocktailListsRepository cocktailListsRepository;
+    CocktailListsRepositoryCustom cocktailListsRepositoryCustom ;
 
     @Autowired
     CocktailExternalApiService cocktailExternalApiService;
@@ -57,7 +57,7 @@ public class SearchController {
         }
 
         //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
-        Optional<CocktailLists> cocktailListsOptional = cocktailListsRepository.findByUserIdAndCocktailId(userInfoOptional.get().getId(), Long.parseLong(cocktailId));
+        Optional<CocktailLists> cocktailListsOptional = cocktailListsRepositoryCustom.findByUserIdAndCocktailId(userInfoOptional.get().getId(), Long.parseLong(cocktailId));
         if(!cocktailListsOptional.isPresent()){
             return ResponseEntity.ok(NO_DB_INFO);     // CocktailList 정보 가져올 수 없음
         }
