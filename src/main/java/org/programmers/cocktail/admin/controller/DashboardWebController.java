@@ -35,6 +35,9 @@ public class DashboardWebController {
         long totalHits = dashboardService.getTotalHits();
         mv.addObject("totalHits", totalHits);
 
+
+
+
         mv.setViewName("dashboard");
         return mv;
     }
