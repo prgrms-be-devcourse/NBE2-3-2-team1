@@ -5,7 +5,7 @@ import org.programmers.cocktail.entity.CocktailLists;
 import org.programmers.cocktail.entity.Cocktails;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CocktailsRepository extends JpaRepository<Cocktails, Long> {
+public interface CocktailsRepository extends JpaRepository<Cocktails, Long>, CocktailsRepositoryCustom {
 
     List<Cocktails> findAllByOrderByLikesDesc();
     List<Cocktails> findByNameContaining(String userInput);

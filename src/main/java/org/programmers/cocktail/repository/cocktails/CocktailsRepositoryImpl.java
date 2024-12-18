@@ -8,12 +8,31 @@ import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.programmers.cocktail.entity.QCocktails;
+import org.springframework.context.annotation.Bean;
+
 
 @Repository
-public class CocktailsRepositoryImpl {
+public class CocktailsRepositoryImpl implements CocktailsRepositoryCustom {
+
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
     private ModelMapper modelMapper;
+
+    public CocktailsRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
+
+    @Override
+    public Long getTotalHits() {
+        QCocktails cocktails = QCocktails.cocktails;
+        return queryFactory
+            .select(cocktails.hits.sum())
+            .from(cocktails)
+            .fetchOne();
+    }
 
     public List<CocktailsTO> convertToCocktailsTOList(List<Cocktails> cocktailsList) {
         List<CocktailsTO> cocktailsTOList = cocktailsList.stream()
