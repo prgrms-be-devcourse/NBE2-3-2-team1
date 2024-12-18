@@ -27,17 +27,30 @@ public class LoginService {
         return flag;
     }
 
-    public Users findByEmail(@Param("email") String email) {
+    public Users findByEmail(String email) {
 
         Users users = usersRepositoryCustom.findByEmail(email);
 
         return users;
     }
 
-    public Users selectByEmailandPassword(@Param("email") String email, @Param("password") String password) {
+    public Users selectByEmailandPassword(String email, String password) {
 
         Users users = usersRepositoryCustom.findByEmailAndPassword(email, password);
 
         return users;
+    }
+
+    public int deleteUser(Long id) {
+
+        System.out.println("deleteUser(Long id): " + id + ")"); // 잘 출력된
+
+        usersRepository.deleteById(id);
+
+        if ( usersRepository.existsById(id) ) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }

@@ -47,30 +47,16 @@ public class LoginController {
         return email + name + password + "Register Successful!";
     }
 
-
-//    @PostMapping("/login")
-//    public String login(
-//        @RequestParam("email") String email,
-//        @RequestParam("password") String password)
-//    {
-//        System.out.println( "email: " + email );
-//
-//        Users users = loginService.selectByEmailandPassword( email, password );
-//
-//        // 이메일, 패스워드 둘 다 일치하지 않으면 에러 남
-//        // @Query 쓴 건 dto 쓸 수 없음. users -> userregisterdto 변환할 수 없기 때문
-//
-//        return users.getName();
-//    }
-
-
+    // 이메일, 비밀번호, 이름, 생년월일(아마) select하기 (mypage에 띄워놓기: 프론트)
     @PostMapping("/login/mypageUserInformation")
     public UserRegisterDto mypageUserInformation(
         @RequestParam("email") String email
     ) {
 
+        // DB에서 이메일, 패스워드 가져오기
         Users users = loginService.findByEmail( email );
 
+        // dto에 users값 넣기
         UserRegisterDto to = new UserRegisterDto();
         to.setId( users.getId() );
         to.setEmail( users.getEmail() );
@@ -79,6 +65,7 @@ public class LoginController {
 
         return to;
     }
+
 
 
     @PostMapping("/login/mypageUsersFavoriteCocktail")
@@ -109,21 +96,13 @@ public class LoginController {
 
         List<CocktailsDto> ct = new ArrayList<>();
 
+        // user, cocktails, cocktaillists 조인해서 user_id타고
+        // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
         for (CocktailLists cl : cocktailLists) {
-            System.out.println("cl: " + cl );
             if ( users.getId().equals( cl.getUsers().getId() ) ) {
-                System.out.println("cl.getUsers().getId(): " + cl.getUsers().getId());
-                System.out.println("cl.getCocktails().getId(): "+ cl.getCocktails().getId());
                 for (CocktailsDto c : cocktailsDtos) {
-                    System.out.println("CocktailsDto2: " + c );
-
                     if (cl.getCocktails().getId().equals(c.getId())) {
-                        System.out.println("cl.getCocktails().getId():" + cl.getCocktails().getId());
-
-                        System.out.println( c.getName() + ", " + c.getImage_url() );
-
                         ct.add( c );
-
                     }
                 }
             }
@@ -136,6 +115,8 @@ public class LoginController {
     public String login_form() {
         return "login_form";
     }
+
+
 
     // login_ok에서 0을 반환하면 마이페이지로 이동
     @PostMapping("/login_ok")
@@ -160,6 +141,8 @@ public class LoginController {
             session.setAttribute("semail", email);
             //session.setAttribute("spassword", password);
 
+            System.out.println("session.getAttribure: " + session.getAttribute("semail"));
+
 
         } else {
             flag = 1;
@@ -168,36 +151,13 @@ public class LoginController {
         return flag;
     }
 
-    // 이메일, 비밀번호, 이름, 생년월일(아마) select하기 (mypage에 띄워놓기: 프론트)
-    @PostMapping("/login/mypage")
-    public UserRegisterDto mypage(
-        @RequestParam("email") String email
-    ) {
-
-        // DB에서 이메일, 패스워드 가져오기
-        Users users = loginService.findByEmail( email );
-
-        // cocktail_lists, cocktails 조인해서 특정한 유저의 내가 찜한 칵테일 목록 가져오기(나중에)
-
-        // dto에 users값 넣기
-        UserRegisterDto to = new UserRegisterDto();
-        to.setId( users.getId() );
-        to.setEmail( users.getEmail() );
-        to.setPassword( users.getPassword() );
-        to.setName( users.getName() );
-
-        // System.out.println(to.getId());
-        // System.out.println(to.getEmail());
-
-        return to;
-    }
 
 
     @PostMapping("/login_complete")
     public int login_complete(HttpSession session) {
         int flag = 2;
 
-        if (session.getAttribute("semail") != null && session.getAttribute("spassword") != null) {
+        if (session.getAttribute("semail") != null) {
             flag = 0;
         } else {
             flag = 1;
@@ -205,6 +165,7 @@ public class LoginController {
 
         return flag;
     }
+
 
     @PostMapping("/logout_ok")
     public String logout_ok(HttpSession session) {
@@ -215,6 +176,30 @@ public class LoginController {
         return "logout_ok";
     }
 
+
+    @PostMapping("/withdrawal_ok")
+    public int userWithdrawal(
+        @RequestParam("email") String email,
+        @RequestParam("password") String password
+    ) {
+        int flag = 0;
+
+        Users users = loginService.selectByEmailandPassword( email, password );
+        // System.out.println("users.getEmail(): " + users.getEmail()); // 잘 나옴
+
+        int result = 0;
+        if(email.equals(users.getEmail()) && password.equals(users.getPassword())) {
+            result = loginService.deleteUser( users.getId() );
+        }
+
+        if ( result == 0 ) {
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+
+        return flag;
+    }
 
 }
 
