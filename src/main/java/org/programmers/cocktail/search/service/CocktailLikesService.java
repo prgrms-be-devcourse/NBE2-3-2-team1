@@ -38,7 +38,6 @@ public class CocktailLikesService {
 
         // TO->Entity 변환
         CocktailLikes cocktailLikes = cocktailLikesRepositoryImpl.convertToCocktailLikes(cocktailLikesTO);
-        System.out.println("cocktailLists: " + cocktailLikes);
         try {
             cocktailLikesRepositoryCustom.save(cocktailLikes);
         } catch (Exception e) {
@@ -48,5 +47,19 @@ public class CocktailLikesService {
 
         return SUCCESS;
     }
+
+    public int deleteCocktailLikes(CocktailLikesTO cocktailLikesTO){
+
+        int cocktailLikesDeleteResult = cocktailLikesRepositoryCustom.deleteByUserIdAndCocktailId(cocktailLikesTO.getUserId(), cocktailLikesTO.getCocktailId());;
+
+        if(cocktailLikesDeleteResult==0){
+            // 삭제된 행이 없는 경우
+            return FAIL;
+        }
+
+        return SUCCESS;
+    }
+
+
 
 }

@@ -162,7 +162,9 @@
 <div>
     <span id="likeIcon" class="like">&#9825;</span>
 </div>
-
+<div>
+    <p>hits: <%=hits%></p>
+</div>
 
 </body>
 </html>

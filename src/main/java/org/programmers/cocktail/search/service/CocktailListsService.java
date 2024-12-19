@@ -34,7 +34,6 @@ public class CocktailListsService {
 
         // TO->Entity 변환
         CocktailLists cocktailLists = cocktailListsRepositoryImpl.convertToCocktailLists(cocktailListsTO);
-        System.out.println("cocktailLists: " + cocktailLists);
         try {
             cocktailListsRepositoryCustom.save(cocktailLists);
         } catch (Exception e) {
@@ -47,9 +46,8 @@ public class CocktailListsService {
 
     public int deleteCocktailList(CocktailListsTO cocktailListsTO){
 
-        System.out.println(cocktailListsTO.getUserId() + " "+ cocktailListsTO.getCocktailId());
         int cocktailListDeleteResult = cocktailListsRepositoryCustom.deleteByUserIdAndCocktailId(cocktailListsTO.getUserId(), cocktailListsTO.getCocktailId());
-        System.out.println("cocktailListDeleteResult: " +cocktailListDeleteResult);
+
         if(cocktailListDeleteResult==0){
             // 삭제된 행이 없는 경우
             return FAIL;
