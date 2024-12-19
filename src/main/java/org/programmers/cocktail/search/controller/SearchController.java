@@ -38,13 +38,13 @@ public class SearchController {
     @Autowired
     CocktailListsService cocktailListsService;
 
+    static final int NOT_LOGGED_IN = 0;
+    static final int OPERATION_FAIL = 1;
+    static final int OPERATION_SUCESS = 2;      // FAVORITED, ADD, DELETE
+
     @GetMapping("/favorites/cocktails/{cocktailId}")
     @ResponseBody
     public ResponseEntity<Integer> isFavoritedByUser(@PathVariable String cocktailId){
-
-        final int NOT_LOGGED_IN = 0;
-        final int NO_DB_INFO = 1;
-        final int FAVORITED = 2;
 
         // 1. 로그인 상태 확인
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -52,23 +52,23 @@ public class SearchController {
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
-            return ResponseEntity.ok(NOT_LOGGED_IN);
+            return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
         }
 
         //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
         Boolean isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
 
         if(!isCocktailListsPresent){
-            return ResponseEntity.ok(NO_DB_INFO);     // CocktailList 정보 가져올 수 없음
+            return ResponseEntity.ok(OPERATION_FAIL);     // 즐겨찾기 조회 실패
         }
 
-        return ResponseEntity.ok(FAVORITED);    // 즐겨찾기 등록되어있는 경우
+        return ResponseEntity.ok(OPERATION_SUCESS);    // 즐겨찾기 조회 성공
     }
 
     @GetMapping("/search/cocktails")
@@ -115,6 +115,7 @@ public class SearchController {
         model.addAttribute("cocktailById", cocktailsById);
 
         // 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
+        // todo 리스트 상세페이지 구현되면 상세페이지 반환하도록 설정
         return "favorites";
     }
 
@@ -122,24 +123,19 @@ public class SearchController {
     @ResponseBody
     public ResponseEntity<Integer> addFavoritesByUser(@PathVariable String cocktailId){
 
-        final int NOT_LOGGED_IN = 0;
-        final int NO_DB_INFO = 1;
-        final int ADD_FAIL = 1;
-        final int ADD_SUCCESS =2;
-
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
         String session = "abc@abc.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
-            return ResponseEntity.ok(NOT_LOGGED_IN);
+            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
         }
 
         // 3. cocktail_likes에 user_id, cocktail_id 저장
@@ -152,20 +148,15 @@ public class SearchController {
 
 //        System.out.println("cocktailListInsertResult: "+ cocktailListInsertResult);
         if(cocktailListInsertResult==0){
-            return ResponseEntity.ok(ADD_FAIL);
+            return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
         }
 
-        return ResponseEntity.ok(ADD_SUCCESS);
+        return ResponseEntity.ok(OPERATION_SUCESS);         // DB추가 성공
     }
 
     @DeleteMapping("/favorites/cocktails/{cocktailId}")
     @ResponseBody
     public ResponseEntity<Integer> deleteFavoritesByUser(@PathVariable String cocktailId){
-
-        final int NOT_LOGGED_IN = 0;
-        final int NO_DB_INFO = 1;
-        final int DELETE_FAIL = 1;
-        final int DELETE_SUCCESS =2;
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
@@ -173,13 +164,13 @@ public class SearchController {
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
-            return ResponseEntity.ok(NOT_LOGGED_IN);
+            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
         }
 
         // 3. cocktail_likes에서 user_id, cocktail_id 삭제
@@ -188,14 +179,13 @@ public class SearchController {
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
-        //int cocktailListDeleteResult = cocktailListsService.insertCocktailList(cocktailListsTO);
         int cocktailListDeleteResult = cocktailListsService.deleteCocktailList(cocktailListsTO);
 
         System.out.println("cocktailListDeleteResult: "+ cocktailListDeleteResult);
         if(cocktailListDeleteResult==0){
-            return ResponseEntity.ok(DELETE_FAIL);
+            return ResponseEntity.ok(OPERATION_FAIL);       //DB삭제 실패
         }
 
-        return ResponseEntity.ok(DELETE_SUCCESS);
+        return ResponseEntity.ok(OPERATION_SUCESS);        //DB삭제 성공
     }
 }
