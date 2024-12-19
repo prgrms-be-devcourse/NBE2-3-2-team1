@@ -12,8 +12,8 @@ import org.programmers.cocktail.login.service.LoginService;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,22 +29,28 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+
     @PostMapping("/login/register")
-    public String register(
+    public int register(
         @RequestParam("email") String email,
         @RequestParam("name") String name,
         @RequestParam("password") String password)
     {
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        String encodedPassword = passwordEncoder.encode(password);
+
         // UserRegisterDto에 사용자입력값 세팅하기
         UserRegisterDto to = new UserRegisterDto();
         to.setEmail( email );
         to.setName( name );
-        to.setPassword( password );
+        to.setPassword( encodedPassword );
 
         //DB에 사용자 입력값 insert하기
-        loginService.insert( to );
+        int flag = loginService.insert( to );
 
-        return email + name + password + "Register Successful!";
+        return flag;
     }
 
     // 이메일, 비밀번호, 이름, 생년월일(아마) select하기 (mypage에 띄워놓기: 프론트)
@@ -126,23 +132,27 @@ public class LoginController {
         @RequestParam("password") String password,
         HttpSession session
     ) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         // 로그인창에서 입력받은 이메일과 패스워드
         String saveEmail = email;
         String savePassword = password;
 
         //DB에서 이메일, 패스워드 가져오기
-        Users users = loginService.selectByEmailandPassword( email, password );
+        Users users = loginService.findByEmail( email );
 
         int flag = 2;
 
-        if ( saveEmail.equals(users.getEmail()) && savePassword.equals(users.getPassword())) {
+        if ( saveEmail.equals(users.getEmail()) && encoder.matches(savePassword, users.getPassword())) {
             flag = 0;
 
             // session 부여
+            // 이후 세션에 저장된 semail 값은 사용자가 페이지를 이동하더라도 유지되며, 다른 요청에서 접근할 수 있음
             session.setAttribute("semail", email);
             //session.setAttribute("spassword", password);
 
-            System.out.println("session.getAttribure: " + session.getAttribute("semail"));
+            System.out.println("session.getAttribute: " + session.getAttribute("semail"));
 
 
         } else {
@@ -170,8 +180,6 @@ public class LoginController {
         to.setPassword( users.getPassword() );
         to.setName( users.getName() );
 
-        // System.out.println(to.getId());
-        // System.out.println(to.getEmail());
 
         return to;
     }
@@ -198,6 +206,22 @@ public class LoginController {
         session.invalidate();
 
         return "logout_ok";
+    }
+
+    @PostMapping("/login/modify")
+    public String userModify(HttpSession session) {
+
+        String email = (String) session.getAttribute("semail");
+
+        return email;
+    }
+
+    @PostMapping("/login/modify_ok")
+    public String modify_ok(@RequestParam("email") String email) {
+
+        //String email = (String) session.getAttribute("semail");
+
+        return email;
     }
 
 

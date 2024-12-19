@@ -10,7 +10,7 @@ public interface UsersRepositoryCustom extends JpaRepository<Users, Long> {
     @Query(value = "select u from users u where u.email = :email")
     Users findByEmail(String email);
 
-    @Query(value = "select u from users u where u.email = :email and u.password = :password")
-    Users findByEmailAndPassword(String email, String password);
+//    @Query(value = "select u from users u where u.email = :email and u.password = :password")
+//    Users findByEmailAndPassword(String email, String password);
 
 }
