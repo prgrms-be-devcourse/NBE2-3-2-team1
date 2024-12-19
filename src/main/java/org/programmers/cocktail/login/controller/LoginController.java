@@ -29,7 +29,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-
+    // 회원가입
     @PostMapping("/login/register")
     public int register(
         @RequestParam("email") String email,
@@ -38,7 +38,7 @@ public class LoginController {
     {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+        // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(password);
 
         // UserRegisterDto에 사용자입력값 세팅하기
@@ -72,7 +72,7 @@ public class LoginController {
         return to;
     }
 
-
+    // Mypage에서 내가 찜한 칵테일 보여주기
     @PostMapping("/login/mypageUsersFavoriteCocktail")
     public List<CocktailsDto> mypageUsersFavoriteCocktail(
         @RequestParam("email") String email
@@ -89,14 +89,13 @@ public class LoginController {
             CocktailsDto cocktailsTo = new CocktailsDto();
             cocktailsTo.setId(cocktail.getId());
             cocktailsTo.setName(cocktail.getName());
-            //System.out.println("cocktailsTo.setName(cocktail.getName()): " + cocktailsTo.getName()); // 잘 들어감
             cocktailsTo.setImage_url(cocktail.getImage_url());
             cocktailsDtos.add(cocktailsTo);
-            //System.out.println("cocktailsDtos: "+ cocktailsDtos); // 잘 들어감
         }
 
+        // 칵테일 정보 잘 가져오는지 확인
         for (CocktailsDto c : cocktailsDtos) {
-            System.out.println("CocktailsDto1: " + c);
+            System.out.println("CocktailsDto: " + c);
         }
 
         List<CocktailsDto> ct = new ArrayList<>();
@@ -115,12 +114,6 @@ public class LoginController {
 
         return ct;
     }
-
-//    @PostMapping("/login_form")
-//    public String login_form() {
-//        return "login_form";
-//    }
-
 
 
     // login_ok에서 0을 반환하면 마이페이지로 이동
@@ -150,10 +143,6 @@ public class LoginController {
             // session 부여
             // 이후 세션에 저장된 semail 값은 사용자가 페이지를 이동하더라도 유지되며, 다른 요청에서 접근할 수 있음
             session.setAttribute("semail", email);
-            //session.setAttribute("spassword", password);
-
-            System.out.println("session.getAttribute: " + session.getAttribute("semail"));
-
 
         } else {
             flag = 1;
@@ -171,8 +160,6 @@ public class LoginController {
         // DB에서 이메일, 패스워드 가져오기
         Users users = loginService.findByEmail( email );
 
-        // cocktail_lists, cocktails 조인해서 특정한 유저의 내가 찜한 칵테일 목록 가져오기(나중에)
-
         // dto에 users값 넣기
         UserRegisterDto to = new UserRegisterDto();
         to.setId( users.getId() );
@@ -184,7 +171,7 @@ public class LoginController {
         return to;
     }
 
-
+    // session 확인 후 session 존재하면(=로그인 되어 있으면) mypage로 이동(구현 예정)
     @PostMapping("/login_complete")
     public int login_complete(HttpSession session) {
         int flag = 2;
@@ -208,20 +195,41 @@ public class LoginController {
         return "logout_ok";
     }
 
+    // 회원 정보 수정 페이지 / 이름, 이메일, 생년월일(나중에), 전화번호(나중에) form에 넣어놓기
     @PostMapping("/login/modify")
-    public String userModify(HttpSession session) {
-
+    public UserRegisterDto userModify(HttpSession session) {
+        // 세션에서 "semail"이라는 키로 저장된 객체를 반환
+        // 출력: 유저 이메일
         String email = (String) session.getAttribute("semail");
+        Users users = loginService.findByEmail( email );
 
-        return email;
+        UserRegisterDto to = new UserRegisterDto();
+        to.setId( users.getId() );
+        to.setEmail( users.getEmail() );
+        to.setName( users.getName() );
+
+        return to;
     }
 
+    // 이메일은 변경 X
+    // 이메일로 유저의 Id를 가져와 비밀번호와 이름을 수정
     @PostMapping("/login/modify_ok")
-    public String modify_ok(@RequestParam("email") String email) {
+    public int modify_ok(
+        @RequestParam("email") String email,
+        @RequestParam("name") String name,
+        @RequestParam("password") String password
+    ) {
+        int flag = 0;
 
-        //String email = (String) session.getAttribute("semail");
+        Users users = loginService.findByEmail( email );
 
-        return email;
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(password);
+
+        flag = loginService.updateUser( name, encodedPassword, users.getId());
+
+
+        return flag;
     }
 
 

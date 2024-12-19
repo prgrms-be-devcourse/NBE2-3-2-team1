@@ -41,9 +41,21 @@ public class LoginService {
         return users;
     }
 
+    public int updateUser(String name, String password, Long id) {
+
+        int flag = usersRepositoryCustom.updateById(name, password, id);
+
+        if ( flag == 0 ) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+
     public int deleteUser(Long id) {
 
-        System.out.println("deleteUser(Long id): " + id + ")"); // 잘 출력된
+        System.out.println("deleteUser(Long id): " + id + ")");
 
         usersRepository.deleteById(id);
 
@@ -53,4 +65,5 @@ public class LoginService {
             return 1;
         }
     }
+
 }
