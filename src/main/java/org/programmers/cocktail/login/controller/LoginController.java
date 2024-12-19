@@ -111,14 +111,16 @@ public class LoginController {
         return ct;
     }
 
-    @PostMapping("/login_form")
-    public String login_form() {
-        return "login_form";
-    }
+//    @PostMapping("/login_form")
+//    public String login_form() {
+//        return "login_form";
+//    }
 
 
 
     // login_ok에서 0을 반환하면 마이페이지로 이동
+    // 클라이언트에서 POST /login_ok로 전송된 요청에 포함된
+    // 데이터를 @RequestParam으로 받아옴
     @PostMapping("/login_ok")
     public int login_ok(
         @RequestParam("email") String email,
