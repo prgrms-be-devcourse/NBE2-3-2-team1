@@ -42,35 +42,6 @@ public class SearchController {
     static final int OPERATION_FAIL = 1;
     static final int OPERATION_SUCESS = 2;      // FAVORITED, ADD, DELETE
 
-    @GetMapping("/favorites/cocktails/{cocktailId}")
-    @ResponseBody
-    public ResponseEntity<Integer> isFavoritedByUser(@PathVariable String cocktailId){
-
-        // 1. 로그인 상태 확인
-        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
-        String session = "abc@abc.com";
-        if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
-            return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
-        }
-
-        // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(session);
-        if(userInfo==null){
-            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
-        }
-
-        //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
-        Boolean isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
-
-        if(!isCocktailListsPresent){
-            return ResponseEntity.ok(OPERATION_FAIL);     // 즐겨찾기 조회 실패
-        }
-
-        return ResponseEntity.ok(OPERATION_SUCESS);    // 즐겨찾기 조회 성공
-    }
-
     @GetMapping("/search/cocktails")
     @ResponseBody
     public ResponseEntity<List<CocktailsTO>> getCocktailSearchResults(@RequestParam String userInput) {
@@ -94,7 +65,12 @@ public class SearchController {
 
         for(CocktailsTO cocktail : cocktailSearchList){
             System.out.println("new cocktail adding to Local DB");
-            cocktailsService.insertNewCocktailDB(cocktail);
+            int cocktailInsertResult = cocktailsService.insertNewCocktailDB(cocktail);
+
+            if(cocktailInsertResult==0){
+                // todo 데이터 삽입 실패시 프론트에 alert 띄울지 고민
+                System.out.println("[에러] New Cocktail Data Insertion Failed");
+            }
         }
 
         // 2-2) DB에 저장된 데이터를 가져와서 반환
@@ -114,9 +90,51 @@ public class SearchController {
         Cocktails cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
         model.addAttribute("cocktailById", cocktailsById);
 
-        // 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
+        // 특정 칵테일 상세페이지 조회시 해당 칵테일 hit 증가
+        CocktailsTO cocktailsTO = new CocktailsTO();
+        cocktailsTO.setId(Long.parseLong((cocktailId)));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailHitsUpdateResult = cocktailsService.updateCocktailHits(cocktailsTO);
+
+        if(cocktailHitsUpdateResult==0)
+        {
+            System.out.println("[에러] Cocktail Hits Update Failed");
+        }
+
+        // todo 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
         // todo 리스트 상세페이지 구현되면 상세페이지 반환하도록 설정
         return "favorites";
+    }
+
+    @GetMapping("/favorites/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> isFavoritedByUser(@PathVariable String cocktailId){
+
+        // 1. 로그인 상태 확인
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+        }
+
+        //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
+        // SUCCESS: 1, FAIL: 0
+        int isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+
+        if(isCocktailListsPresent==0){
+            return ResponseEntity.ok(OPERATION_FAIL);     // 즐겨찾기 조회 실패
+        }
+
+        return ResponseEntity.ok(OPERATION_SUCESS);    // 즐겨찾기 조회 성공
     }
 
     @PostMapping("/favorites/cocktails/{cocktailId}")
@@ -188,4 +206,33 @@ public class SearchController {
 
         return ResponseEntity.ok(OPERATION_SUCESS);        //DB삭제 성공
     }
+
+    @GetMapping("/likes/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> isLikedByUser(@PathVariable String cocktailId) {
+
+        System.out.println("Enter isLikedByUser");
+        System.out.println("cocktailId : "+ cocktailId);
+
+        return ResponseEntity.ok(2);
+    }
+
+    @PostMapping("/likes/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> addLikesByUser(@PathVariable String cocktailId) {
+        System.out.println("Enter addLikesByUser");
+        System.out.println("cocktailId : "+ cocktailId);
+
+        return ResponseEntity.ok(2);
+    }
+
+    @DeleteMapping("/likes/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> deleteLikesByUser(@PathVariable String cocktailId) {
+        System.out.println("Enter deleteLikesByUser");
+        System.out.println("cocktailId : "+ cocktailId);
+
+        return ResponseEntity.ok(2);
+    }
+
 }

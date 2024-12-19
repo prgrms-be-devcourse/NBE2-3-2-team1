@@ -11,19 +11,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class CocktailListsService {
 
+    static final int SUCCESS = 1;
+    static final int FAIL = 0;
+
     @Autowired
     private CocktailListsRepositoryCustom cocktailListsRepositoryCustom;
 
     @Autowired
     private CocktailListsRepositoryImpl cocktailListsRepositoryImpl;
 
-    public Boolean findByUserIdAndCocktailId(Long userId, Long cocktailId){
-        final Boolean SUCCESS = true;
-        final Boolean FAIL = false;
+    public int findByUserIdAndCocktailId(Long userId, Long cocktailId){
 
         Optional<CocktailLists> cocktailListsOptional = cocktailListsRepositoryCustom.findByUserIdAndCocktailId(userId, cocktailId);
 
-//        System.out.println("test:" + cocktailListsRepositoryImpl.convertToCocktailsListsTO(cocktailListsOptional.get()));
         if(!cocktailListsOptional.isPresent()){
             return FAIL;
         }
@@ -31,9 +31,6 @@ public class CocktailListsService {
     }
 
     public int insertCocktailList(CocktailListsTO cocktailListsTO){
-
-        final int SUCCESS = 1;
-        final int FAIL = 0;
 
         // TO->Entity 변환
         CocktailLists cocktailLists = cocktailListsRepositoryImpl.convertToCocktailLists(cocktailListsTO);
@@ -49,9 +46,6 @@ public class CocktailListsService {
     }
 
     public int deleteCocktailList(CocktailListsTO cocktailListsTO){
-
-        final int SUCCESS = 1;
-        final int FAIL = 0;
 
         System.out.println(cocktailListsTO.getUserId() + " "+ cocktailListsTO.getCocktailId());
         int cocktailListDeleteResult = cocktailListsRepositoryCustom.deleteByUserIdAndCocktailId(cocktailListsTO.getUserId(), cocktailListsTO.getCocktailId());

@@ -2,6 +2,7 @@ package org.programmers.cocktail.search.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CocktailsService {
+
+    static final int SUCCESS = 1;
+    static final int FAIL = 0;
 
     @Autowired
     private CocktailsRepository cocktailsRepository;
@@ -29,15 +33,15 @@ public class CocktailsService {
         return Collections.emptyList();
     }
 
-    public Boolean insertNewCocktailDB(CocktailsTO cocktailsTO) {
+    public int insertNewCocktailDB(CocktailsTO cocktailsTO) {
         try {
             //TO->Entity 변환
             Cocktails cocktails = cocktailsRepositoryImpl.convertToCocktails(cocktailsTO);
             cocktailsRepository.save(cocktails);
-            return true;    //저장성공
+            return SUCCESS;    //저장성공
         } catch (Exception e) {
             System.out.println("[저장실패] : "+e.getMessage());
-            return false;       //저장실패
+            return FAIL;       //저장실패
         }
     }
 
@@ -45,4 +49,21 @@ public class CocktailsService {
         Cocktails cocktails = cocktailsRepository.findById(cocktailId).orElse(null);
         return cocktails;
     }
+
+    public int updateCocktailHits(CocktailsTO cocktailsTO) {
+
+        Optional<Cocktails> cocktailsOptional = cocktailsRepository.findById(cocktailsTO.getId());
+
+        if(!cocktailsOptional.isPresent()){
+            return FAIL;        // 칵테일 불러오기 실패
+        }
+
+        Cocktails cocktails = cocktailsOptional.get();
+        cocktails.setHits(cocktails.getHits()+1);
+
+        cocktailsRepository.flush();
+
+        return SUCCESS;
+    }
+
 }
