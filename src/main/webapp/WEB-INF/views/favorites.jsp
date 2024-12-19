@@ -55,51 +55,60 @@
           }
         };
         xhr.send();
+
         //하트 클릭 시 POST 또는 DELETE 요청
-        // heartIcon.addEventListener("click", () => {
-        //   const xhr = new XMLHttpRequest();
-        //   if (heartIcon.classList.contains("liked")) {
-        //     // DELETE 요청 (하트를 취소하는 경우)
-        //     xhr.open("DELETE", `/api/cocktails/remove`, true);
-        //     xhr.setRequestHeader("Content-Type", "application/json");
-        //     xhr.onreadystatechange = function() {
-        //       if (xhr.readyState === XMLHttpRequest.DONE) {
-        //         if (xhr.status === 200) {
-        //           const response = JSON.parse(xhr.responseText);
-        //           if (response.success) {
-        //             heartIcon.classList.remove("liked"); // 하트 비활성화
-        //           }
-        //         } else {
-        //           console.error("Error removing heart");
-        //         }
-        //       }
-        //     };
-        //     xhr.send(JSON.stringify({ userId, cocktailId }));
-        //   } else {
-        //     // POST 요청 (하트를 누른 경우)
-        //     xhr.open("POST", `/api/cocktails/add`, true);
-        //     xhr.setRequestHeader("Content-Type", "application/json");
-        //     xhr.onreadystatechange = function() {
-        //       if (xhr.readyState === XMLHttpRequest.DONE) {
-        //         if (xhr.status === 200) {
-        //           const response = JSON.parse(xhr.responseText);
-        //           if (response.success) {
-        //             heartIcon.classList.add("liked"); // 하트 활성화
-        //           }
-        //         } else {
-        //           console.error("Error adding heart");
-        //         }
-        //       }
-        //     };
-        //     xhr.send(JSON.stringify({ userId, cocktailId }));
-        //   }
-        // });
+        heartIcon.addEventListener("click", () => {
+          const xhr = new XMLHttpRequest();
+          if (heartIcon.classList.contains("liked")) {
+            // DELETE 요청 (하트를 취소하는 경우)
+            xhr.open("DELETE", "/api/favorites/cocktails/"+<%=cocktailId%>, true);
+            // xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                  const response = parseInt(xhr.responseText);
+                  if (response === 2) {
+                    console.log('delete favorites');
+                    heartIcon.innerHTML="&#9825";
+                    heartIcon.classList.remove("liked"); // 하트 비활성화
+                  }else{
+                    console.log(response);
+                  }
+                } else {
+                  console.error("Error removing heart");
+                }
+              }
+            };
+            xhr.send();
+          } else {
+            // POST 요청 (하트를 누른 경우)
+            xhr.open("POST", "/api/favorites/cocktails/"+<%=cocktailId%>, true);
+            // xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                  const response = parseInt(xhr.responseText);
+                  if (response === 2) {
+                    console.log('add favorites');
+                    heartIcon.innerHTML="&#9829";
+                    heartIcon.classList.add("liked"); // 하트 활성화
+                  }else{
+                    console.log(response);
+                  }
+                } else {
+                  console.error("Error adding heart");
+                }
+              }
+            };
+            xhr.send();
+          }
+        });
       };
     </script>
 </head>
 <body>
 <div>
-    <span id="heartIcon" class="heart liked">&#9829;</span>
+    <span id="heartIcon" class="heart">&#9825;</span>
 </div>
 
 </body>

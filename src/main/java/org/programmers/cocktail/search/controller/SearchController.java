@@ -2,7 +2,7 @@ package org.programmers.cocktail.search.controller;
 
 import java.util.List;
 import org.programmers.cocktail.entity.Cocktails;
-import org.programmers.cocktail.repository.users.UsersRepository;
+import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,8 +47,11 @@ public class SearchController {
         final int FAVORITED = 2;
 
         // 1. 로그인 상태 확인
-        String session = "abc@abc.com";         // session.getAttribute("email") HttpSession session 으로 대체 필요
-        if(session == null || !session.equals("abc@abc.com")){
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);
         }
 
@@ -111,5 +116,86 @@ public class SearchController {
 
         // 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
         return "favorites";
+    }
+
+    @PostMapping("/favorites/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> addFavoritesByUser(@PathVariable String cocktailId){
+
+        final int NOT_LOGGED_IN = 0;
+        final int NO_DB_INFO = 1;
+        final int ADD_FAIL = 1;
+        final int ADD_SUCCESS =2;
+
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        //1. 로그인 상태 확인
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
+        }
+
+        // 3. cocktail_likes에 user_id, cocktail_id 저장
+        CocktailListsTO cocktailListsTO = new CocktailListsTO();
+        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailListInsertResult = cocktailListsService.insertCocktailList(cocktailListsTO);
+
+//        System.out.println("cocktailListInsertResult: "+ cocktailListInsertResult);
+        if(cocktailListInsertResult==0){
+            return ResponseEntity.ok(ADD_FAIL);
+        }
+
+        return ResponseEntity.ok(ADD_SUCCESS);
+    }
+
+    @DeleteMapping("/favorites/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> deleteFavoritesByUser(@PathVariable String cocktailId){
+
+        final int NOT_LOGGED_IN = 0;
+        final int NO_DB_INFO = 1;
+        final int DELETE_FAIL = 1;
+        final int DELETE_SUCCESS =2;
+
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        //1. 로그인 상태 확인
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(NO_DB_INFO);   // 유저 정보 가져올 수 없음
+        }
+
+        // 3. cocktail_likes에서 user_id, cocktail_id 삭제
+        CocktailListsTO cocktailListsTO = new CocktailListsTO();
+        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        //int cocktailListDeleteResult = cocktailListsService.insertCocktailList(cocktailListsTO);
+        int cocktailListDeleteResult = cocktailListsService.deleteCocktailList(cocktailListsTO);
+
+        System.out.println("cocktailListDeleteResult: "+ cocktailListDeleteResult);
+        if(cocktailListDeleteResult==0){
+            return ResponseEntity.ok(DELETE_FAIL);
+        }
+
+        return ResponseEntity.ok(DELETE_SUCCESS);
     }
 }

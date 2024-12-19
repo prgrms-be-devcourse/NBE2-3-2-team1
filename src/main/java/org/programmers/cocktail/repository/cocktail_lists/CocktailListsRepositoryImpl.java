@@ -17,17 +17,31 @@ public class CocktailListsRepositoryImpl {
     public CocktailListsRepositoryImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
 
+        // CocktailLists -> CocktailListsTO 변환 매핑
         modelMapper.addMappings(new PropertyMap<CocktailLists, CocktailListsTO>() {
             @Override
             protected void configure() {
-                map(source.getUsers().getId(), destination.getUserId());
-                map(source.getCocktails().getId(), destination.getCocktailId());
+                map().setUserId(source.getUsers().getId());
+                map().setCocktailId(source.getCocktails().getId());
+            }
+        });
+
+        // CocktailListsTO -> CocktailLists 변환 매핑
+        modelMapper.addMappings(new PropertyMap<CocktailListsTO, CocktailLists>() {
+            @Override
+            protected void configure() {
+                map().getUsers().setId(source.getUserId());
+                map().getCocktails().setId(source.getCocktailId());
             }
         });
     }
 
     public CocktailListsTO convertToCocktailsListsTO(CocktailLists cocktailLists) {
         return modelMapper.map(cocktailLists, CocktailListsTO.class);
+    }
+
+    public CocktailLists convertToCocktailLists(CocktailListsTO cocktailListsTO){
+        return modelMapper.map(cocktailListsTO, CocktailLists.class);
     }
 
 }
