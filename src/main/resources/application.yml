@@ -9,6 +9,10 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
 
   jpa:
     hibernate:
@@ -22,6 +26,7 @@ spring:
     multipart:
       enabled: true
       max-file-size: 2MB
+
       max-request-size: 10MB
     web:
       resources:

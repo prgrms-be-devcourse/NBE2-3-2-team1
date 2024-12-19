@@ -67,7 +67,6 @@ public class LoginController {
     }
 
 
-
     @PostMapping("/login/mypageUsersFavoriteCocktail")
     public List<CocktailsDto> mypageUsersFavoriteCocktail(
         @RequestParam("email") String email
@@ -153,6 +152,29 @@ public class LoginController {
         return flag;
     }
 
+    // 이메일, 비밀번호, 이름, 생년월일(아마) select하기 (mypage에 띄워놓기: 프론트)
+    @PostMapping("/login/mypage")
+    public UserRegisterDto mypage(
+        @RequestParam("email") String email
+    ) {
+
+        // DB에서 이메일, 패스워드 가져오기
+        Users users = loginService.findByEmail( email );
+
+        // cocktail_lists, cocktails 조인해서 특정한 유저의 내가 찜한 칵테일 목록 가져오기(나중에)
+
+        // dto에 users값 넣기
+        UserRegisterDto to = new UserRegisterDto();
+        to.setId( users.getId() );
+        to.setEmail( users.getEmail() );
+        to.setPassword( users.getPassword() );
+        to.setName( users.getName() );
+
+        // System.out.println(to.getId());
+        // System.out.println(to.getEmail());
+
+        return to;
+    }
 
 
     @PostMapping("/login_complete")
