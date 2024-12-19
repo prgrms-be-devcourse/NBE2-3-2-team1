@@ -76,7 +76,7 @@
                 if (xhr.status === 200) {
                   const response = parseInt(xhr.responseText);
                   if (response === 2) {
-                    console.log(icon.id);
+                    console.log(icon.id, ' : ', response);
                     icon.innerHTML=inactiveSymbol;
                     icon.classList.remove(additionalClass); // 하트 비활성화
                   }else{
@@ -96,7 +96,7 @@
                 if (xhr.status === 200) {
                   const response = parseInt(xhr.responseText);
                   if (response === 2) {
-                    console.log(icon.id);
+                    console.log(icon.id, ' : ', response);
                     icon.innerHTML=activeSymbol;
                     icon.classList.add(additionalClass); // 하트 활성화
                   }else{

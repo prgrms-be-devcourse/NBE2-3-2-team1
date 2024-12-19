@@ -2,6 +2,7 @@ package org.programmers.cocktail.search.controller;
 
 import java.util.List;
 import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.UsersTO;
@@ -162,7 +163,7 @@ public class SearchController {
             return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
         }
 
-        // 3. cocktail_likes에 user_id, cocktail_id 저장
+        // 3. cocktail_lists에 user_id, cocktail_id 저장
         CocktailListsTO cocktailListsTO = new CocktailListsTO();
         cocktailListsTO.setUserId(userInfo.getId());
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
@@ -249,7 +250,35 @@ public class SearchController {
         System.out.println("Enter addLikesByUser");
         System.out.println("cocktailId : "+ cocktailId);
 
-        return ResponseEntity.ok(2);
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        //1. 로그인 상태 확인
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+        }
+
+        // 3. cocktail_likes에 user_id, cocktail_id 저장
+        CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
+        cocktailLikesTO.setUserId(userInfo.getId());
+        cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailLikesInsertResult = cocktailLikesService.insertCocktailLikes(cocktailLikesTO);
+
+        System.out.println("cocktailLikesInsertResult: "+ cocktailLikesInsertResult);
+        if(cocktailLikesInsertResult==0){
+            return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
+        }
+
+        return ResponseEntity.ok(OPERATION_SUCCESS);        // DB추가 성공
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
