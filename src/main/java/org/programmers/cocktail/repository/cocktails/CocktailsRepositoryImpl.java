@@ -44,4 +44,8 @@ public class CocktailsRepositoryImpl implements CocktailsRepositoryCustom {
     public Cocktails convertToCocktails(CocktailsTO cocktailsTO) {
         return modelMapper.map(cocktailsTO, Cocktails.class);
     }
+
+    public CocktailsTO convertToCocktailsTO(Cocktails cocktails) {
+        return modelMapper.map(cocktails, CocktailsTO.class);
+    }
 }

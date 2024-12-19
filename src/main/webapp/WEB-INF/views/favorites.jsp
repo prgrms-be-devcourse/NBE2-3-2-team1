@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="org.programmers.cocktail.entity.Cocktails" %>
+<%@ page import="org.programmers.cocktail.search.dto.CocktailsTO" %>
+
 <%
-    Cocktails cocktailById = (Cocktails)request.getAttribute("cocktailById");
+    CocktailsTO cocktailById = (CocktailsTO)request.getAttribute("cocktailById");
     Long cocktailId = cocktailById.getId();
     String cocktailName = cocktailById.getName();
     String ingredients = cocktailById.getIngredients();
@@ -13,6 +14,13 @@
     Long likes = cocktailById.getLikes();
     System.out.println("cocktailId: " + cocktailId);
     System.out.println("cocktailName: " + cocktailName);
+    System.out.println("cocktailingredients: " + ingredients);
+    System.out.println("cocktailrecipes: " +recipes);
+    System.out.println("cocktailcategory: " + category);
+    System.out.println("cocktailalcoholic: " + alcoholic);
+    System.out.println("cocktailImage_url: " + Image_url);
+    System.out.println("cocktaillikes: " + likes);
+
 %>
 
 <!DOCTYPE html>

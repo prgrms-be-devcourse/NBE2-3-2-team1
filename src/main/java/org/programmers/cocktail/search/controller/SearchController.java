@@ -94,7 +94,9 @@ public class SearchController {
 
     @RequestMapping("/search/cocktails/{cocktailId}")
     public String getCocktailInfoById(@PathVariable String cocktailId, Model model) {
-        Cocktails cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
+        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
+
+        System.out.println(cocktailsById);
         model.addAttribute("cocktailById", cocktailsById);
 
         // 특정 칵테일 상세페이지 조회시 해당 칵테일 hit 증가

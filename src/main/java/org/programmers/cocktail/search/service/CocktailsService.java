@@ -45,9 +45,11 @@ public class CocktailsService {
         }
     }
 
-    public Cocktails findById(Long cocktailId){
+    public CocktailsTO findById(Long cocktailId){
         Cocktails cocktails = cocktailsRepository.findById(cocktailId).orElse(null);
-        return cocktails;
+        CocktailsTO cocktailsTO = cocktailsRepositoryImpl.convertToCocktailsTO(cocktails);
+
+        return cocktailsTO;
     }
 
     public int updateCocktailHits(CocktailsTO cocktailsTO) {
