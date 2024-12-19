@@ -2,9 +2,12 @@ package org.programmers.cocktail.admin.controller;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import org.programmers.cocktail.admin.dto.DashboardCocktailResponse;
 import org.programmers.cocktail.admin.service.DashboardService;
+import org.programmers.cocktail.admin.service.HitsLogService;
 import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.entity.TotalHitsLog;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,26 +19,34 @@ public class DashboardWebController {
 
     private final DashboardService dashboardService;
 
-    public DashboardWebController(final DashboardService dashboardService) {
+    private final HitsLogService hitsLogService;
+
+    public DashboardWebController(final DashboardService dashboardService,
+        HitsLogService hitsLogService) {
         this.dashboardService = dashboardService;
+        this.hitsLogService = hitsLogService;
     }
 
     @GetMapping("/dashboard")
     public ModelAndView dashboard(ModelAndView mv) {
-        List<Cocktails> list = dashboardService.getCocktailsByLikesDesc();
-        List<DashboardCocktailResponse> responses = list.stream()
-            .map(cocktail -> DashboardCocktailResponse.builder()
-                .name(cocktail.getName())
-                .imageUrl(cocktail.getImage_url())
-                .hits(cocktail.getHits())
-                .likes(cocktail.getLikes())
-                .build())
-            .toList();
+        List<DashboardCocktailResponse> list = dashboardService.getCocktailsTopThreeByLikesDesc();
 
-        mv.addObject("list", responses);
+        mv.addObject("list", list);
 
-        int userCount = dashboardService.getUserCount();
+        int userCount = dashboardService.countByRoleUser();
         mv.addObject("userCount", userCount);
+
+        long commentCount = dashboardService.countComments();
+        mv.addObject("commentCount", commentCount);
+
+        long totalHits = dashboardService.getTotalHits();
+        mv.addObject("totalHits", totalHits);
+
+        long yesterdayHits = hitsLogService.getYesterdayLog()
+            .map(TotalHitsLog::getTotalHits)
+            .orElse(0L);
+
+        mv.addObject("yesterdayHits", yesterdayHits);
 
         mv.setViewName("dashboard");
         return mv;
