@@ -6,6 +6,7 @@ import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
+import org.programmers.cocktail.search.service.CocktailLikesService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
 import org.programmers.cocktail.search.service.UsersService;
@@ -38,9 +39,14 @@ public class SearchController {
     @Autowired
     CocktailListsService cocktailListsService;
 
+    @Autowired
+    CocktailLikesService cocktailLikesService;
+
     static final int NOT_LOGGED_IN = 0;
     static final int OPERATION_FAIL = 1;
-    static final int OPERATION_SUCESS = 2;      // FAVORITED, ADD, DELETE
+    static final int OPERATION_SUCCESS = 2;      // FAVORITED, ADD, DELETE
+
+    // todo 로그인 및 userid 가져오는 부분 메서드화
 
     @GetMapping("/search/cocktails")
     @ResponseBody
@@ -134,7 +140,7 @@ public class SearchController {
             return ResponseEntity.ok(OPERATION_FAIL);     // 즐겨찾기 조회 실패
         }
 
-        return ResponseEntity.ok(OPERATION_SUCESS);    // 즐겨찾기 조회 성공
+        return ResponseEntity.ok(OPERATION_SUCCESS);    // 즐겨찾기 조회 성공
     }
 
     @PostMapping("/favorites/cocktails/{cocktailId}")
@@ -169,7 +175,7 @@ public class SearchController {
             return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
         }
 
-        return ResponseEntity.ok(OPERATION_SUCESS);         // DB추가 성공
+        return ResponseEntity.ok(OPERATION_SUCCESS);         // DB추가 성공
     }
 
     @DeleteMapping("/favorites/cocktails/{cocktailId}")
@@ -204,17 +210,37 @@ public class SearchController {
             return ResponseEntity.ok(OPERATION_FAIL);       //DB삭제 실패
         }
 
-        return ResponseEntity.ok(OPERATION_SUCESS);        //DB삭제 성공
+        return ResponseEntity.ok(OPERATION_SUCCESS);        //DB삭제 성공
     }
 
     @GetMapping("/likes/cocktails/{cocktailId}")
     @ResponseBody
     public ResponseEntity<Integer> isLikedByUser(@PathVariable String cocktailId) {
 
-        System.out.println("Enter isLikedByUser");
-        System.out.println("cocktailId : "+ cocktailId);
+        // 1. 로그인 상태 확인
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
+        }
 
-        return ResponseEntity.ok(2);
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+        }
+
+        //3. userid, cocktailid가 cocktail_likes에 존재하는지 확인
+        // SUCCESS: 1, FAIL: 0
+        int isCocktailLikesPresent = cocktailLikesService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+
+        if(isCocktailLikesPresent==0){
+            return ResponseEntity.ok(OPERATION_FAIL);     // 좋아요 조회 실패
+        }
+
+        return ResponseEntity.ok(OPERATION_SUCCESS);        // 좋아요 조회 성공
     }
 
     @PostMapping("/likes/cocktails/{cocktailId}")

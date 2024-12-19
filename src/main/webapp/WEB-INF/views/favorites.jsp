@@ -49,9 +49,11 @@
             if (xhr.status === 200) {
               const response = parseInt(xhr.responseText);
               if (response === 2) {
+                console.log(icon.id, ' : ', response);
                 icon.classList.add(additionalClass);
                 icon.innerHTML = activeSymbol;
               } else {
+                console.log(icon.id, ' : ', response);
                 icon.classList.remove(additionalClass);
                 icon.innerHTML = inactiveSymbol;
               }
