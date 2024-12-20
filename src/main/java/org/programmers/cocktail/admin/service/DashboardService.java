@@ -1,5 +1,6 @@
 package org.programmers.cocktail.admin.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,14 @@ public class DashboardService {
 
     public Long getTotalHits() {
         return cocktailsRepository.getTotalHits();
+    }
+
+    public Long countTotalUserUntilYesterday() {
+        return authoritiesRepository.countTotalUserUntilYesterday("USER_ROLE", LocalDateTime.now());
+    }
+
+    public Long countTotalCommentsUntilYesterday() {
+        return commentsRepository.countTotalCommentsUntilYesterday(LocalDateTime.now());
     }
 
 }

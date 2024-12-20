@@ -46,6 +46,9 @@ dependencies {
     // Spring Security core
     implementation 'org.springframework.security:spring-security-core' // 사용 중인 Spring Boot 버전에 맞게 설정
 
+    // format JSON
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+
 }
 
 tasks.named('test') {
