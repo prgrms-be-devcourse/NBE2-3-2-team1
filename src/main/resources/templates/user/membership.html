@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      background-color: transparent;
+      color: #000000;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      margin: 40px 39%;
+    }
+
+    .sub-text {
+      background-color: transparent;
+      color: #000000;
+      text-align: left;
+      padding: 20px 0;
+      font-size: 15px;
+    }
+
+    .sub-container {
+      text-align: right;
+      margin-top: auto;
+    }
+
+    input[type="text"], input[type="password"] {
+      display: flex;
+      width: 250px;
+      height: 32px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 15px;
+      outline: none;
+      padding-left: 10px;
+      background-color: #dddddd;
+    }
+
+    .btn {
+      width: 140px;
+      height: 32px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 15px;
+      outline: none;
+      padding-left: 10px;
+      background-color: rgb(252, 214, 44);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <a href="user.html">
+      <img src="line.png">
+    </a>
+  </div>
+</div>
+
+<div class="header">회원가입</div>
+
+<!-- 폼 작성 -->
+<form id="signup-form" action=# method="POST" class="container">
+  <div class="sub-text">
+    이름<br>
+    <input type="text" name="name" placeholder="name" required><br><br>
+
+    이메일<br>
+    <input type="text" name="email" placeholder="email" required><br><br>
+
+    비밀번호<br>
+    <input type="password" name="password" placeholder="password" required><br>
+  </div>
+
+  <div class="sub-container">
+    <button type="submit" class="btn">회원가입</button><br><br><br>
+  </div>
+</form>
+
+<script>
+  // 폼 제출 시 처리하는 함수
+  document.getElementById("signup-form").onsubmit = function(event) {
+    event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+    // 서버에 데이터가 성공적으로 제출되었다고 가정하고 리다이렉트
+    setTimeout(function() {
+      window.location.href = "login.html";  // 3초 후에 로그인 페이지로 리다이렉트
+    }, 3000);  // 3초 후에 로그인 페이지로 이동
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>만개의 칵테일</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      background-color: transparent;
+      color: #000000;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      flex-direction: column; /* 세로로 요소들이 쌓이게 설정 */
+      align-items: center; /* 가로로 중앙 정렬 */
+      margin: 40px 20px;
+      background-color: #fcd62c;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .left-section {
+      flex: 1;
+      text-align: center;
+      padding-right: 20px;
+    }
+
+    .right-section {
+      flex: 2;
+      padding-left: 20px;
+    }
+
+    .cocktail-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cocktail-name {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .cocktail-ingredients, .cocktail-method, .cocktail-abv {
+      margin-bottom: 15px;
+    }
+
+    .cocktail-description {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 네비게이션 바 -->
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <a href="user.html">
+      <img src="line.png">
+    </a>
+  </div>
+</div>
+
+<!-- 오늘의 칵테일 섹션 -->
+<div class="container">
+  <div class="header">오늘의 칵테일</div>
+  <div class="content">
+    <!-- 왼쪽 칵테일 이미지 -->
+    <div class="left-section">
+      <img src="https://via.placeholder.com/400x300" alt="칵테일 이미지" class="cocktail-image" id="cocktailImage">
+    </div>
+
+    <!-- 오른쪽 칵테일 상세 정보 -->
+    <div class="right-section">
+      <div class="cocktail-name" id="cocktailName">칵테일 이름</div>
+
+      <div class="cocktail-ingredients">
+        <strong>재료:</strong>
+        <p id="cocktailIngredients">칵테일 재료</p>
+      </div>
+
+      <div class="cocktail-method">
+        <strong>제조법:</strong>
+        <p id="cocktailMethod">칵테일 제조법</p>
+      </div>
+
+      <div class="cocktail-abv">
+        <strong>도수:</strong>
+        <p id="cocktailABV">칵테일 도수</p>
+      </div>
+
+      <div class="cocktail-description">
+        <strong>설명:</strong>
+        <p id="cocktailDescription">칵테일 설명</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // API에서 칵테일 정보 가져오는 함수 (예시로 임의의 데이터 사용)
+  function fetchCocktailDetails() {
+    const cocktailData = {
+      name: "마티니",
+      ingredients: "진, 드라이 베르무트, 올리브 또는 레몬 껍질",
+      method: "진과 드라이 베르무트를 얼음과 함께 흔든 뒤 차가운 글라스에 따르고 올리브나 레몬 껍질을 장식합니다.",
+      abv: "약 30%",
+      description: "마티니는 진과 드라이 베르무트를 베이스로 한 클래식한 칵테일로, 고급스러움과 간결함을 동시에 갖춘 음료입니다. 전통적인 칵테일의 대표격이라 할 수 있습니다.",
+      image: "https://via.placeholder.com/400x300"
+    };
+
+    // API 응답 데이터로 칵테일 정보 업데이트
+    document.getElementById('cocktailName').textContent = cocktailData.name;
+    document.getElementById('cocktailIngredients').textContent = cocktailData.ingredients;
+    document.getElementById('cocktailMethod').textContent = cocktailData.method;
+    document.getElementById('cocktailABV').textContent = cocktailData.abv;
+    document.getElementById('cocktailDescription').textContent = cocktailData.description;
+    document.getElementById('cocktailImage').src = cocktailData.image;
+  }
+
+  // 페이지 로드 시 칵테일 정보 불러오기
+  fetchCocktailDetails();
+</script>
+
+</body>
+</html>
