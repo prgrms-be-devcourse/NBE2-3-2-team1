@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>칵테일 상세 페이지</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fcd62c;
+      padding: 50px 0;
+    }
+
+    .search-input {
+      width: 30%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 15px;
+      border: 1px solid transparent;
+      background-color: rgba(62, 62, 62, 0.58);
+    }
+
+    .search-button {
+      padding: 10px 20px;
+      background-color: #ffffff;
+      color: #000000;
+      font-size: 16px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    .content-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-section {
+      flex: 1;
+      padding-right: 20px;
+      text-align: center;
+    }
+
+    .right-section {
+      flex: 2;
+      padding-left: 20px;
+    }
+
+    .cocktail-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cocktail-name {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .cocktail-ingredients, .cocktail-method, .cocktail-abv {
+      margin-bottom: 15px;
+    }
+
+    .cocktail-description {
+      margin-bottom: 15px;
+    }
+
+    .like-container {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .like-button {
+      padding: 10px 20px;
+      background-color: #fcd62c;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .favorite-button {
+      padding: 10px 20px;
+      background-color: #FFD700;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .favorite-button:disabled {
+      background-color: #ccc;
+    }
+
+    .comment-section {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .comment-input {
+      width: calc(100% - 120px);
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      margin-right: 10px;
+    }
+
+    .comment-button {
+      padding: 10px 20px;
+      background-color: #fcd62c;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .comment-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <a href="user.html">
+      <img src="line.png">
+    </a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="search-container">
+    <input type="text" class="search-input">
+    <button class="search-button">Search</button>
+  </div>
+</div>
+
+<div class="content-container">
+  <div class="content">
+    <div class="left-section">
+      <img src="https://via.placeholder.com/400x300" alt="칵테일 이미지" class="cocktail-image" id="cocktailImage">
+    </div>
+
+    <div class="right-section">
+      <div class="cocktail-name" id="cocktailName">마티니</div>
+
+      <div class="cocktail-ingredients">
+        <strong>재료:</strong>
+        <p id="cocktailIngredients">진, 드라이 베르무트, 올리브 또는 레몬 껍질</p>
+      </div>
+
+      <div class="cocktail-method">
+        <strong>제조법:</strong>
+        <p id="cocktailMethod">진과 드라이 베르무트를 얼음과 함께 흔든 뒤 차가운 글라스에 따르고 올리브나 레몬 껍질을 장식합니다.</p>
+      </div>
+
+      <div class="cocktail-category">
+        <strong>카테고리:</strong>
+        <p id="cocktailCategory">클래식 칵테일</p>
+      </div>
+
+      <div class="cocktail-alcohol">
+        <strong>알콜 여부:</strong>
+        <p id="cocktailAlcohol">알콜 있음</p>
+      </div>
+
+      <div class="cocktail-abv">
+        <strong>도수:</strong>
+        <p id="cocktailABV">약 30%</p>
+      </div>
+
+      <div class="cocktail-description">
+        <strong>설명:</strong>
+        <p id="cocktailDescription">마티니는 진과 드라이 베르무트를 베이스로 한 클래식한 칵테일로, 고급스러움과 간결함을 동시에 갖춘 음료입니다.</p>
+      </div>
+
+      <div class="like-container">
+        <button class="like-button" id="likeButton">좋아요</button>
+        <span id="likeCount">좋아요 0개</span>
+        <button class="favorite-button" id="favoriteButton" onclick="addToFavorites()" disabled>즐겨찾기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="comment-section">
+  <textarea class="comment-input" id="commentInput" placeholder="댓글을 남겨주세요..."></textarea>
+  <button class="comment-button" id="commentButton">댓글 달기</button>
+
+  <ul class="comment-list" id="commentList"></ul>
+</div>
+
+<script>
+  let likeCount = 0;
+  let isLoggedIn = false;  // 로그인 상태를 확인하는 변수. 실제 로그인 상태에 맞게 수정 필요
+
+  // 로그인 상태에 따라 즐겨찾기 버튼 활성화
+  if (isLoggedIn) {
+    document.getElementById('favoriteButton').disabled = false;
+  }
+
+  document.getElementById('likeButton').addEventListener('click', function() {
+    likeCount++;
+    document.getElementById('likeCount').textContent = `좋아요 ${likeCount}개`;
+  });
+
+  document.getElementById('commentButton').addEventListener('click', function() {
+    const commentInput = document.getElementById('commentInput').value;
+    if (commentInput) {
+      const commentList = document.getElementById('commentList');
+      const newComment = document.createElement('li');
+      newComment.classList.add('comment-item');
+      newComment.innerHTML = `<strong>익명:</strong> ${commentInput}`;
+      commentList.appendChild(newComment);
+      document.getElementById('commentInput').value = '';
+    } else {
+      alert("댓글을 입력해주세요.");
+    }
+  });
+
+  document.querySelector('.search-button').addEventListener('click', function() {
+    const searchQuery = document.querySelector('.search-input').value;
+    if (searchQuery) {
+      window.location.href = `search2.html?query=${encodeURIComponent(searchQuery)}`;
+    } else {
+      alert("검색어를 입력해주세요.");
+    }
+  });
+
+  function addToFavorites() {
+    if (!isLoggedIn) {
+      alert("로그인 후 즐겨찾기를 추가할 수 있습니다.");
+      return;
+    }
+
+    const cocktailData = {
+      name: "마티니",
+      ingredients: "진, 드라이 베르무트, 올리브 또는 레몬 껍질",
+      method: "진과 드라이 베르무트를 얼음과 함께 흔든 뒤 차가운 글라스에 따르고 올리브나 레몬 껍질을 장식합니다.",
+      category: "클래식 칵테일",
+      alcohol: "알콜 있음",
+      abv: "약 30%",
+      description: "마티니는 진과 드라이 베르무트를 베이스로 한 클래식한 칵테일로, 고급스러움과 간결함을 동시에 갖춘 음료입니다.",
+      image: "https://via.placeholder.com/400x300"
+    };
+
+    // 여기에 칵테일 데이터를 서버로 보내는 AJAX 요청 코드 추가
+    // 예: fetch('/addToFavorites', { method: 'POST', body: JSON.stringify(cocktailData) });
+
+    alert("즐겨찾기에 추가되었습니다.");
+  }
+</script>
+
+</body>
+</html>
