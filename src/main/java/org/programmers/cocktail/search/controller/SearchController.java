@@ -1,6 +1,7 @@
 package org.programmers.cocktail.search.controller;
 
 import java.util.List;
+import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToUrl;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -310,6 +312,37 @@ public class SearchController {
         }
 
         return ResponseEntity.ok(OPERATION_SUCCESS);        //DB삭제 성공
+    }
+
+    @GetMapping("/reviews/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> loadCocktailComments(@PathVariable String cocktailId) {
+
+        System.out.println("enter loadCocktailComments");
+        return ResponseEntity.ok(0);
+
+    }
+
+    @PostMapping("/reviews/cocktails/{cocktailId}")
+    @ResponseBody
+    public ResponseEntity<Integer> registerCocktailComments(@PathVariable String cocktailId) {
+
+        System.out.println("enter registerCocktailComments");
+        return ResponseEntity.ok(0);
+
+    }
+
+    @DeleteMapping("/reviews/cocktails/{cocktailId}/{reviewId}")
+    @ResponseBody
+    public ResponseEntity<Integer> deleteCocktailComments(@PathVariable String cocktailId, @PathVariable String reviewId) {
+
+        System.out.println("enter deleteCocktailComments");
+
+        System.out.println("cocktailId: "+ cocktailId);
+        System.out.println("reviewId: "+ reviewId);
+
+        return ResponseEntity.ok(0);
+
     }
 
 }
