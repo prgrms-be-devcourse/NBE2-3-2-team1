@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     reviewDiv.innerHTML = `
       <div class="review-header">
-          ${review.author} - ${new Date(review.date).toLocaleString()}
+          ${review.userName} - ${review.updatedAt ? new Date(review.updatedAt).toLocaleString() : '날짜정보없음'}
           <button class="delete-review" data-review-id="${review.id}">Delete</button>
       </div>
       <div class="review-content">
@@ -71,7 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
           // 여기서 지우는것 말고 만약 삭제 반환값이 정상으로 response로 돌아오면 loadReview()호출해서 댓글뜨게 설정해주기
           const reviewDiv = reviewList.querySelector(`[data-review-id="${reviewId}"]`);
           if (reviewDiv) {
-            reviewDiv.remove();
+            // reviewDiv.remove();
+            console.log("data-review-id: " + reviewDiv.dataset.reviewId);
           }
         } else {
           console.error("Error deleting review");
@@ -90,7 +91,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (xhr.status === 200) {
           const reviews = JSON.parse(xhr.responseText);
           reviews.forEach((review) => addReviewToList(review));
-        } else {
+        }
+        else if(xhr.status === 204){
+          console.log("No review exists for cocktail id '" +cocktailId+"'");
+        }
+        else {
           console.error("Error loading reviews");
         }
       }

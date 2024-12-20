@@ -16,6 +16,7 @@ public class CommentsTO {
     private Long id;
     private String content;
     private Long userId;
+    private String userName;
     private Long cocktailId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

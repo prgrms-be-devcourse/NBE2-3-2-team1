@@ -6,11 +6,13 @@ import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
+import org.programmers.cocktail.search.dto.CommentsTO;
 import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailLikesService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
+import org.programmers.cocktail.search.service.CommentsService;
 import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +46,9 @@ public class SearchController {
 
     @Autowired
     CocktailLikesService cocktailLikesService;
+
+    @Autowired
+    CommentsService commentsService;
 
     static final int NOT_LOGGED_IN = 0;
     static final int OPERATION_FAIL = 1;
@@ -316,15 +321,17 @@ public class SearchController {
 
     @GetMapping("/reviews/cocktails/{cocktailId}")
     @ResponseBody
-    public ResponseEntity<Integer> loadCocktailComments(@PathVariable String cocktailId) {
+    public ResponseEntity<List<CommentsTO>> loadCocktailComments(@PathVariable String cocktailId) {
 
         System.out.println("enter loadCocktailComments");
 
+        List<CommentsTO> commentsTOList = commentsService.findByCocktailId(Long.parseLong(cocktailId));
 
+        if(commentsTOList.isEmpty()){
+            return ResponseEntity.noContent().build();      // 상태코드 204 전송
+        }
 
-
-
-        return ResponseEntity.ok(0);
+        return ResponseEntity.ok(commentsTOList);
 
     }
 

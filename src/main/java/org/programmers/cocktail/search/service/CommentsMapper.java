@@ -25,6 +25,7 @@ public class CommentsMapper {
             protected void configure() {
                 map().setUserId(source.getUsers().getId());
                 map().setCocktailId(source.getCocktails().getId());
+                map().setUserName(source.getUsers().getName());
             }
         });
 
