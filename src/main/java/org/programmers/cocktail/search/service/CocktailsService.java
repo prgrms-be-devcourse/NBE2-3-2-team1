@@ -19,15 +19,18 @@ public class CocktailsService {
     @Autowired
     private CocktailsRepository cocktailsRepository;
 
+//    @Autowired
+//    private CocktailsRepositoryImpl cocktailsRepositoryImpl;
+
     @Autowired
-    private CocktailsRepositoryImpl cocktailsRepositoryImpl;
+    private CocktailsMapper cocktailsMapper;
 
     public List<CocktailsTO> findByNameContaining(String keyword) {
 
         List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
 
         if(!cocktailSearchList.isEmpty()) {
-            return cocktailsRepositoryImpl.convertToCocktailsTOList(cocktailSearchList);
+            return cocktailsMapper.convertToCocktailsTOList(cocktailSearchList);
         }
 
         return Collections.emptyList();
@@ -36,7 +39,7 @@ public class CocktailsService {
     public int insertNewCocktailDB(CocktailsTO cocktailsTO) {
         try {
             //TO->Entity 변환
-            Cocktails cocktails = cocktailsRepositoryImpl.convertToCocktails(cocktailsTO);
+            Cocktails cocktails = cocktailsMapper.convertToCocktails(cocktailsTO);
             cocktailsRepository.save(cocktails);
             return SUCCESS;    //저장성공
         } catch (Exception e) {
@@ -47,7 +50,7 @@ public class CocktailsService {
 
     public CocktailsTO findById(Long cocktailId){
         Cocktails cocktails = cocktailsRepository.findById(cocktailId).orElse(null);
-        CocktailsTO cocktailsTO = cocktailsRepositoryImpl.convertToCocktailsTO(cocktails);
+        CocktailsTO cocktailsTO = cocktailsMapper.convertToCocktailsTO(cocktails);
 
         return cocktailsTO;
     }

@@ -14,11 +14,14 @@ public class UsersService {
     private UsersRepository usersRepository;
 
     @Autowired
-    private UsersRepositoryImpl usersRepositoryImpl;
+    private UsersMapper usersMapper;
+
+//    @Autowired
+//    private UsersRepositoryImpl usersRepositoryImpl;
 
     public UsersTO findByEmail(String sessionEmail) {
         Users userInfo =  usersRepository.findByEmail(sessionEmail).orElse(null);
-        return usersRepositoryImpl.convertToUsersTO(userInfo);
+        return usersMapper.convertToUsersTO(userInfo);
     }
 
 }

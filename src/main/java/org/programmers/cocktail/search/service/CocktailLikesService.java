@@ -21,8 +21,11 @@ public class CocktailLikesService {
     @Autowired
     private CocktailLikesRepositoryCustom cocktailLikesRepositoryCustom;
 
+//    @Autowired
+//    private CocktailLikesRepositoryImpl cocktailLikesRepositoryImpl;
+
     @Autowired
-    private CocktailLikesRepositoryImpl cocktailLikesRepositoryImpl;
+    private CocktailLikesMapper cocktailLikesMapper;
 
     public int findByUserIdAndCocktailId(Long userId, Long cocktailId){
 
@@ -37,7 +40,7 @@ public class CocktailLikesService {
     public int insertCocktailLikes(CocktailLikesTO cocktailLikesTO){
 
         // TO->Entity 변환
-        CocktailLikes cocktailLikes = cocktailLikesRepositoryImpl.convertToCocktailLikes(cocktailLikesTO);
+        CocktailLikes cocktailLikes = cocktailLikesMapper.convertToCocktailLikes(cocktailLikesTO);
         try {
             cocktailLikesRepositoryCustom.save(cocktailLikes);
         } catch (Exception e) {

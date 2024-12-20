@@ -19,8 +19,11 @@ public class CocktailExternalApiService {
     @Autowired
     private RestTemplate restTemplate;
 
+//    @Autowired
+//    private CocktailsRepositoryImpl cocktailsRepository;
+
     @Autowired
-    private CocktailsRepositoryImpl cocktailsRepository;
+    private CocktailsMapper cocktailsMapper;
 
     public List<CocktailsTO> fetchCocktailData(String cocktailName) {
         // API 호출
@@ -61,6 +64,6 @@ public class CocktailExternalApiService {
             // ProcessedCocktail 객체 생성
             cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
         }
-        return cocktailsRepository.convertToCocktailsTOList(cocktails);
+        return cocktailsMapper.convertToCocktailsTOList(cocktails);
     }
 }
