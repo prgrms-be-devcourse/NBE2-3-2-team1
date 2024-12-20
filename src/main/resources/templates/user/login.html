@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      background-color: transparent;
+      color: #000000;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      margin: 40px 20px;
+    }
+
+    .sub-container {
+      display: flex;
+      justify-content: center;
+      margin: auto;
+    }
+
+    .sub-text {
+      background-color: transparent;
+      color: #000000;
+      text-align: left;
+      padding: 20px 0;
+      font-size: 15px;
+    }
+
+    input[type="text"], input[type="password"] {
+      display: flex;
+      width: 250px;
+      height: 32px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 15px;
+      outline: none;
+      padding-left: 10px;
+      background-color: #dddddd;
+    }
+
+    .login-btn {
+      width: 130px;
+      height: 32px;
+      font-size: 15px;
+      border: 0;
+      border-radius: 15px;
+      outline: none;
+      padding-left: 10px;
+      background-color: rgb(252, 214, 44);
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .user-btn {
+      width: 100px;
+      height: 26px;
+      font-size: 12px;
+      outline: none;
+      padding-left: 10px;
+      color: white;
+      background-color: rgb(0, 0, 0);
+      cursor: pointer;
+      text-align: center;
+    }
+  </style>
+  <script>
+    // 로그인 처리 함수
+    function handleLogin() {
+      var email = document.getElementById("email").value;
+      var password = document.getElementById("password").value;
+
+      // 서버로 로그인 요청을 보냄 (AJAX로 구현 가능)
+      // 예시로, 로그인 성공 시 user.html로 이동하고 실패 시 다시 로그인 페이지로 리디렉션
+      if (email === "test@example.com" && password === "password123") {
+        // 로그인 성공 시 user.html로 이동
+        window.location.href = "user.html";
+      } else {
+        // 로그인 실패 시 로그인 페이지로 이동
+        alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+        window.location.href = "login.html";  // 로그인 페이지로 리디렉션
+      }
+    }
+
+    // 회원가입 페이지로 이동
+    function goToSignUp() {
+      window.location.href = "membership.html";
+    }
+  </script>
+</head>
+<body>
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <a href="user.html">
+      <img src="line.png">
+    </a>
+  </div>
+</div>
+
+<div class="header">로그인</div>
+
+<div class="container">
+  <div class="sub-text">
+    이메일<br>
+    <input type="text" id="email" placeholder="email"><br><br>
+
+    비밀번호<br>
+    <input type="password" id="password" placeholder="password">
+
+    <div class="sub-container">
+      <button type="button" class="login-btn" onclick="handleLogin()">로그인</button>
+    </div>
+
+    <br><br>
+
+    아직 계정이 없으신가요?
+    <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
+  </div>
+</div>
+
+</body>
+</html>
