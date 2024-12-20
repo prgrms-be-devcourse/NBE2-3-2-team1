@@ -319,6 +319,11 @@ public class SearchController {
     public ResponseEntity<Integer> loadCocktailComments(@PathVariable String cocktailId) {
 
         System.out.println("enter loadCocktailComments");
+
+
+
+
+
         return ResponseEntity.ok(0);
 
     }
