@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원 정보 수정</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     /* 기존 스타일 유지 */
     body {
@@ -12,6 +13,7 @@
       background-color: #fff;
       color: #333;
     }
+
 
     .navbar {
       display: flex;
@@ -28,6 +30,23 @@
       margin: 0 10px;
       font-weight: bold;
     }
+
+    .navbar .right {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .navbar .logout-btn {
+      background-color: rgb(255, 0, 0);
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
 
     .header {
       background-color: transparent;
@@ -167,10 +186,14 @@
     <a href="#">인기 칵테일</a>
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
-    <a href="user.html">
-      <img src="line.png">
+    <a href="#" onclick="checkLogin()">
+      <img src="/images/line.png">
     </a>
   </div>
+</div>
+
+<div class="right">
+  <button class="logout-btn" onclick="logout()">로그아웃</button>
 </div>
 
 <div class="header">계정</div>
@@ -190,10 +213,10 @@
     </div>
 
     <div class="mid-text">로그인 정보</div><br>
-    <div class="text">로그인 이메일 및 비밀번호를 확인할 수 있습니다.</div><br>
+    <div class="text">로그인 이메일 및 계정 정보를 확인할 수 있습니다.</div><br>
 
     이메일<br>
-    <input type="text" id="email" placeholder="email"><br>
+    <input type="text" id="email" placeholder="email" th:value="${to.email}"><br>
     비밀번호<br>
     <input type="password" id="password" placeholder="password"><br>
 
@@ -207,11 +230,11 @@
     <div class="text">회원님의 계정 정보를 업데이트 및 수정하세요.</div><br>
 
     이름<br>
-    <input type="text" placeholder="이름"><br>
-    전화번호<br>
-    <input type="text" placeholder="전화번호"><br>
-    생년월일<br>
-    <input type="date" placeholder="생년월일">
+    <input type="text" placeholder="이름" th:value="${to.name}"><br>
+<!--    전화번호<br>-->
+<!--    <input type="text" placeholder="전화번호"><br>-->
+<!--    생년월일<br>-->
+<!--    <input type="date" placeholder="생년월일">-->
 
     <div class="btn">
       <button type="button" id="editButton">수정</button>
@@ -220,10 +243,20 @@
   </div>
 </div>
 
-<script>
-  // 가상의 DB 데이터 (실제 DB와 연결되는 부분은 백엔드에서 처리해야 합니다)
+<!-- 메시지가 있을 경우 JavaScript alert로 띄우기 -->
+<div th:if="${message}">
+  <script type="text/javascript">
+    var message = /*[[${message}]]*/ 'undefined';
+    if (message !== 'undefined' && message !== '') {
+      alert(message);  // 메시지를 alert로 띄움
+    }
+  </script>
+</div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
   const userDB = {
-    email: "user@example.com",  // 실제 DB의 이메일
+    email: [[${to.email}]],  // 실제 DB의 이메일
     password: "password123"     // 실제 DB의 비밀번호
   };
 
@@ -294,6 +327,45 @@
       `;
 
       cocktailListElement.appendChild(cocktailItem);
+    });
+  }
+
+  // 로그아웃 처리 함수
+  function logout() {
+    // 세션 정보를 삭제하는 로그아웃 처리
+    $.ajax({
+      url: '/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
+      type: 'POST',
+      success: function(response) {
+        // "로그아웃" 메시지를 띄우고 로그인 페이지로 리디렉션
+        alert('로그아웃');
+        window.location.href = '/login';  // 로그인 페이지로 리디렉션
+      },
+      error: function(xhr, status, error) {
+        alert('로그아웃 실패: ' + error);
+      }
+    });
+  }
+
+  // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
+  function checkLogin() {
+    $.ajax({
+      url: '/login_complete',  // 로그인 상태 확인 API
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          // 세션이 있으면 mypage로 이동
+          window.location.href = '/mypage';
+        } else {
+          // 세션이 없으면 login 페이지로 이동
+          alert(response.message);  // "로그인해야 합니다."
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';  // 로그인 페이지로 리디렉션
+      }
     });
   }
 

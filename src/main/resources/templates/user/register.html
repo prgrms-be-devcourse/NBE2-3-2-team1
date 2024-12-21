@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>회원가입</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -92,8 +93,8 @@
     <a href="#">인기 칵테일</a>
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
-    <a href="user.html">
-      <img src="line.png">
+    <a href="/login_complete">
+      <img src="/images/line.png">
     </a>
   </div>
 </div>
@@ -101,7 +102,7 @@
 <div class="header">회원가입</div>
 
 <!-- 폼 작성 -->
-<form id="signup-form" action=# method="POST" class="container">
+<form id="signup-form" th:action="@{/register_ok}" method="POST" class="container">
   <div class="sub-text">
     이름<br>
     <input type="text" name="name" placeholder="name" required><br><br>
@@ -119,16 +120,38 @@
 </form>
 
 <script>
-  // 폼 제출 시 처리하는 함수
+  // 폼 제출을 비동기적으로 처리
   document.getElementById("signup-form").onsubmit = function(event) {
-    event.preventDefault(); // 기본 폼 제출 동작을 막음
+    event.preventDefault(); // 기본 제출 동작을 취소
+    console.log("폼 제출 이벤트 시작");
 
-    // 서버에 데이터가 성공적으로 제출되었다고 가정하고 리다이렉트
-    setTimeout(function() {
-      window.location.href = "login.html";  // 3초 후에 로그인 페이지로 리다이렉트
-    }, 3000);  // 3초 후에 로그인 페이지로 이동
-  }
+    // 폼 데이터 수집
+    var formData = new FormData(document.getElementById("signup-form"));
+    console.log(formData);
+    // AJAX 요청
+    $.ajax({
+      url: '/register_ok',  // 서버의 POST 요청 URL
+      type: 'POST',         // POST 요청
+      data: formData,       // 폼 데이터
+      processData: false,   // 폼 데이터 그대로 전송
+      contentType: false,   // 서버에서 받는 데이터의 형식 처리
+      success: function(response) {
+        // 서버 응답 처리 (성공 시)
+        var message = response.message;  // 서버에서 받은 성공 메시지
+        $('#message').text(message).addClass('success');  // 성공 메시지 표시
+
+        // 성공 후 로그인 페이지로 이동
+        setTimeout(function() {
+          window.location.href = '/login'; //  Spring Boot 애플리케이션의 매핑 경로와 일치해야 한다
+        }, 2000); // 2초 후 이동
+      },
+      error: function(xhr, status, error) {
+        // 서버 오류 처리
+        var errorMessage = '회원가입 실패: ' + error;
+        $('#message').text(errorMessage).addClass('error');  // 실패 메시지 표시
+      }
+    });
+  };
 </script>
-
 </body>
 </html>
