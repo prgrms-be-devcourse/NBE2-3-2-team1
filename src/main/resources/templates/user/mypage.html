@@ -216,9 +216,9 @@
     <div class="text">로그인 이메일 및 계정 정보를 확인할 수 있습니다.</div><br>
 
     이메일<br>
-    <input type="text" id="email" placeholder="email" th:value="${to.email}"><br>
+    <input type="text" id="email" name="email" placeholder="email" th:value="${to.email}" readonly><br>
     비밀번호<br>
-    <input type="password" id="password" placeholder="password"><br>
+    <input type="password" id="password" name="password" placeholder="password"><br>
 
     <div class="error-message" id="error-message"></div> <!-- 실패 메시지 출력 영역 -->
 
@@ -227,17 +227,16 @@
     </div>
 
     <div class="mid-text">계정 정보</div><br>
-    <div class="text">회원님의 계정 정보를 업데이트 및 수정하세요.</div><br>
+    <div class="text">회원님의 계정 정보를 수정하거나 만개의 칵테일에서 탈퇴할 수 있습니다.</div><br>
 
     이름<br>
-    <input type="text" placeholder="이름" th:value="${to.name}"><br>
+    <input type="text" id="name" name="name" placeholder="이름" th:value="${to.name}"><br>
 <!--    전화번호<br>-->
 <!--    <input type="text" placeholder="전화번호"><br>-->
 <!--    생년월일<br>-->
 <!--    <input type="date" placeholder="생년월일">-->
-
     <div class="btn">
-      <button type="button" id="editButton">수정</button>
+      <button type="button" id="modifyButton" onclick="handlemodify()">수정</button>
       <button type="button" id="deleteButton">탈퇴</button>
     </div>
   </div>
@@ -253,31 +252,43 @@
   </script>
 </div>
 
-<script th:inline="javascript">
-  /*<![CDATA[*/
-  const userDB = {
-    email: [[${to.email}]],  // 실제 DB의 이메일
-    password: "password123"     // 실제 DB의 비밀번호
-  };
+<script>
+  function handlemodify() {
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+    var name = document.getElementById("name").value;
 
-  // 로그인 정보 확인 함수
-  function verifyLogin(email, password) {
-    return email === userDB.email && password === userDB.password;
+    // 서버로 로그인 요청을 보냄 (AJAX로 구현)
+    $.ajax({
+      url: '/modify_ok',  // 서버의 POST 요청 URL
+      type: 'POST',      // POST 요청
+      data: {            // 폼 데이터 전송
+        email: email,
+        password: password,
+        name: name
+      },
+      success: function(response) {
+        // 서버 응답 처리
+        if (response.flag === 0) {
+          alert(response.message);
+          // 수정 성공 시 마이페이지로 이동
+
+          window.location.href = "/login";
+
+        } else {
+          // 수정 실패 시 메시지 출력
+          alert(response.message);
+
+          window.location.href = "/mypage";
+
+        }
+      },
+      error: function(xhr, status, error) {
+        // 서버 오류 처리
+        alert("수정 실패: " + error);
+      }
+    });
   }
-
-  // 수정 버튼 클릭 이벤트
-  document.getElementById('editButton').addEventListener('click', function() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    if (verifyLogin(email, password)) {
-      // 로그인 성공 시: user.html로 리디렉션
-      window.location.href = "user.html";
-    } else {
-      // 로그인 실패 시: 실패 메시지 출력
-      document.getElementById('error-message').textContent = "이메일 또는 비밀번호가 잘못되었습니다.";
-    }
-  });
 
   // 탈퇴 버튼 클릭 이벤트
   document.getElementById('deleteButton').addEventListener('click', function() {
