@@ -137,21 +137,21 @@
       contentType: false,   // 서버에서 받는 데이터의 형식 처리
       success: function(response) {
         // 서버 응답 처리 (성공 시)
-        var message = response.message;  // 서버에서 받은 성공 메시지
-        $('#message').text(message).addClass('success');  // 성공 메시지 표시
-
-        // 성공 후 로그인 페이지로 이동
-        setTimeout(function() {
-          window.location.href = '/login'; //  Spring Boot 애플리케이션의 매핑 경로와 일치해야 한다
-        }, 2000); // 2초 후 이동
+        if (response.flag === 0) {
+          alert(response.message);
+          window.location.href = '/login';
+        } else {
+          // 세션이 없으면 login 페이지로 이동
+          alert(response.message);  // "로그인해야 합니다."
+          window.location.href = '/register';
+        }
       },
       error: function(xhr, status, error) {
-        // 서버 오류 처리
-        var errorMessage = '회원가입 실패: ' + error;
-        $('#message').text(errorMessage).addClass('error');  // 실패 메시지 표시
+        alert('회원가입 상태 확인 실패: ' + error);
+        window.location.href = '/register';  // 로그인 페이지로 리디렉션
       }
     });
-  };
+  }
 </script>
 </body>
 </html>

@@ -291,17 +291,8 @@
   }
 
   // 탈퇴 버튼 클릭 이벤트
-  document.getElementById('deleteButton').addEventListener('click', function() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    if (verifyLogin(email, password)) {
-      // 로그인 성공 시: done.html로 리디렉션 (탈퇴 성공)
-      window.location.href = "done.html";
-    } else {
-      // 로그인 실패 시: 실패 메시지 출력
-      document.getElementById('error-message').textContent = "이메일 또는 비밀번호가 잘못되었습니다.";
-    }
+  document.getElementById("deleteButton").addEventListener("click", function() {
+    window.location.href = "/withdrawalPage";
   });
 
   // 예시 데이터를 사용하여 즐겨찾기 칵테일 목록을 생성

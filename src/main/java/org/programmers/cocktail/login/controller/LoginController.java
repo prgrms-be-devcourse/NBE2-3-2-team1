@@ -21,9 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -48,11 +46,11 @@ public class LoginController {
 
     // 회원가입
     @PostMapping("/register_ok")
-    public String register_ok(
+    public ResponseEntity<Map<String, Object>> register_ok(
         @RequestParam("email") String email,
         @RequestParam("name") String name,
-        @RequestParam("password") String password,
-        RedirectAttributes redirectAttributes )
+        @RequestParam("password") String password
+    )
     {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -65,12 +63,26 @@ public class LoginController {
         to.setName( name );
         to.setPassword( encodedPassword );
 
-        //DB에 사용자 입력값 insert하기
-        int flag = loginService.insert( to );
+        Users users = loginService.findByEmail( to.getEmail() );
 
-        redirectAttributes.addFlashAttribute("message", "회원가입이 성공적으로 완료되었습니다!");
+        Map<String, Object> response = new HashMap<>();
 
-        return "redirect:/login";
+        int flag = 2;
+
+        if ( users != null ) {
+            flag = 1;
+            response.put("message", "존재하는 아이디입니다.");
+
+        } else {
+            flag = 0;
+            loginService.insert( to );
+            response.put("message", "회원가입이 성공적으로 완료되었습니다.");
+        }
+
+        response.put("flag", flag);
+
+        return ResponseEntity.ok(response);
+
     }
 
     @GetMapping("/login")
@@ -93,35 +105,37 @@ public class LoginController {
         System.out.println("password: " + password);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        // 로그인창에서 입력받은 이메일과 패스워드
-        String saveEmail = email;
-        String savePassword = password;
-
         //DB에서 이메일, 패스워드 가져오기
         Users users = loginService.findByEmail( email );
 
         Map<String, Object> response = new HashMap<>();
 
-        int flag = 2;
+        int flag = 3;
 
-        System.out.println("users.getEmail(): " + users.getEmail());
-        System.out.println("users.getPassword(): " + users.getPassword());
+        //System.out.println("users.getEmail(): " + users.getEmail());
+        //System.out.println("users.getPassword(): " + users.getPassword());
 
-        if ( saveEmail.equals(users.getEmail()) && encoder.matches(savePassword, users.getPassword())) {
-            flag = 0;
+        if( users != null ) {
 
-            System.out.println("flag0: " + flag);
+            if (email.equals(users.getEmail()) && encoder.matches(password, users.getPassword())) {
+                flag = 0;
 
-            // session 부여
-            // 이후 세션에 저장된 semail 값은 사용자가 페이지를 이동하더라도 유지되며, 다른 요청에서 접근할 수 있음
-            session.setAttribute("semail", email);
+                System.out.println("flag0: " + flag);
 
-            response.put("message", "로그인 성공");
+                // session 부여
+                // 이후 세션에 저장된 semail 값은 사용자가 페이지를 이동하더라도 유지되며, 다른 요청에서 접근할 수 있음
+                session.setAttribute("semail", email);
 
+                response.put("message", "로그인 성공");
+
+            } else {
+                flag = 1;
+                System.out.println("flag1: " + flag);
+                response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
+            }
         } else {
-            flag = 1;
-            System.out.println("flag1: " + flag);
-            response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
+            flag = 2;
+            response.put("message", "존재하지 않는 회원입니다.");
         }
 
         // 모델에 flag 값을 전달
@@ -144,11 +158,12 @@ public class LoginController {
 
     @PostMapping("/login_complete")
     public ResponseEntity<Map<String, Object>> login_complete(HttpSession session) {
-
+        System.out.println("login_complete 호출");
         Map<String, Object> response = new HashMap<>();
         int flag = 2;
 
         if (session.getAttribute("semail") != null ) {
+            System.out.println("login_complete semail: " + session.getAttribute("semail"));
             flag = 0;
         } else {
             flag = 1;
@@ -168,6 +183,7 @@ public class LoginController {
         Model model,
         RedirectAttributes redirectAttributes) {
 
+        System.out.println("mypage 호출");
         String email = (String) session.getAttribute("semail");
         List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
         List<Cocktails> cocktails = cocktailsRepository.findAll();
@@ -184,13 +200,12 @@ public class LoginController {
         }
 
         // 칵테일 정보 잘 가져오는지 확인
-        for (CocktailsDto c : cocktailsDtos) {
-            System.out.println("CocktailsDto: " + c);
-        }
-
-        if( email != null ) {
+//        for (CocktailsDto c : cocktailsDtos) {
+//            System.out.println("CocktailsDto: " + c);
+//        }
+        Users users = loginService.findByEmail(email);
+        if( email != null && users.getId() != null) {
             // 세션에서 이메일을 통해 DB에서 유저 정보를 가져오기
-            Users users = loginService.findByEmail(email);
 
             // UserRegisterDto 객체에 유저 정보 담기
             UserRegisterDto to = new UserRegisterDto();
@@ -264,22 +279,35 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
+
+    @GetMapping("/withdrawalPage")
+    public String showWithdrawalPage() {
+        return "user/withdrawalPage"; // "login.html" 템플릿을 반환
+    }
+
     @PostMapping("/withdrawal_ok")
     public ResponseEntity<Map<String, Object>> userWithdrawal(
         @RequestParam("email") String email,
-        @RequestParam("password") String password
+        @RequestParam("password") String password,
+        HttpSession session
     ) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         System.out.println("withdrawal_ok 호출");
+        System.out.println("email: " + email);
+        System.out.println("password: " + password);
         Map<String, Object> response = new HashMap<>();
 
         int flag = 2;
 
-        Users users = loginService.selectByEmailandPassword( email, password );
-        // System.out.println("users.getEmail(): " + users.getEmail()); // 잘 나옴
+        Users users = loginService.findByEmail( email );
+        System.out.println("users.getEmail(): " + users.getEmail()); // 잘 나옴
+        System.out.println("users.password(): " + users.getPassword()); // 잘 나옴
 
         int result = 0;
-        if(email.equals(users.getEmail()) && password.equals(users.getPassword())) {
+        if(email.equals(users.getEmail()) && encoder.matches(password, users.getPassword())) {
             result = loginService.deleteUser( users.getId() );
+            session.invalidate();
         }
 
         if ( result == 0 ) {

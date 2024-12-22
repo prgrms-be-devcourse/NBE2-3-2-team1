@@ -177,8 +177,11 @@
         if (response.flag === 0) {
           // 세션이 있으면 mypage로 이동
           window.location.href = '/mypage';
-        } else {
+        } else if ( response.flag === 1) {
           // 세션이 없으면 login 페이지로 이동
+          alert(response.message);  // "로그인해야 합니다."
+          window.location.href = '/login';
+        } else {
           alert(response.message);  // "로그인해야 합니다."
           window.location.href = '/login';
         }
@@ -193,7 +196,7 @@
 
   // 회원가입 페이지로 이동
   function goToSignUp() {
-    window.location.href = "membership.html";
+    window.location.href = "/register";
   }
 </script>
 
