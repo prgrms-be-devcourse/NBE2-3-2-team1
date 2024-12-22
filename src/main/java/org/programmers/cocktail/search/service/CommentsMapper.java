@@ -46,10 +46,7 @@ public class CommentsMapper {
         return commentsTOList;
     }
 
-    public List<Comments> convertToCommentsList(List<CommentsTO> commentsTOList) {
-        List<Comments> commentsList = commentsTOList.stream()
-            .map(commentsTO -> modelMapper.map(commentsTO, Comments.class))
-            .collect(Collectors.toList());
-        return commentsList;
+    public Comments convertToComments(CommentsTO commentsTO) {
+        return modelMapper.map(commentsTO, Comments.class);
     }
 }

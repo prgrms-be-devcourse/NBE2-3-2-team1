@@ -7,6 +7,7 @@ import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.CommentsTO;
+import org.programmers.cocktail.search.dto.ReviewData;
 import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailLikesService;
@@ -15,6 +16,8 @@ import org.programmers.cocktail.search.service.CocktailsService;
 import org.programmers.cocktail.search.service.CommentsService;
 import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -337,24 +341,62 @@ public class SearchController {
 
     @PostMapping("/reviews/cocktails/{cocktailId}")
     @ResponseBody
-    public ResponseEntity<Integer> registerCocktailComments(@PathVariable String cocktailId) {
+    public ResponseEntity<Integer> registerCocktailComments(@PathVariable String cocktailId,
+        @RequestBody CommentsTO commentsTOFromClient) {
 
-        System.out.println("enter registerCocktailComments");
-        return ResponseEntity.ok(0);
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        //1. 로그인 상태 확인
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
+        }
 
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(session);
+        if(userInfo==null){
+            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+        }
+
+        CommentsTO commentsTO = new CommentsTO();
+        commentsTO.setContent(commentsTOFromClient.getContent());
+        commentsTO.setUserId(userInfo.getId());
+        commentsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int commentsInsertResult = commentsService.insertComments(commentsTO);
+
+        if(commentsInsertResult==0){
+            return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
+        }
+
+        return ResponseEntity.ok(OPERATION_SUCCESS);        // DB추가 성공
     }
 
-    @DeleteMapping("/reviews/cocktails/{cocktailId}/{reviewId}")
+    @DeleteMapping("/reviews/cocktails/{reviewId}")
     @ResponseBody
-    public ResponseEntity<Integer> deleteCocktailComments(@PathVariable String cocktailId, @PathVariable String reviewId) {
+    public ResponseEntity<Void> deleteCocktailComments(@PathVariable String reviewId) {
 
-        System.out.println("enter deleteCocktailComments");
+        // todo session.getAttribute("email") HttpSession session 으로 대체 필요
+        //1. 로그인 상태 확인
+        String session = "abc@abc.com";
+        if(session == null){
+            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
+            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
 
-        System.out.println("cocktailId: "+ cocktailId);
-        System.out.println("reviewId: "+ reviewId);
+        CommentsTO commentsTO = new CommentsTO();
+        commentsTO.setId(Long.parseLong(reviewId));
 
-        return ResponseEntity.ok(0);
+        int commentsDeleteResult = commentsService.deleteById(commentsTO);
 
+        // SUCCESS: 1, FAIL: 0
+        if(commentsDeleteResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // DB추가 실패(500반환))
+        }
+        return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
     }
 
 }

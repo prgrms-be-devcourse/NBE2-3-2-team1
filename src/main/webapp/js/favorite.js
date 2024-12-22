@@ -20,9 +20,17 @@ document.addEventListener("DOMContentLoaded", function () {
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 200) {
-          const newReview = JSON.parse(xhr.responseText);
-          addReviewToList(newReview);
-          reviewText.value = "";
+          const response = parseInt(xhr.responseText);
+          console.log(response)
+          if(response===2){
+            reviewList.innerHTML = '';
+            loadReviews();
+          } else if(response === 0) {
+            alert('로그인이 필요합니다.');
+          } else{
+            alert('댓글 등록에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
+          }
+
         } else {
           console.error("Error submitting review");
         }
@@ -44,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     reviewDiv.innerHTML = `
       <div class="review-header">
-          ${review.userName} - ${review.updatedAt ? new Date(review.updatedAt).toLocaleString() : '날짜정보없음'}
+          ${review.userName} - 수정 :${review.updatedAt ? calculateTimeAgo(new Date(review.updatedAt)) : '날짜정보없음'}
           <button class="delete-review" data-review-id="${review.id}">Delete</button>
       </div>
       <div class="review-content">
@@ -64,18 +72,20 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!confirm("Are you sure you want to delete this review?")) return;
 
     const xhr = new XMLHttpRequest();
-    xhr.open("DELETE", `/api/reviews/cocktails/${cocktailId}/${reviewId}`, true);
+    xhr.open("DELETE", `/api/reviews/cocktails/${reviewId}`, true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
+        if (xhr.status === 204) {
           // 여기서 지우는것 말고 만약 삭제 반환값이 정상으로 response로 돌아오면 loadReview()호출해서 댓글뜨게 설정해주기
           const reviewDiv = reviewList.querySelector(`[data-review-id="${reviewId}"]`);
           if (reviewDiv) {
-            // reviewDiv.remove();
-            console.log("data-review-id: " + reviewDiv.dataset.reviewId);
+            reviewDiv.remove();
+            // console.log("data-review-id: " + reviewDiv.dataset.reviewId);
           }
-        } else {
-          console.error("Error deleting review");
+        } else if(xhr.status === 401){
+          alert('로그인이 필요합니다.');
+        } else{
+          alert('댓글 삭제에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
         }
       }
     };
@@ -102,6 +112,31 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     xhr.send();
   }
+
+  function calculateTimeAgo(date) {
+    const now = new Date();
+    const diffInMs = now - date; // 시간 차이 (밀리초 단위)
+    const diffInMinutes = Math.floor(diffInMs / 60000); // 분 단위로 변환
+
+    if (diffInMinutes < 1) return '방금 전';
+    if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}시간 전`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}일 전`;
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) return `${diffInWeeks}주 전`;
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) return `${diffInMonths}개월 전`;
+
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return `${diffInYears}년 전`;
+  }
+
 
   // Initialize reviews
   loadReviews();

@@ -34,7 +34,7 @@
     <p>Hits: <%= hits %></p>
 </div>
 <div>
-    <span id="favoriteIcon" class="favorite">&#9825;</span>
+    <span id="favoriteIcon" class="favorite">&#9829;</span>
     <span id="likeIcon" class="like">&#9829;</span>
 </div>
 <h2>Reviews</h2>
