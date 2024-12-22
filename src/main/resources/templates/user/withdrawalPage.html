@@ -121,7 +121,7 @@
 
     // 서버로 계정 삭제 요청을 보냄 (AJAX로 구현)
     $.ajax({
-      url: '/withdrawal_ok',  // 서버의 계정 삭제 URL
+      url: '/api/withdrawal_ok',  // 서버의 계정 삭제 URL
       type: 'POST',           // POST 요청
       data: {                 // 폼 데이터 전송
         email: email,
@@ -132,11 +132,11 @@
         if (response.flag === 0) {
           alert(response.message); // 삭제 성공 메시지
           // 로그인 페이지로 이동
-          window.location.href = "/login";
+          window.location.href = "/api/withdrawalCompletePage";
         } else {
           // 삭제 실패 시 메시지 출력
           alert(response.message);
-          window.location.href = "/withdrawalPage";
+          window.location.href = "/api/withdrawalPage";
         }
       },
       error: function(xhr, status, error) {

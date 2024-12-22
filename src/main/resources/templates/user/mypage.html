@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회원 정보 수정</title>
+  <title>마이 페이지</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     /* 기존 스타일 유지 */
@@ -22,6 +22,7 @@
       padding: 10px 20px;
       background-color: #fff;
       border-bottom: 1px solid #ddd;
+      height: 30px;
     }
 
     .navbar a {
@@ -31,11 +32,6 @@
       font-weight: bold;
     }
 
-    .navbar .right {
-      display: flex;
-      align-items: center;
-      margin-left: auto;
-    }
 
     .navbar .logout-btn {
       background-color: rgb(255, 0, 0);
@@ -45,6 +41,7 @@
       font-size: 14px;
       border-radius: 5px;
       cursor: pointer;
+      margin-left: 10px;
     }
 
 
@@ -69,7 +66,7 @@
       display: flex;
       justify-content: flex-start;
       flex-direction: column;
-      margin: 40px 20px;
+      margin: 20px 20px;
       width: 50%;
     }
 
@@ -107,23 +104,42 @@
       margin: 10px 0;
     }
 
-    .cocktail-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 15px;
-      margin-bottom: 30px;
-      background-color: transparent;
-      width: 600px;
+
+    .cocktail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 한 행에 3개 */
+      gap: 20px; /* 아이템 간 간격 */
+      padding: 20px; /* 컨테이너 여백 */
+    }
+
+
+    #cocktailTable td {
+      width: 33%; /* 한 줄에 3개씩 표시 */
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #cocktailTable img {
+      width: 100%; /* 이미지가 <td>의 크기에 맞게 크기 조정 */
+      height: auto; /* 비율 유지 */
+    }
+
+    .cocktail-list img {
+      width: 100%; /* 이미지가 td 요소에 맞게 크기 조정 */
+      height: auto; /* 비율 유지 */
     }
 
     .cocktail-item {
-      width: 160px;
       text-align: center;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      background-color: rgb(252, 214, 44);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 180px; /* 고정 높이 설정 */
       padding: 10px;
+      background-color: rgb(252, 214, 44);
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .cocktail-item img {
@@ -139,20 +155,34 @@
       margin-top: 10px;
     }
 
-    .cocktail-item {
-      font-size: 14px;
-      color: #555;
-      margin-top: 5px;
+    .cocktail-btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      height: 100%;
     }
 
-    .cocktail-item .view-btn {
+    .cocktail-btn img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cocktail-btn .title {
       margin-top: 10px;
-      background-color: #FFD700;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
+      font-size: 16px;
+      color: #333;
+      line-height: 1.2;
+      max-height: 40px; /* 두 줄 높이에 맞춤 */
+      overflow: hidden; /* 내용이 넘칠 경우 숨김 */
+      text-overflow: ellipsis; /* 넘친 텍스트에 말줄임표 추가 */
+      white-space: normal; /* 텍스트 줄바꿈 허용 */
     }
 
     .cocktail-item .view-btn:hover {
@@ -165,12 +195,6 @@
 
     .btn {
       text-align: right;
-    }
-
-    .cocktail-btn {
-      text-align: center;
-      width: 100%;
-      background-color: #fcd62c;
     }
 
     .error-message {
@@ -186,27 +210,26 @@
     <a href="#">인기 칵테일</a>
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
-    <a href="#" onclick="checkLogin()">
-      <img src="/images/line.png">
-    </a>
+<!--    <a href="#" onclick="checkLogin()">-->
+<!--      <img src="/images/line.png">-->
+<!--    </a>-->
+    <button class="logout-btn" onclick="logout()">로그아웃</button>
   </div>
 </div>
 
-<div class="right">
-  <button class="logout-btn" onclick="logout()">로그아웃</button>
-</div>
+<!--<div class="right">-->
+<!--  <button class="logout-btn" onclick="logout()">로그아웃</button>-->
+<!--</div>-->
 
-<div class="header">계정</div>
+<div class="header">My Page</div>
 
-<div class="container">
+<form id="modify-form" th:action="@{/api/modify_ok}" method="POST" class="container">
   <div class="sub-container">
     <div class="mid-text">나만의 칵테일</div>
     <div class="text">나에게 맞는 칵테일을 저장하세요!</div><br>
 
-    <!-- 즐겨찾기 칵테일 리스트 -->
-    <div class="cocktail-list" id="cocktailList">
-      <!-- 여기에 칵테일 항목들이 동적으로 추가됨 -->
-    </div>
+    <!--내가 찜한 칵테일 목록-->
+    <div id="cocktailList" class="cocktail-grid"></div>
 
     <div>
       <hr style="border: 1px solid #dddddd;">
@@ -218,7 +241,7 @@
     이메일<br>
     <input type="text" id="email" name="email" placeholder="email" th:value="${to.email}" readonly><br>
     비밀번호<br>
-    <input type="password" id="password" name="password" placeholder="password"><br>
+    <input type="password" id="password" name="password" placeholder="password" required><br>
 
     <div class="error-message" id="error-message"></div> <!-- 실패 메시지 출력 영역 -->
 
@@ -230,60 +253,51 @@
     <div class="text">회원님의 계정 정보를 수정하거나 만개의 칵테일에서 탈퇴할 수 있습니다.</div><br>
 
     이름<br>
-    <input type="text" id="name" name="name" placeholder="이름" th:value="${to.name}"><br>
+    <input type="text" id="name" name="name" placeholder="이름" th:value="${to.name}" required><br>
 <!--    전화번호<br>-->
 <!--    <input type="text" placeholder="전화번호"><br>-->
 <!--    생년월일<br>-->
 <!--    <input type="date" placeholder="생년월일">-->
     <div class="btn">
-      <button type="button" id="modifyButton" onclick="handlemodify()">수정</button>
+      <button type="submit" id="modifyButton">수정</button>
       <button type="button" id="deleteButton">탈퇴</button>
     </div>
   </div>
-</div>
+</form>
 
-<!-- 메시지가 있을 경우 JavaScript alert로 띄우기 -->
-<div th:if="${message}">
-  <script type="text/javascript">
-    var message = /*[[${message}]]*/ 'undefined';
-    if (message !== 'undefined' && message !== '') {
-      alert(message);  // 메시지를 alert로 띄움
-    }
-  </script>
-</div>
-
-<script>
-  function handlemodify() {
+<script th:inline="javascript">
+  document.getElementById("modify-form").onsubmit = function (event) {
+    event.preventDefault();
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
     var name = document.getElementById("name").value;
 
     // 서버로 로그인 요청을 보냄 (AJAX로 구현)
     $.ajax({
-      url: '/modify_ok',  // 서버의 POST 요청 URL
+      url: '/api/modify_ok',  // 서버의 POST 요청 URL
       type: 'POST',      // POST 요청
       data: {            // 폼 데이터 전송
         email: email,
         password: password,
         name: name
       },
-      success: function(response) {
+      success: function (response) {
         // 서버 응답 처리
         if (response.flag === 0) {
           alert(response.message);
           // 수정 성공 시 마이페이지로 이동
 
-          window.location.href = "/login";
+          window.location.href = "/api/login";
 
         } else {
           // 수정 실패 시 메시지 출력
           alert(response.message);
 
-          window.location.href = "/mypage";
+          window.location.href = "/api/mypage";
 
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         // 서버 오류 처리
         alert("수정 실패: " + error);
       }
@@ -291,59 +305,56 @@
   }
 
   // 탈퇴 버튼 클릭 이벤트
-  document.getElementById("deleteButton").addEventListener("click", function() {
-    window.location.href = "/withdrawalPage";
+  document.getElementById("deleteButton").addEventListener("click", function () {
+    window.location.href = "/api/withdrawalPage";
   });
 
-  // 예시 데이터를 사용하여 즐겨찾기 칵테일 목록을 생성
-  const cocktailData = [
-    {
-      name: "Mojito",
-      imgSrc: "https://via.placeholder.com/200x120?text=Mojito",
-      link: "search3.html#mojito" // search3.html로 이동하도록 설정
-    },
-    {
-      name: "Margarita",
-      imgSrc: "https://via.placeholder.com/200x120?text=Margarita",
-      link: "search3.html#margarita" // search3.html로 이동하도록 설정
-    },
-    {
-      name: "Old Fashioned",
-      imgSrc: "https://via.placeholder.com/200x120?text=Old+Fashioned",
-      link: "search3.html#oldfashioned" // search3.html로 이동하도록 설정
-    }
-  ];
 
-  // 칵테일 리스트를 DOM에 동적으로 추가하는 함수
-  function renderCocktailList() {
+  // Thymeleaf에서 전달된 ct 데이터를 JavaScript 배열로 변환
+  /*<![CDATA[*/
+  const cocktailData = /*[[${ct}]]*/ [];
+  /*]]>*/ // Thymeleaf에서 ct 리스트를 JavaScript 배열로 변환
+
+  function renderCocktailList(cocktailData) {
     const cocktailListElement = document.getElementById('cocktailList');
-    cocktailData.forEach(cocktail => {
-      const cocktailItem = document.createElement('div');
-      cocktailItem.classList.add('cocktail-item');
 
-      cocktailItem.innerHTML = `
-        <button class="cocktail-btn" onclick="window.location.href='${cocktail.link}'">
-          <img src="${cocktail.imgSrc}" alt="${cocktail.name}">
-          <div class="title">${cocktail.name}</div>
-        </button>
-      `;
+    // 배열이 비어 있지 않으면 동적으로 리스트 생성
+    if (cocktailData && cocktailData.length > 0) {
+      cocktailData.forEach(cocktail => {
+        const cocktailItem = document.createElement('td');
+        cocktailItem.classList.add('cocktail-item');
 
-      cocktailListElement.appendChild(cocktailItem);
-    });
+        // 칵테일 이름과 이미지를 동적으로 추가
+        cocktailItem.innerHTML = `
+          <button class="cocktail-btn" type="button" onclick="window.location.href='/api/search/cocktails/${cocktail.id}'">
+            <img src="${cocktail.image_url}" alt="${cocktail.name}">
+            <div class="title">${cocktail.name}</div>
+          </button>
+        `;
+
+        cocktailListElement.appendChild(cocktailItem);
+      });
+    } else {
+      // 찜한 칵테일이 없을 경우 메시지 표시
+      cocktailListElement.innerHTML = "<p>찜한 칵테일이 없습니다.</p>";
+    }
   }
+
+  // 페이지 로드 시, 서버에서 받아온 데이터를 기반으로 리스트 렌더링
+  renderCocktailList(cocktailData);
 
   // 로그아웃 처리 함수
   function logout() {
     // 세션 정보를 삭제하는 로그아웃 처리
     $.ajax({
-      url: '/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
+      url: '/api/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
       type: 'POST',
-      success: function(response) {
+      success: function (response) {
         // "로그아웃" 메시지를 띄우고 로그인 페이지로 리디렉션
         alert('로그아웃');
-        window.location.href = '/login';  // 로그인 페이지로 리디렉션
+        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         alert('로그아웃 실패: ' + error);
       }
     });
@@ -352,27 +363,24 @@
   // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
   function checkLogin() {
     $.ajax({
-      url: '/login_complete',  // 로그인 상태 확인 API
+      url: '/api/login_complete',  // 로그인 상태 확인 API
       type: 'POST',
-      success: function(response) {
+      success: function (response) {
         if (response.flag === 0) {
           // 세션이 있으면 mypage로 이동
-          window.location.href = '/mypage';
+          window.location.href = '/api/mypage';
         } else {
           // 세션이 없으면 login 페이지로 이동
           alert(response.message);  // "로그인해야 합니다."
-          window.location.href = '/login';
+          window.location.href = '/api/login';
         }
       },
-      error: function(xhr, status, error) {
+      error: function (xhr, status, error) {
         alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/login';  // 로그인 페이지로 리디렉션
+        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
       }
     });
   }
-
-  // 페이지 로드 시 칵테일 리스트 렌더링
-  window.onload = renderCocktailList;
 </script>
 </body>
 </html>

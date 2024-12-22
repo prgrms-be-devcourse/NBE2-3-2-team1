@@ -21,12 +21,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Slf4j
-//@RequestMapping("/api/login")
+@RequestMapping("/api")
 public class LoginController {
 
     @Autowired
@@ -153,7 +154,7 @@ public class LoginController {
 
         session.invalidate();
 
-        return "redirect:/login"; // JSON 형태로 반환
+        return "redirect:/api/login"; // JSON 형태로 반환
     }
 
     @PostMapping("/login_complete")
@@ -175,19 +176,82 @@ public class LoginController {
         return ResponseEntity.ok(response);
     }
 
-
-
     @GetMapping("/mypage")
-    public String showMyPage(
-        HttpSession session,
-        Model model,
-        RedirectAttributes redirectAttributes) {
-
+    public String showMyPage(HttpSession session, Model model) {
         System.out.println("mypage 호출");
+
+        String email = (String) session.getAttribute("semail");
+
+        // 세션이 있다면
+        if (email != null) {
+            Users users = loginService.findByEmail(email);
+            List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
+            List<Cocktails> cocktails = cocktailsRepository.findAll();
+
+            List<CocktailsDto> cocktailsDtos = new ArrayList<>();
+
+            for ( Cocktails cocktail : cocktails ) {
+                CocktailsDto cocktailsTo = new CocktailsDto();
+                cocktailsTo.setId(cocktail.getId());
+                cocktailsTo.setName(cocktail.getName());
+                cocktailsTo.setImage_url(cocktail.getImage_url());
+                cocktailsDtos.add(cocktailsTo);
+            }
+
+            if (users.getId() != null) {
+                // 세션에서 이메일을 통해 DB에서 유저 정보를 가져오기
+                // UserRegisterDto 객체에 유저 정보 담기
+                UserRegisterDto to = new UserRegisterDto();
+                to.setId(users.getId());
+                to.setEmail(users.getEmail());
+                to.setName(users.getName());
+                to.setPassword(users.getPassword());
+
+                // 모델에 유저 정보를 담아서 뷰로 전달
+                model.addAttribute("to", to);
+
+                // user, cocktails, cocktaillists 조인해서 user_id타고
+                // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
+                List<CocktailsDto> ct = new ArrayList<>();
+
+                for (CocktailLists cl : cocktailLists) {
+                    if ( users.getId().equals( cl.getUsers().getId() ) ) {
+                        for (CocktailsDto c : cocktailsDtos) {
+                            if (cl.getCocktails().getId().equals(c.getId())) {
+                                ct.add( c );
+                            }
+                        }
+                    }
+                }
+
+                for (CocktailsDto c : ct) {
+                    System.out.println("CocktailsDto: " + c);
+                }
+
+                model.addAttribute("ct", ct);
+
+                return "user/mypage";
+            }
+        }
+
+        return "redirect:/api/login";
+    }
+
+    @PostMapping("/mypage_ok")
+    public ResponseEntity<Map<String, Object>> myPageOk(
+        HttpSession session,
+        Model model
+        ) {
+
+        System.out.println("mypage_ok 호출");
+
+        Map<String, Object> response = new HashMap<>();
+
+        int flag = 2;
+
         String email = (String) session.getAttribute("semail");
         List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
         List<Cocktails> cocktails = cocktailsRepository.findAll();
-
 
         List<CocktailsDto> cocktailsDtos = new ArrayList<>();
 
@@ -205,17 +269,6 @@ public class LoginController {
 //        }
         Users users = loginService.findByEmail(email);
         if( email != null && users.getId() != null) {
-            // 세션에서 이메일을 통해 DB에서 유저 정보를 가져오기
-
-            // UserRegisterDto 객체에 유저 정보 담기
-            UserRegisterDto to = new UserRegisterDto();
-            to.setId(users.getId());
-            to.setEmail(users.getEmail());
-            to.setName(users.getName());
-            to.setPassword(users.getPassword());
-
-            // 모델에 유저 정보를 담아서 뷰로 전달
-            model.addAttribute("to", to);
 
             // user, cocktails, cocktaillists 조인해서 user_id타고
             // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
@@ -231,13 +284,24 @@ public class LoginController {
                 }
             }
 
-            model.addAttribute("ct", ct);
+            for (CocktailsDto c : ct) {
+                System.out.println("CocktailsDto: " + c);
+            }
 
-            return "user/mypage";
+            model.addAttribute("ct", ct);
+            flag = 0;
+            //return "user/mypage";
         } else {
-            redirectAttributes.addFlashAttribute("message", "로그인해야 합니다.");
-            return "redirect:/login";
+            flag = 1;
+            response.put("message", "로그인해야 합니다.");
+            // redirectAttributes.addFlashAttribute("message", "로그인해야 합니다.");
+            //return "redirect:/login";
         }
+
+        response.put("flag", flag);
+
+        return ResponseEntity.ok(response);
+
     }
 
     // 이메일은 변경 X
@@ -246,7 +310,8 @@ public class LoginController {
     public ResponseEntity<Map<String, Object>> modify_ok(
         @RequestParam("email") String email,
         @RequestParam("name") String name,
-        @RequestParam("password") String password
+        @RequestParam("password") String password,
+        HttpSession session
     ) {
         System.out.println("modify_ok 호출");
         Map<String, Object> response = new HashMap<>();
@@ -265,8 +330,9 @@ public class LoginController {
         int result = loginService.updateUser( name, encodedPassword, users.getId());
         System.out.println("result: " + result );
 
-        if (result == 0) {
+        if (result > 0) {
             flag = 0;
+            session.invalidate();
             response.put("message", "계정 정보 수정 성공");
         } else {
             flag = 1;
@@ -283,6 +349,11 @@ public class LoginController {
     @GetMapping("/withdrawalPage")
     public String showWithdrawalPage() {
         return "user/withdrawalPage"; // "login.html" 템플릿을 반환
+    }
+
+    @GetMapping("/withdrawalCompletePage")
+    public String showWithdrawalCompletePage() {
+        return "user/withdrawal_complete"; // "login.html" 템플릿을 반환
     }
 
     @PostMapping("/withdrawal_ok")
@@ -322,73 +393,6 @@ public class LoginController {
 
         return ResponseEntity.ok(response);
     }
-
-
-//    // Mypage에서 내가 찜한 칵테일 보여주기
-//    @PostMapping("/login/mypageUsersFavoriteCocktail")
-//    public List<CocktailsDto> mypageUsersFavoriteCocktail(
-//        @RequestParam("email") String email
-//    ) {
-//
-//        Users users = loginService.findByEmail( email );
-//        List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
-//        List<Cocktails> cocktails = cocktailsRepository.findAll();
-//
-//
-//        List<CocktailsDto> cocktailsDtos = new ArrayList<>();
-//
-//        for ( Cocktails cocktail : cocktails ) {
-//            CocktailsDto cocktailsTo = new CocktailsDto();
-//            cocktailsTo.setId(cocktail.getId());
-//            cocktailsTo.setName(cocktail.getName());
-//            cocktailsTo.setImage_url(cocktail.getImage_url());
-//            cocktailsDtos.add(cocktailsTo);
-//        }
-//
-//        // 칵테일 정보 잘 가져오는지 확인
-//        for (CocktailsDto c : cocktailsDtos) {
-//            out.println("CocktailsDto: " + c);
-//        }
-//
-//        List<CocktailsDto> ct = new ArrayList<>();
-//
-//        // user, cocktails, cocktaillists 조인해서 user_id타고
-//        // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
-//        for (CocktailLists cl : cocktailLists) {
-//            if ( users.getId().equals( cl.getUsers().getId() ) ) {
-//                for (CocktailsDto c : cocktailsDtos) {
-//                    if (cl.getCocktails().getId().equals(c.getId())) {
-//                        ct.add( c );
-//                    }
-//                }
-//            }
-//        }
-//
-//        return ct;
-//    }
-
-    // 이메일, 비밀번호, 이름, 생년월일(아마) select하기 (mypage에 띄워놓기: 프론트)
-//    @PostMapping("/login/mypageUserInformation")
-//    public void mypageUserInformation(
-//        @RequestParam("email") String email,
-//        Model model
-//    ) {
-//
-//        // DB에서 이메일, 패스워드 가져오기
-//        Users users = loginService.findByEmail( email );
-//
-//        // dto에 users값 넣기
-//        UserRegisterDto to = new UserRegisterDto();
-//        to.setId( users.getId() );
-//        to.setEmail( users.getEmail() );
-//        to.setName( users.getName() );
-//        to.setPassword( users.getPassword() );
-//
-//        model.addAttribute("to", to);
-//
-//    }
-
-
 
 }
 

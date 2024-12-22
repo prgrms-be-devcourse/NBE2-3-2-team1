@@ -93,7 +93,7 @@
     <a href="#">인기 칵테일</a>
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
-    <a href="/login_complete">
+    <a href="/api/login_complete">
       <img src="/images/line.png">
     </a>
   </div>
@@ -102,7 +102,7 @@
 <div class="header">회원가입</div>
 
 <!-- 폼 작성 -->
-<form id="signup-form" th:action="@{/register_ok}" method="POST" class="container">
+<form id="signup-form" th:action="@{/api/register_ok}" method="POST" class="container">
   <div class="sub-text">
     이름<br>
     <input type="text" name="name" placeholder="name" required><br><br>
@@ -130,7 +130,7 @@
     console.log(formData);
     // AJAX 요청
     $.ajax({
-      url: '/register_ok',  // 서버의 POST 요청 URL
+      url: '/api/register_ok',  // 서버의 POST 요청 URL
       type: 'POST',         // POST 요청
       data: formData,       // 폼 데이터
       processData: false,   // 폼 데이터 그대로 전송
@@ -139,16 +139,16 @@
         // 서버 응답 처리 (성공 시)
         if (response.flag === 0) {
           alert(response.message);
-          window.location.href = '/login';
+          window.location.href = '/api/login';
         } else {
           // 세션이 없으면 login 페이지로 이동
           alert(response.message);  // "로그인해야 합니다."
-          window.location.href = '/register';
+          window.location.href = '/api/register';
         }
       },
       error: function(xhr, status, error) {
         alert('회원가입 상태 확인 실패: ' + error);
-        window.location.href = '/register';  // 로그인 페이지로 리디렉션
+        window.location.href = '/api/register';  // 로그인 페이지로 리디렉션
       }
     });
   }

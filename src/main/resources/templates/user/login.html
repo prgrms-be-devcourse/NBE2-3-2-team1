@@ -113,33 +113,35 @@
 
 <div class="header">로그인</div>
 
-<div class="container">
+<form id="login-form" th:action="@{/apilogin_ok}" method="POST" class="container">
   <div class="sub-text">
-    이메일<br>
-    <input type="text" id="email" placeholder="email" ><br><br>
+      이메일<br>
+      <input type="text" id="email" placeholder="email" required><br><br>
 
-    비밀번호<br>
-    <input type="password" id="password" placeholder="password">
+      비밀번호<br>
+      <input type="password" id="password" placeholder="password" required>
 
-    <div class="sub-container">
-      <button type="button" class="login-btn" onclick="handleLogin()">로그인</button>
+      <div class="sub-container">
+        <button type="submit" class="login-btn">로그인</button>
+      </div>
+
+      <br><br>
+
+      아직 계정이 없으신가요?
+      <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
     </div>
-
-    <br><br>
-
-    아직 계정이 없으신가요?
-    <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
-  </div>
+  </form>
 </div>
 
 <script>
-  function handleLogin() {
+  document.getElementById("login-form").onsubmit = function(event) {
+    event.preventDefault();
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
     // 서버로 로그인 요청을 보냄 (AJAX로 구현)
     $.ajax({
-      url: '/login_ok',  // 서버의 POST 요청 URL
+      url: '/api/login_ok',  // 서버의 POST 요청 URL
       type: 'POST',      // POST 요청
       data: {            // 폼 데이터 전송
         email: email,
@@ -151,14 +153,15 @@
           alert(response.message);
           // 로그인 성공 시 마이페이지로 이동
 
-          window.location.href = "/mypage";
+          window.location.href = "/api/mypage";
 
+        } else if ( response.flag === 1) {
+          // 세션이 없으면 login 페이지로 이동
+          alert(response.message);  // "로그인해야 합니다."
+          window.location.href = '/api/login';
         } else {
-          // 로그인 실패 시 메시지 출력
-          alert(response.message);
-
-          window.location.href = "/login";
-
+          alert(response.message);  // "로그인해야 합니다."
+          window.location.href = '/api/login';
         }
       },
       error: function(xhr, status, error) {
@@ -171,24 +174,20 @@
   // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
   function checkLogin() {
     $.ajax({
-      url: '/login_complete',  // 로그인 상태 확인 API
+      url: '/api/login_complete',  // 로그인 상태 확인 API
       type: 'POST',
       success: function(response) {
         if (response.flag === 0) {
           // 세션이 있으면 mypage로 이동
-          window.location.href = '/mypage';
-        } else if ( response.flag === 1) {
-          // 세션이 없으면 login 페이지로 이동
-          alert(response.message);  // "로그인해야 합니다."
-          window.location.href = '/login';
+          window.location.href = '/api/mypage';
         } else {
-          alert(response.message);  // "로그인해야 합니다."
-          window.location.href = '/login';
+          alert(response.message); // "로그인해야 합니다."
+          window.location.href = '/api/login';
         }
       },
       error: function(xhr, status, error) {
         alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/login';  // 로그인 페이지로 리디렉션
+        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
       }
     });
   }
@@ -196,7 +195,7 @@
 
   // 회원가입 페이지로 이동
   function goToSignUp() {
-    window.location.href = "/register";
+    window.location.href = "/api/register";
   }
 </script>
 

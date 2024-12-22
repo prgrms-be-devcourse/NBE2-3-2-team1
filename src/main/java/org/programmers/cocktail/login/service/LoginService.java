@@ -34,22 +34,18 @@ public class LoginService {
         return users;
     }
 
-    public Users selectByEmailandPassword(String email, String password) {
-
-        Users users = usersRepositoryCustom.findByEmailAndPassword(email, password);
-
-        return users;
-    }
+//    public Users selectByEmailandPassword(String email, String password) {
+//
+//        Users users = usersRepositoryCustom.findByEmailAndPassword(email, password);
+//
+//        return users;
+//    }
 
     public int updateUser(String name, String password, Long id) {
 
         int flag = usersRepositoryCustom.updateById(name, password, id);
 
-        if ( flag == 0 ) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return flag;
     }
 
 
