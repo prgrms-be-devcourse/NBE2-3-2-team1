@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.spring6.processor.SpringInputCheckboxFieldTagProcessor;
 
 
 @RestController
@@ -219,20 +220,21 @@ public class SearchController {
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Integer> deleteLikesByUser(@PathVariable String cocktailId) {
+    public ResponseEntity<Void> deleteLikesByUser(@PathVariable String cocktailId) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         // 3. cocktail_likes에서 user_id, cocktail_id 삭제
@@ -244,7 +246,7 @@ public class SearchController {
         int cocktailLikesDeleteResult = cocktailLikesService.deleteCocktailLikes(cocktailLikesTO);
 
         if(cocktailLikesDeleteResult==0){
-            return ResponseEntity.ok(OPERATION_FAIL);       //DB삭제 실패
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
         }
 
         // cocktailId에 해당하는 cocktailsLikes 값 가져오기
@@ -259,10 +261,10 @@ public class SearchController {
 
         // SUCCESS: 1, FAIL: 0
         if(cocktailLikesCountUpdateResult==0){
-            return ResponseEntity.ok(OPERATION_FAIL);     // 칵테일 좋아요 업데이트 실패
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패
         }
 
-        return ResponseEntity.ok(OPERATION_SUCCESS);        //DB삭제 성공
+        return ResponseEntity.noContent().build();      //DB삭제 성공
     }
 
     @GetMapping("/reviews/cocktails/{cocktailId}")
@@ -272,7 +274,9 @@ public class SearchController {
 
         List<CommentsTO> commentsTOList = commentsService.findByCocktailId(Long.parseLong(cocktailId));
 
-        if(commentsTOList.isEmpty()){
+        System.out.println("commentsTOList: "+ commentsTOList);
+        if(commentsTOList.isEmpty()||commentsTOList==null){
+            System.out.println("commentsTOListisempty");
             return ResponseEntity.noContent().build();      // 상태코드 204 전송
         }
 
@@ -307,7 +311,6 @@ public class SearchController {
         int commentsInsertResult = commentsService.insertComments(commentsTO);
 
         if(commentsInsertResult==0){
-            // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
         }
 
