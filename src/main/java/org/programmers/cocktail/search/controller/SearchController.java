@@ -1,13 +1,10 @@
 package org.programmers.cocktail.search.controller;
 
 import java.util.List;
-import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToUrl;
-import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.CommentsTO;
-import org.programmers.cocktail.search.dto.ReviewData;
 import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailLikesService;
@@ -16,23 +13,19 @@ import org.programmers.cocktail.search.service.CocktailsService;
 import org.programmers.cocktail.search.service.CommentsService;
 import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-//@RestController
-@Controller
+
+@RestController
 @RequestMapping("/api")
 public class SearchController {
 
@@ -57,11 +50,8 @@ public class SearchController {
     static final int NOT_LOGGED_IN = 0;
     static final int OPERATION_FAIL = 1;
     static final int OPERATION_SUCCESS = 2;      // FAVORITED, ADD, DELETE
-
     // todo 로그인 및 userid 가져오는 부분 메서드화
-
     @GetMapping("/search/cocktails")
-    @ResponseBody
     public ResponseEntity<List<CocktailsTO>> getCocktailSearchResults(@RequestParam String userInput) {
 
         // 검색결과 설정
@@ -103,32 +93,7 @@ public class SearchController {
         return ResponseEntity.ok(cocktailSearchList);
     }
 
-    @RequestMapping("/search/cocktails/{cocktailId}")
-    public String getCocktailInfoById(@PathVariable String cocktailId, Model model) {
-        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
-
-        System.out.println(cocktailsById);
-        model.addAttribute("cocktailById", cocktailsById);
-
-        // 특정 칵테일 상세페이지 조회시 해당 칵테일 hit 증가
-        CocktailsTO cocktailsTO = new CocktailsTO();
-        cocktailsTO.setId(Long.parseLong((cocktailId)));
-
-        // SUCCESS: 1, FAIL: 0
-        int cocktailHitsUpdateResult = cocktailsService.updateCocktailHits(cocktailsTO);
-
-        if(cocktailHitsUpdateResult==0)
-        {
-            System.out.println("[에러] Cocktail Hits Update Failed");
-        }
-
-        // todo 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
-        // todo 리스트 상세페이지 구현되면 상세페이지 반환하도록 설정
-        return "favorites";
-    }
-
     @GetMapping("/favorites/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> isFavoritedByUser(@PathVariable String cocktailId){
 
         // 1. 로그인 상태 확인
@@ -158,7 +123,6 @@ public class SearchController {
     }
 
     @PostMapping("/favorites/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> addFavoritesByUser(@PathVariable String cocktailId){
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -192,7 +156,6 @@ public class SearchController {
     }
 
     @DeleteMapping("/favorites/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> deleteFavoritesByUser(@PathVariable String cocktailId){
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -226,7 +189,6 @@ public class SearchController {
     }
 
     @GetMapping("/likes/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> isLikedByUser(@PathVariable String cocktailId) {
 
         // 1. 로그인 상태 확인
@@ -256,7 +218,6 @@ public class SearchController {
     }
 
     @PostMapping("/likes/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> addLikesByUser(@PathVariable String cocktailId) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -290,7 +251,6 @@ public class SearchController {
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> deleteLikesByUser(@PathVariable String cocktailId) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -324,7 +284,6 @@ public class SearchController {
     }
 
     @GetMapping("/reviews/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<List<CommentsTO>> loadCocktailComments(@PathVariable String cocktailId) {
 
         System.out.println("enter loadCocktailComments");
@@ -340,7 +299,6 @@ public class SearchController {
     }
 
     @PostMapping("/reviews/cocktails/{cocktailId}")
-    @ResponseBody
     public ResponseEntity<Integer> registerCocktailComments(@PathVariable String cocktailId,
         @RequestBody CommentsTO commentsTOFromClient) {
 
@@ -375,7 +333,6 @@ public class SearchController {
     }
 
     @DeleteMapping("/reviews/cocktails/{reviewId}")
-    @ResponseBody
     public ResponseEntity<Void> deleteCocktailComments(@PathVariable String reviewId) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
@@ -398,5 +355,7 @@ public class SearchController {
         }
         return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
     }
+
+
 
 }
