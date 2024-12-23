@@ -51,19 +51,23 @@ function handleRequest(icon, url, additionalClass, activeSymbol, inactiveSymbol)
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function () {
     if (xhr.readyState === XMLHttpRequest.DONE) {
-      if (xhr.status === 200) {
-        const response = parseInt(xhr.responseText);
-        if (response === 2) {
-          console.log(icon.id, " : ", response);
+      if (xhr.status === 204) {
           icon.classList.add(additionalClass);
           icon.innerHTML = activeSymbol;
-        } else {
-          console.log(icon.id, " : ", response);
+        }
+      else {
+          // 상태코드 401, 500 공통
           icon.classList.remove(additionalClass);
           icon.innerHTML = inactiveSymbol;
-        }
-      } else {
-        console.error(`Error processing request to ${url}`);
+
+          if(xhr.status===500){
+            // 상태코드 500 반환시
+            if(additionalClass=== "favorited"){
+              alert('즐겨찾기 정보 조회에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
+            }else{
+              alert('좋아요 정보 조회에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
+            }
+          }
       }
     }
   };
