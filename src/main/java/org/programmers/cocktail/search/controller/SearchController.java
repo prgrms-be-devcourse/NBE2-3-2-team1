@@ -98,7 +98,8 @@ public class SearchController {
 
         // 1. 로그인 상태 확인
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
-        String session = "abc@abc.com";
+        //        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -127,7 +128,8 @@ public class SearchController {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
-        String session = "abc@abc.com";
+        //        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -160,7 +162,8 @@ public class SearchController {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
-        String session = "abc@abc.com";
+        //        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -193,7 +196,8 @@ public class SearchController {
 
         // 1. 로그인 상태 확인
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
-        String session = "abc@abc.com";
+//        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -222,7 +226,8 @@ public class SearchController {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
-        String session = "abc@abc.com";
+//        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -247,6 +252,21 @@ public class SearchController {
             return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
         }
 
+        // cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
+
+        // cocktails테이블에 cocktailsLikes 값 업데이트
+        CocktailsTO cocktailsTO = new CocktailsTO();
+        cocktailsTO.setId(Long.parseLong(cocktailId));
+        cocktailsTO.setLikes(cocktailLikesCountById);
+
+        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
+
+        // SUCCESS: 1, FAIL: 0
+        if(cocktailLikesCountUpdateResult==0){
+            return ResponseEntity.ok(OPERATION_FAIL);     // 칵테일 좋아요 업데이트 실패
+        }
+
         return ResponseEntity.ok(OPERATION_SUCCESS);        // DB추가 성공
     }
 
@@ -255,7 +275,8 @@ public class SearchController {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
-        String session = "abc@abc.com";
+        //        String session = "abc@abc.com";
+        String session = "cde@cde.com";
         if(session == null){
             //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
             //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
@@ -278,6 +299,21 @@ public class SearchController {
 
         if(cocktailLikesDeleteResult==0){
             return ResponseEntity.ok(OPERATION_FAIL);       //DB삭제 실패
+        }
+
+        // cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
+
+        // cocktails테이블에 cocktailsLikes 값 업데이트
+        CocktailsTO cocktailsTO = new CocktailsTO();
+        cocktailsTO.setId(Long.parseLong(cocktailId));
+        cocktailsTO.setLikes(cocktailLikesCountById);
+
+        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
+
+        // SUCCESS: 1, FAIL: 0
+        if(cocktailLikesCountUpdateResult==0){
+            return ResponseEntity.ok(OPERATION_FAIL);     // 칵테일 좋아요 업데이트 실패
         }
 
         return ResponseEntity.ok(OPERATION_SUCCESS);        //DB삭제 성공

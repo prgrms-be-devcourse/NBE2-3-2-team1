@@ -71,4 +71,20 @@ public class CocktailsService {
         return SUCCESS;
     }
 
+    public int updateCocktailLikesCount(CocktailsTO cocktailsTO) {
+
+        Cocktails cocktails = cocktailsRepository.findById(cocktailsTO.getId()).orElse(null);
+
+        if(cocktails == null){
+            return FAIL;
+        }
+        cocktails.setLikes(cocktailsTO.getLikes());
+
+        cocktailsRepository.flush();
+
+        System.out.println(cocktails);
+
+        return SUCCESS;
+    }
+
 }

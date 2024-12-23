@@ -84,6 +84,7 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
               console.log(icon.id, " : ", response);
               icon.innerHTML = inactiveSymbol;
               icon.classList.remove(additionalClass); // 비활성화
+              location.reload(); //새로고침
             } else {
               console.log(response);
             }
@@ -104,6 +105,7 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
               console.log(icon.id, " : ", response);
               icon.innerHTML = activeSymbol;
               icon.classList.add(additionalClass); // 활성화
+              location.reload(); //새로고침
             } else {
               console.log(response);
             }

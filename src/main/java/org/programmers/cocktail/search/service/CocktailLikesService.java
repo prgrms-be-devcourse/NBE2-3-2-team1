@@ -3,6 +3,7 @@ package org.programmers.cocktail.search.service;
 import java.util.Optional;
 import org.programmers.cocktail.entity.CocktailLikes;
 import org.programmers.cocktail.entity.CocktailLists;
+import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepository;
 import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositoryCustom;
 import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositoryImpl;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryCustom;
@@ -21,8 +22,9 @@ public class CocktailLikesService {
     @Autowired
     private CocktailLikesRepositoryCustom cocktailLikesRepositoryCustom;
 
-//    @Autowired
-//    private CocktailLikesRepositoryImpl cocktailLikesRepositoryImpl;
+    @Autowired
+    private CocktailLikesRepository cocktailLikesRepository;
+
 
     @Autowired
     private CocktailLikesMapper cocktailLikesMapper;
@@ -63,6 +65,14 @@ public class CocktailLikesService {
         return SUCCESS;
     }
 
+    public Long countCocktailLikesById(CocktailLikesTO cocktailLikesTO){
 
+        //todo 예외처리 -> 에러 발생시 어떻게 처리할지 체크
+        // 1) cocktailLikesTO에 cocktailid가 null일때
+        // 2)
+        Long cocktailLikesCountById = cocktailLikesRepository.countCocktailLikesById(cocktailLikesTO.getCocktailId());
+
+        return cocktailLikesCountById;
+    }
 
 }
