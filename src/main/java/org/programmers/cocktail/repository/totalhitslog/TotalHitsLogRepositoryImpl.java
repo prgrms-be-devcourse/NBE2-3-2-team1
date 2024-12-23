@@ -4,6 +4,7 @@ import static org.programmers.cocktail.entity.QTotalHitsLog.totalHitsLog;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.TotalHitsLog;
 import org.springframework.stereotype.Repository;
@@ -28,5 +29,11 @@ public class TotalHitsLogRepositoryImpl implements TotalHitsLogRepositoryCustom 
             .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<TotalHitsLog> findSevendaysByRecordedAtBetween(LocalDateTime startOfDay,
+        LocalDateTime endOfDay) {
+        return List.of();
     }
 }

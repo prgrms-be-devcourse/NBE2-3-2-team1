@@ -37,12 +37,12 @@ public class DashboardWebController {
      * 카드 형식으로 commentCount, CountGrowthRate, YesterdayCounts를 계산하여 총 댓글 수 추이를 가져옵니다.
      */
     @GetMapping("/dashboard")
-    public ModelAndView dashboard(ModelAndView mv) {
+    public ModelAndView dashboard(ModelAndView mv ) {
         List<DashboardCocktailResponse> list = dashboardService.getCocktailsTopThreeByLikesDesc();
 
         mv.addObject("list", list);
 
-        int userCount = dashboardService.countByRoleUser();
+        long userCount = dashboardService.countByRoleUser();
         mv.addObject("userCount", userCount);
 
         long yesterdayUsers = dashboardService.countTotalUserUntilYesterday();
@@ -83,7 +83,9 @@ public class DashboardWebController {
             mv.addObject("commentGrowthRate", 0.0);
         }
 
-        mv.setViewName("dashboard");
+        mv.setViewName("/admin/dashboard");
+
+
         return mv;
     }
 }

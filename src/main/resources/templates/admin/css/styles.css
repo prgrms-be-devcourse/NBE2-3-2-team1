@@ -1,255 +1,97 @@
-/* styles.css */
-
-/* 전체 페이지의 기본 폰트 설정 */
+/* 기본 레이아웃 구조 */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f2f5;
-    color: #333;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    padding-top: 56px; /* 네비게이션 바 높이만큼 패딩 추가 */
 }
 
-/* 상단 내비게이션 바 스타일 */
+/* 네비게이션 바 */
 .navbar {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background: white !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 56px;
-    flex-shrink: 0; /* 내비게이션 바가 축소되지 않도록 설정 */
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1031; /* z-index 값 증가 */
 }
 
-/* 컨테이너 스타일 */
-.container-fluid {
-    flex: 1; /* 나머지 공간을 모두 차지 */
+/* wrapper 수정 */
+.wrapper {
     display: flex;
-    overflow: hidden;
+    min-height: calc(100vh - 56px);
+    position: relative;
+    margin-top: 0; /* margin-top 제거 */
 }
 
-/* 사이드바 스타일 */
+/* 사이드바 수정 */
 .sidebar {
     width: 220px;
-    padding-top: 20px;
+    min-width: 220px;
+    background-color: #f8f9fa;
     border-right: 1px solid #dee2e6;
-    background-color: #ffffff;
-    transition: all 0.3s;
-    height: 100%;
-    overflow-y: auto;
-    position: fixed; /* 고정 위치 설정 */
-    top: 56px; /* 내비게이션 바 아래에 위치 */
-    left: 0;
-    bottom: 0;
-}
-
-/* 사이드바 헤딩 스타일 */
-.sidebar-heading {
-    padding: 12px 16px;
-    font-size: 1.1rem;
-    color: #2c3e50;
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 10px; /* 여백 축소 */
-}
-
-/* 네비게이션 링크 스타일 */
-.nav-link {
-    color: #2c3e50;
-    transition: all 0.3s;
-    padding: 8px 12px; /* 패딩 축소 */
-    border-radius: 4px; /* 라운드 축소 */
-    margin: 0 8px 4px 8px; /* 마진 축소 */
-    display: flex;
-    align-items: center;
-    font-size: 0.95rem; /* 글자 크기 축소 */
-}
-
-.nav-link:hover {
-    background-color: #3498db;
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.nav-link.active {
-    background-color: #2980b9;
-    color: #ffffff;
-}
-
-.nav-link i {
-    margin-right: 8px;
-    width: 16px;
-    text-align: center;
-    color: inherit;
-    font-size: 1rem; /* 아이콘 크기 조정 */
-}
-
-/* 메인 콘텐츠 스타일 */
-main {
-    margin-left: 220px; /* 사이드바 너비만큼 마진 설정 */
-    padding: 16px 24px;
-    height: 100%;
-    overflow-y: auto;
-    flex: 1;
-    background-color: #f0f2f5;
-}
-
-/* 카드 레이아웃 개선: Bootstrap의 그리드 시스템 사용 */
-.card-deck {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -10px;
-}
-
-.card-deck .card {
-    margin: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s;
-    border: none;
-    border-radius: 12px;
-    overflow: hidden;
-    flex: 1 1 calc(33.333% - 20px); /* 3개씩 배치 */
-    max-width: calc(33.333% - 20px);
-    min-width: 250px; /* 최소 너비 설정 */
-}
-
-.card-deck .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.card-img-top {
-    height: 140px;
-    object-fit: cover;
-}
-
-/* 대시보드 제목 스타일 */
-main h2 {
-    color: #2c3e50;
-    border-bottom: 3px solid #3498db;
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-}
-
-/* 대시보드 섹션 제목 스타일 */
-main h5 {
-    color: #2c3e50;
-    margin: 15px 0;
-    border-left: 4px solid #3498db;
-    padding-left: 12px;
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-/* 상태 카드 스타일 */
-.status-card {
-    border: none;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    height: 100%;
-    margin-bottom: 0;
-    color: #ffffff; /* 텍스트 색상 흰색으로 설정 */
-}
-
-.status-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.status-card .card-header {
-    border: none;
-    padding: 15px;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-}
-
-.status-card .card-body {
-    padding: 15px;
-}
-
-.status-card .card-title {
-    font-size: 1.2rem;
-    margin: 0;
-    color: #ffffff; /* 카드 본문 텍스트 색상 변경 */
-}
-
-/* 배경 색상 조정 */
-.bg-views {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-}
-
-.bg-users {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-}
-
-.bg-comments {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-}
-
-/* 차트 컨테이너 스타일 */
-.chart-container {
-    background: white;
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    height: 250px;
-    margin: 15px 0;
-    width: 100%;
+    position: fixed;
+    top: 56px; /* navbar 높이만큼 떨어뜨림 */
+    left: 0;
+    bottom: 0; /* bottom 추가 */
+    overflow-y: auto;
+    z-index: 1030;
+    transition: transform 0.3s ease-in-out;
 }
 
-/* 반응형 조정 */
-@media (max-width: 1200px) {
-    .card-deck .card {
-        flex: 1 1 calc(50% - 20px); /* 2개씩 배치 */
-        max-width: calc(50% - 20px);
-    }
+/* 메인 컨텐츠 영역 수정 */
+.main-wrapper {
+    flex: 1;
+    margin-left: 220px;
+    padding: 20px;
+    background-color: #f0f2f5;
+    min-height: calc(100vh - 56px);
+    width: calc(100% - 220px);
+    position: relative; /* position 속성 추가 */
 }
 
+/* 반응형 디자인 수정 */
 @media (max-width: 992px) {
-    .card-deck .card {
-        flex: 1 1 calc(100% - 20px); /* 1개씩 배치 */
-        max-width: calc(100% - 20px);
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* 모바일에서 사이드바가 열렸을 때 배경 오버레이 */
+    .sidebar.show::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: -1;
     }
 }
+/* 나머지 스타일은 그대로 유지 */
 
-@media (max-width: 768px) {
-    /* 모바일 화면 스타일 유지 */
-    body {
-        overflow: auto;
-    }
-    
-    .container-fluid {
-        height: auto;
-        overflow: auto;
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        position: relative; /* 고정 위치 해제 */
-        width: 100%;
-        height: auto;
-        margin-bottom: 20px;
-    }
-    
-    main {
-        margin-left: 0; /* 사이드바 너비 마진 제거 */
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-    
-    .card-deck {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        margin: 0;
-    }
-    
-    .card-deck .card {
-        max-width: 100%;
-        margin: 0 0 15px 0;
-        flex: none;
-    }
+/* 배경색 클래스 */
+.bg-views { background-color: #e3f2fd; }
+.bg-users { background-color: #e8f5e9; }
+.bg-comments { background-color: #fce4ec; }
+
+/* 추가 유틸리티 */
+.overflow-hidden {
+    overflow: hidden !important;
 }

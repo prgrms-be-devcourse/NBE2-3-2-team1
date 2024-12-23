@@ -46,12 +46,15 @@ public class DashboardService {
                 .imageUrl(cocktail.getImage_url())
                 .hits(cocktail.getHits())
                 .likes(cocktail.getLikes())
+                .comments((long) cocktail.getComments().size())
                 .build())
             .toList();
     }
 
-    public int countByRoleUser() {
-        return authoritiesRepository.countByRole("ROLE_USER");
+    public Long countByRoleUser() {
+        Long countByRole = (long) authoritiesRepository.countByRole("ROLE_USER");
+        log.info("countByRole: {}", countByRole);
+        return countByRole;
     }
 
     public Long countComments() {
@@ -67,7 +70,10 @@ public class DashboardService {
     }
 
     public Long countTotalUserUntilYesterday() {
-        return authoritiesRepository.countTotalUserUntilYesterday("USER_ROLE", LocalDateTime.now());
+        log.info("localDateTime: {}", LocalDateTime.now());
+        Long countTotalUserUntilYesterday = authoritiesRepository.countTotalUserUntilYesterday("ROLE_USER", LocalDateTime.now());
+        log.info("countTotalUserUntilYesterday: {}", countTotalUserUntilYesterday);
+        return countTotalUserUntilYesterday;
     }
 
     public Long countTotalCommentsUntilYesterday() {

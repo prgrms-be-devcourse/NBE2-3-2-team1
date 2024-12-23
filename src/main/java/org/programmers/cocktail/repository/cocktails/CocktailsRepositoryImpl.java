@@ -20,9 +20,12 @@ public class CocktailsRepositoryImpl implements CocktailsRepositoryCustom {
     @Override
     public Long getTotalHits() {
         QCocktails cocktails = QCocktails.cocktails;
-        return queryFactory
+        Long sum = queryFactory
             .select(cocktails.hits.sum())
             .from(cocktails)
             .fetchOne();
+
+        return sum != null ? sum : 0L;
     }
+
 }
