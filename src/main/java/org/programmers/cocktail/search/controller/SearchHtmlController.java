@@ -84,6 +84,13 @@ public class SearchHtmlController {
         return "user/top";
     }
 
+    // 추천칵테일 페이지 반환
+    @RequestMapping("/recommend")
+    public String recommendCocktailPage() {
+        // 인기 칵테일페이지로 이동
+        return "user/suggestion";
+    }
+
     // 메인페이지 반환
     @RequestMapping("/main")
     public String mainCocktailPage() {
