@@ -173,20 +173,21 @@ public class SearchController {
     }
 
     @PostMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Integer> addLikesByUser(@PathVariable String cocktailId) {
+    public ResponseEntity<Void> addLikesByUser(@PathVariable String cocktailId) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         // 3. cocktail_likes에 user_id, cocktail_id 저장
@@ -198,7 +199,7 @@ public class SearchController {
         int cocktailLikesInsertResult = cocktailLikesService.insertCocktailLikes(cocktailLikesTO);
 
         if(cocktailLikesInsertResult==0){
-            return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
         }
 
         // cocktailId에 해당하는 cocktailsLikes 값 가져오기
@@ -213,10 +214,10 @@ public class SearchController {
 
         // SUCCESS: 1, FAIL: 0
         if(cocktailLikesCountUpdateResult==0){
-            return ResponseEntity.ok(OPERATION_FAIL);     // 칵테일 좋아요 업데이트 실패
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패(500반환)
         }
 
-        return ResponseEntity.ok(OPERATION_SUCCESS);        // DB추가 성공
+        return ResponseEntity.noContent().build();      //DB추가 성공
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")

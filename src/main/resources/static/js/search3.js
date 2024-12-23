@@ -92,7 +92,6 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
             }else{
               alert('좋아요 취소에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
             }
-
           }
         }
       };
@@ -102,18 +101,21 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
       xhr.open("POST", url, true);
       xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            const response = parseInt(xhr.responseText);
-            if (response === 2) {
-              console.log(icon.id, " : ", response);
+          if (xhr.status === 204) {
               icon.innerHTML = activeSymbol;
               icon.classList.add(additionalClass); // 활성화
               location.reload(); //새로고침
-            } else {
-              console.log(response);
             }
-          } else {
-            console.error("Error adding favorite/like");
+          else if(xhr.status === 401){
+            alert('로그인이 필요합니다.');
+          }
+          else{
+            // 상태코드 500 반환시
+            if(additionalClass=== "favorited"){
+              alert('즐겨찾기 등록에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
+            }else{
+              alert('좋아요 등록에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
+            }
           }
         }
       };
