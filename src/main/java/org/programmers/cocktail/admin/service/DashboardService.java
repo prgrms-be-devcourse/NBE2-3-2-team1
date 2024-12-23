@@ -57,16 +57,15 @@ public class DashboardService {
         return countByRole;
     }
 
+    public List<Long> countUserTotalList() {
+        return authoritiesRepository.countUserTotalList(LocalDateTime.now());
+    }
     public Long countComments() {
         return (long) commentsRepository.findAll().size();
     }
 
     public Optional<Users> getUserById(Long id) {
         return usersRepository.findById(id);
-    }
-
-    public Long getTotalHits() {
-        return cocktailsRepository.getTotalHits();
     }
 
     public Long countTotalUserUntilYesterday() {
@@ -78,6 +77,10 @@ public class DashboardService {
 
     public Long countTotalCommentsUntilYesterday() {
         return commentsRepository.countTotalCommentsUntilYesterday(LocalDateTime.now());
+    }
+
+    public List<Long> countCommentsList() {
+        return commentsRepository.countCommentsList(LocalDateTime.now());
     }
 
 }

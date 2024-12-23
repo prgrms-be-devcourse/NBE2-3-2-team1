@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10000cocktail admin - 댓글 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="#">
+    <style>
+        /* 기본 레이아웃 구조 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1031;
+        }
+
+        /* wrapper 수정 */
+        .wrapper {
+            display: flex;
+            min-height: calc(100vh - 56px);
+            position: relative;
+            margin-top: 0;
+        }
+
+        /* 사이드바 수정 */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 1030;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 메인 컨텐츠 영역 수정 */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 220px;
+            padding: 20px;
+            padding-top: 76px;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 반응형 디자인 수정 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            /* 모바일에서 사이드바가 열렸을 때 배경 오버레이 */
+            .sidebar.show::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: -1;
+            }
+        }
+
+        /* 배경색 클래스 */
+        .bg-views { background-color: #e3f2fd; }
+        .bg-users { background-color: #e8f5e9; }
+        .bg-comments { background-color: #fce4ec; }
+
+        /* 추가 유틸리티 */
+        .overflow-hidden {
+            overflow: hidden !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">10000cocktail admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarAdmin">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i> 관리자
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> 프로필</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> 설정</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 사이드바 -->
+<div class="wrapper">
+    <nav class="sidebar">
+        <h4 class="sidebar-heading">관리 메뉴</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-tachometer-alt"></i> 대시보드</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-user-cog"></i> 계정 관리</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#"><i class="fas fa-comments"></i> 댓글 관리</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-wrapper">
+        <h2>댓글 관리</h2>
+
+        <!-- 검색 폼(예시) -->
+        <form class="row g-3 mb-3" method="get" th:action="@{/admin/comments}">
+            <div class="col-auto">
+                <input type="text" name="keyword" class="form-control" placeholder="댓글 내용 검색"
+                       th:value="${param.keyword}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+            </div>
+        </form>
+
+        <!-- 댓글 목록(예시) -->
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">내용</th>
+                        <th scope="col">작성자</th>
+                        <th scope="col">작성일</th>
+                        <th scope="col">관련 칵테일</th>
+                        <th scope="col" style="width:120px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <!-- 예시: comments 목록 -->
+                <tr th:each="comment, iStat : ${comments}">
+                    <th scope="row" th:text="${iStat.index + 1}">1</th>
+                    <td th:text="${comment.content}">이 칵테일 정말 맛있네요!</td>
+                    <td th:text="${comment.authorName}">홍길동</td>
+                    <td th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-02 13:00</td>
+                    <td th:text="${comment.cocktailName}">Margarita</td>
+                    <td>
+                        <!-- 수정, 삭제 버튼 예시 -->
+                        <a th:href="@{/admin/comments/edit/{id}(id=${comment.id})}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger"
+                                th:onclick="'if(confirm(\'정말 이 댓글을 삭제하시겠습니까?\')) location.href=\'/admin/comments/delete/'+${comment.id}+'\';'">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+                <!-- 데이터가 없을 때 표시 -->
+                <tr th:if="${#lists.isEmpty(comments)}">
+                    <td colspan="6" class="text-center">등록된 댓글이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션(예시) -->
+        <nav aria-label="Page navigation" th:if="${totalPages > 1}">
+            <ul class="pagination justify-content-center mt-3">
+                <li class="page-item" th:classappend="${page == 1} ? ' disabled'">
+                    <a class="page-link" th:href="@{/admin/comments(page=${page-1}, keyword=${param.keyword})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <li class="page-item" th:each="p : ${#numbers.sequence(1, totalPages)}"
+                    th:classappend="${p == page} ? ' active'">
+                    <a class="page-link" th:href="@{/admin/comments(page=${p}, keyword=${param.keyword})}"
+                       th:text="${p}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${page == totalPages} ? ' disabled'">
+                    <a class="page-link" th:href="@{/admin/comments(page=${page+1}, keyword=${param.keyword})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

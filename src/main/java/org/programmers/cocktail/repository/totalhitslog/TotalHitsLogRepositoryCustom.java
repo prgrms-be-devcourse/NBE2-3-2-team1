@@ -6,8 +6,10 @@ import java.util.Optional;
 import org.programmers.cocktail.entity.TotalHitsLog;
 
 public interface TotalHitsLogRepositoryCustom {
-    Optional<TotalHitsLog> findByRecordedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
+    long getYesterdayLog(LocalDateTime yesterday);
 
-    List<TotalHitsLog> findSevendaysByRecordedAtBetween(LocalDateTime startOfDay, LocalDateTime endOfDay);
+    long getTodayLog(LocalDateTime today);
+
+    List<Long> getListLog(LocalDateTime today);
 
 }

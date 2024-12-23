@@ -13,11 +13,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 0;
+            padding: 0; /* 여기서 padding-top: 56px; 제거 */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-top: 56px; /* 네비게이션 바 높이만큼 패딩 추가 */
         }
 
         /* 네비게이션 바 */
@@ -61,12 +60,23 @@
             flex: 1;
             margin-left: 220px;
             padding: 20px;
+            padding-top: 76px; /* 혹은 56px + 여유분 등 적절히 조정 */
             background-color: #f0f2f5;
-            min-height: calc(100vh - 56px);
-            width: calc(100% - 220px);
-            position: relative; /* position 속성 추가 */
+            min-height: 100vh;
+            position: relative;
         }
 
+        .chart-container {
+            width: 100%;
+            height: 360px;
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
         /* 반응형 디자인 수정 */
         @media (max-width: 992px) {
             .sidebar {
@@ -240,13 +250,13 @@
             <h5>통계 데이터</h5>
             <ul class="nav nav-tabs mb-3" id="chartTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="views-tab" data-bs-toggle="tab" data-bs-target="#viewsChart" type="button" role="tab" aria-controls="views" aria-selected="true">조회수</button>
+                    <button class="nav-link active" id="views-tab" data-bs-toggle="tab" data-bs-target="#viewsChart" type="button" role="tab" aria-controls="views" aria-selected="true">누적 조회수</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#usersChart" type="button" role="tab" aria-controls="users" aria-selected="false">사용자</button>
+                    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#usersChart" type="button" role="tab" aria-controls="users" aria-selected="false">누적 사용자수</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#commentsChart" type="button" role="tab" aria-controls="comments" aria-selected="false">댓글</button>
+                    <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#commentsChart" type="button" role="tab" aria-controls="comments" aria-selected="false">누적 댓글수</button>
                 </li>
             </ul>
 
@@ -310,6 +320,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
+    /*<![CDATA[*/
     // 탭 전환시 차트 리사이즈를 위한 이벤트 리스너
     document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(button => {
         button.addEventListener('shown.bs.tab', () => {
@@ -317,14 +328,21 @@
         });
     });
 
+    var hitsLogData = /*[[${HitsLog}]]*/;
+
+    var usersLogData = /*[[${usersList}]]*/;
+
+    var commentsLogData = /*[[${commentsList}]]*/;
+
+
     // 조회수 차트
     const viewsChart = new Chart(document.getElementById('viewsChartCanvas').getContext('2d'), {
         type: 'line', // 직선형 그래프로 변경
         data: {
-            labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
             datasets: [{
-                label: '일일 조회수',
-                data: [1200, 1500, 1700, 1400, 2200, 1800, 2500, 2800, 2300, 2600, 2900, 3100],
+                label: '누적 조회수',
+                data: hitsLogData,
                 borderColor: 'rgba(52, 152, 219, 1)',
                 backgroundColor: 'rgba(52, 152, 219, 0.2)',
                 fill: true,
@@ -359,10 +377,10 @@
     const usersChart = new Chart(document.getElementById('usersChartCanvas').getContext('2d'), {
         type: 'line', // 직선형 그래프로 변경
         data: {
-            labels: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
             datasets: [{
-                label: '연령대별 사용자 수',
-                data: [300, 850, 650, 420, 280, 150],
+                label: '누적 사용자 수',
+                data: usersLogData,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 fill: true,
@@ -394,10 +412,10 @@
     const commentsChart = new Chart(document.getElementById('commentsChartCanvas').getContext('2d'), {
         type: 'line', // 직선형 그래프로 변경
         data: {
-            labels: ['긍정적', '중립적', '부정적'],
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
             datasets: [{
-                label: '댓글 수',
-                data: [65, 25, 10], // 예제 데이터
+                label: '누적 댓글 수',
+                data: commentsLogData, // 예제 데이터
                 borderColor: 'rgba(231, 76, 60, 1)',
                 backgroundColor: 'rgba(231, 76, 60, 0.2)',
                 fill: true,
@@ -426,7 +444,13 @@
                 }
             }
         }
+
     });
+    // 모든 차트 리사이즈
+    viewsChart.resize();
+    usersChart.resize();
+    commentsChart.resize();
+    /*]]>*/
 </script>
 </body>
 </html>

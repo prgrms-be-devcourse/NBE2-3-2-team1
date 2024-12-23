@@ -4,6 +4,7 @@ import static org.programmers.cocktail.entity.QTotalHitsLog.totalHitsLog;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.TotalHitsLog;
@@ -19,21 +20,41 @@ public class TotalHitsLogRepositoryImpl implements TotalHitsLogRepositoryCustom 
     }
 
     @Override
-    public Optional<TotalHitsLog> findByRecordedAtBetween(LocalDateTime startOfDay,
-        LocalDateTime endOfDay) {
-        TotalHitsLog result = queryFactory
-            .selectFrom(totalHitsLog)
+    public long getYesterdayLog(LocalDateTime yesterday) {
+
+        Long result = queryFactory
+            .select(totalHitsLog.totalHits.sum())
+            .from(totalHitsLog)
             .where(
-                totalHitsLog.recordedAt.between(startOfDay,endOfDay)
+                totalHitsLog.recordedAt.loe(yesterday)
             )
             .fetchOne();
-
-        return Optional.ofNullable(result);
+        return result == null ? 0 : result;
     }
 
     @Override
-    public List<TotalHitsLog> findSevendaysByRecordedAtBetween(LocalDateTime startOfDay,
-        LocalDateTime endOfDay) {
-        return List.of();
+    public long getTodayLog(LocalDateTime today) {
+        Long result = queryFactory
+            .select(totalHitsLog.totalHits.sum())
+            .from(totalHitsLog)
+            .where(
+                totalHitsLog.recordedAt.loe(today)
+            )
+            .fetchOne();
+        return result == null ? 0 : result;
+    }
+
+    @Override
+    public List<Long> getListLog(LocalDateTime today) {
+        List<Long> logs = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            logs.add(queryFactory
+                .select(totalHitsLog.totalHits.sum())
+                .from(totalHitsLog)
+                .where(
+                    totalHitsLog.recordedAt.loe(today.minusDays(6).plusDays(i).withHour(23).withMinute(59).withSecond(59))
+                ).fetchOne());
+        }
+        return logs;
     }
 }
