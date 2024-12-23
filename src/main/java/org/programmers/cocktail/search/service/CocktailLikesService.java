@@ -20,9 +20,6 @@ public class CocktailLikesService {
     static final int FAIL = 0;
 
     @Autowired
-    private CocktailLikesRepositoryCustom cocktailLikesRepositoryCustom;
-
-    @Autowired
     private CocktailLikesRepository cocktailLikesRepository;
 
 
@@ -31,7 +28,7 @@ public class CocktailLikesService {
 
     public int findByUserIdAndCocktailId(Long userId, Long cocktailId){
 
-        Optional<CocktailLikes> cocktailLikesOptional = cocktailLikesRepositoryCustom.findByUserIdAndCocktailId(userId, cocktailId);
+        Optional<CocktailLikes> cocktailLikesOptional = cocktailLikesRepository.findByUserIdAndCocktailId(userId, cocktailId);
 
         if(!cocktailLikesOptional.isPresent()){
             return FAIL;
@@ -44,7 +41,7 @@ public class CocktailLikesService {
         // TO->Entity 변환
         CocktailLikes cocktailLikes = cocktailLikesMapper.convertToCocktailLikes(cocktailLikesTO);
         try {
-            cocktailLikesRepositoryCustom.save(cocktailLikes);
+            cocktailLikesRepository.save(cocktailLikes);
         } catch (Exception e) {
             System.out.println("[에러]"+e.getMessage());
             return FAIL;
@@ -55,7 +52,7 @@ public class CocktailLikesService {
 
     public int deleteCocktailLikes(CocktailLikesTO cocktailLikesTO){
 
-        int cocktailLikesDeleteResult = cocktailLikesRepositoryCustom.deleteByUserIdAndCocktailId(cocktailLikesTO.getUserId(), cocktailLikesTO.getCocktailId());;
+        int cocktailLikesDeleteResult = cocktailLikesRepository.deleteByUserIdAndCocktailId(cocktailLikesTO.getUserId(), cocktailLikesTO.getCocktailId());;
 
         if(cocktailLikesDeleteResult==0){
             // 삭제된 행이 없는 경우

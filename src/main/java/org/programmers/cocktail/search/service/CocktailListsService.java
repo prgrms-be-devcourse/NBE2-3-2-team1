@@ -2,6 +2,7 @@ package org.programmers.cocktail.search.service;
 
 import java.util.Optional;
 import org.programmers.cocktail.entity.CocktailLists;
+import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryCustom;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryImpl;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
@@ -15,17 +16,15 @@ public class CocktailListsService {
     static final int FAIL = 0;
 
     @Autowired
-    private CocktailListsRepositoryCustom cocktailListsRepositoryCustom;
+    private CocktailListsRepository cocktailListsRepository;
 
-//    @Autowired
-//    private CocktailListsRepositoryImpl cocktailListsRepositoryImpl;
 
     @Autowired
     private CocktailListsMapper cocktailListsMapper;
 
     public int findByUserIdAndCocktailId(Long userId, Long cocktailId){
 
-        Optional<CocktailLists> cocktailListsOptional = cocktailListsRepositoryCustom.findByUserIdAndCocktailId(userId, cocktailId);
+        Optional<CocktailLists> cocktailListsOptional = cocktailListsRepository.findByUserIdAndCocktailId(userId, cocktailId);
 
         if(!cocktailListsOptional.isPresent()){
             return FAIL;
@@ -38,7 +37,7 @@ public class CocktailListsService {
         // TO->Entity 변환
         CocktailLists cocktailLists = cocktailListsMapper.convertToCocktailLists(cocktailListsTO);
         try {
-            cocktailListsRepositoryCustom.save(cocktailLists);
+            cocktailListsRepository.save(cocktailLists);
         } catch (Exception e) {
             System.out.println("[에러]"+e.getMessage());
             return FAIL;
@@ -49,7 +48,7 @@ public class CocktailListsService {
 
     public int deleteCocktailList(CocktailListsTO cocktailListsTO){
 
-        int cocktailListDeleteResult = cocktailListsRepositoryCustom.deleteByUserIdAndCocktailId(cocktailListsTO.getUserId(), cocktailListsTO.getCocktailId());
+        int cocktailListDeleteResult = cocktailListsRepository.deleteByUserIdAndCocktailId(cocktailListsTO.getUserId(), cocktailListsTO.getCocktailId());
 
         if(cocktailListDeleteResult==0){
             // 삭제된 행이 없는 경우

@@ -11,7 +11,6 @@ public interface CommentsRepository extends JpaRepository<Comments, Long>, Comme
     @Query(value ="select cmt from comments cmt where cmt.cocktails.id = :cocktailId")
     List<Comments> findByCocktailId(Long cocktailId);
 
-
     @Transactional
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("Delete from comments cmt where cmt.id = :commentId")
