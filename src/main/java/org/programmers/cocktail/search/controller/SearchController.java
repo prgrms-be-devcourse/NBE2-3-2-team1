@@ -59,8 +59,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
         }
 
@@ -89,8 +87,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
@@ -123,8 +119,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
@@ -157,8 +151,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);       // 로그인 실패
         }
 
@@ -187,8 +179,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
@@ -236,8 +226,6 @@ public class SearchController {
         String session = "abc@abc.com";
 //        String session = "cde@cde.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
         }
 
@@ -293,22 +281,21 @@ public class SearchController {
     }
 
     @PostMapping("/reviews/cocktails/{cocktailId}")
-    public ResponseEntity<Integer> registerCocktailComments(@PathVariable String cocktailId,
+    public ResponseEntity<Void> registerCocktailComments(@PathVariable String cocktailId,
         @RequestBody CommentsTO commentsTOFromClient) {
 
         // todo session.getAttribute("email") HttpSession session 으로 대체 필요
         //1. 로그인 상태 확인
         String session = "abc@abc.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
-            return ResponseEntity.ok(NOT_LOGGED_IN);        // 로그인 실패
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
         UsersTO userInfo = usersService.findByEmail(session);
         if(userInfo==null){
-            return ResponseEntity.ok(OPERATION_FAIL);   // 유저 정보 가져올 수 없음
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         CommentsTO commentsTO = new CommentsTO();
@@ -320,10 +307,11 @@ public class SearchController {
         int commentsInsertResult = commentsService.insertComments(commentsTO);
 
         if(commentsInsertResult==0){
-            return ResponseEntity.ok(OPERATION_FAIL);       // DB추가 실패
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
         }
 
-        return ResponseEntity.ok(OPERATION_SUCCESS);        // DB추가 성공
+        return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
     }
 
     @DeleteMapping("/reviews/cocktails/{reviewId}")
@@ -333,8 +321,6 @@ public class SearchController {
         //1. 로그인 상태 확인
         String session = "abc@abc.com";
         if(session == null){
-            //todo 세션을 활용한 로그인 확인 방법 보안 추가 방법 고민
-            //todo 어차피 아래에서 session으로 db에 email 있는지 확인하면 이중 보안으로 볼 수 있지 않을까
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
@@ -345,9 +331,9 @@ public class SearchController {
 
         // SUCCESS: 1, FAIL: 0
         if(commentsDeleteResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // DB추가 실패(500반환))
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // DB삭제 실패(500반환))
         }
-        return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
+        return ResponseEntity.noContent().build();        // DB삭제 성공(204반환)
     }
 
 

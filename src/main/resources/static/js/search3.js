@@ -140,20 +140,17 @@ document.addEventListener("DOMContentLoaded", function () {
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
+        if (xhr.status === 204) {
           const response = parseInt(xhr.responseText);
           console.log(response)
-          if(response===2){
-            commentList.innerHTML = '';
-            loadComments();
-          } else if(response === 0) {
+          commentList.innerHTML = '';
+          loadComments();
+          } else if(xhr.status === 401){
             alert('로그인이 필요합니다.');
           } else{
+            // 상태코드 500 반환시
             alert('댓글 등록에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
           }
-        } else {
-          console.error("Error submitting comment.");
-        }
       }
     };
 
@@ -204,6 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if(xhr.status === 401){
           alert('로그인이 필요합니다.');
         } else{
+          // 상태코드 500 반환시
           alert('댓글 삭제에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
         }
       }
