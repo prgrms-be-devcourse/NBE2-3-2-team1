@@ -33,7 +33,6 @@ public class SearchHtmlController {
     @RequestMapping("/search/cocktailresults")
     public String cocktailSearchResultPage(@RequestParam String userInput, Model model) {
 
-        System.out.println("userInput: " + userInput);
         // 검색결과 설정
         String keyword = userInput;
 
