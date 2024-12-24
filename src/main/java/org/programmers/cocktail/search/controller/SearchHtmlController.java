@@ -66,7 +66,6 @@ public class SearchHtmlController {
 
         if(cocktailSearchList == null || cocktailSearchList.isEmpty()) {
             System.out.println("No matching results found in Local DB and Extenal API");
-            // 결과가 없는 경우 204 상태코드 반환
             model.addAttribute("cocktailSearchList", Collections.emptyList());      // 비어있는 리스트 전달
             return "user/search2";
         }
@@ -92,17 +91,29 @@ public class SearchHtmlController {
 
     // 메인페이지 반환
     @RequestMapping("/main")
-    public String getMainCocktailPage() {
-        // 메인페이지로 이동
+    public String getMainCocktailPage(Model model) {
+        List<CocktailsTO> cocktailSearchList = cocktailExternalApiService.fetchCocktailData();
+        System.out.println("getMainCocktailPage: " + cocktailSearchList);
+
+        // 1. 랜덤 칵테일 불러오기 실패시
+        if(cocktailSearchList == null || cocktailSearchList.isEmpty()) {
+            System.out.println("Failed to get random response from Extenal API");
+            model.addAttribute("cocktailSearchList", Collections.emptyList());      // 비어있는 리스트 전달
+            return "user/main";
+        }
+
+        // 2. 랜덤 칵테일 불러오기 성공시 -> 반환
+        model.addAttribute("cocktailSearchList", cocktailSearchList);
+
         return "user/main";
     }
 
     // 로그인페이지 반환
-    @RequestMapping("/api/login")
-    public String getLoginPage() {
-        // 로그인페이지로 이동
-        return "user/login";
-    }
+//    @RequestMapping("/api/login")
+//    public String getLoginPage() {
+//        // 로그인페이지로 이동
+//        return "user/login";
+//    }
 
     // todo 추천칵테일 반환 컨트롤러 추가 및 프론트 페이지 연결
 

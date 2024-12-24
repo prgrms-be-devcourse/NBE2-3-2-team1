@@ -1,5 +1,6 @@
 package org.programmers.cocktail.search.service;
 
+import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +20,19 @@ public class CocktailsService {
     @Autowired
     private CocktailsRepository cocktailsRepository;
 
-//    @Autowired
-//    private CocktailsRepositoryImpl cocktailsRepositoryImpl;
-
     @Autowired
     private CocktailsMapper cocktailsMapper;
+
+//    //테스트용 -> 삭제 예정
+//    @Transactional
+//    public int updateNameByName(String oldName, String newName) {
+//        List<Cocktails> cocktails = cocktailsRepository.findByName(oldName);
+//        for (Cocktails cocktail : cocktails) {
+//            cocktail.setName(newName); // 엔티티 필드 값 변경
+//        }
+//        return cocktails.size(); // 업데이트된 엔티티 수 반환
+//    }
+
 
     public List<CocktailsTO> findByNameContaining(String keyword) {
 

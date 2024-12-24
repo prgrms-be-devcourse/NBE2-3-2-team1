@@ -19,15 +19,31 @@ public class CocktailExternalApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-//    @Autowired
-//    private CocktailsRepositoryImpl cocktailsRepository;
-
     @Autowired
     private CocktailsMapper cocktailsMapper;
 
+    // 1. Cocktail 검색용
     public List<CocktailsTO> fetchCocktailData(String cocktailName) {
-        // API 호출
+
+        System.out.println("[Test] fetchCocktailData with parameter");
+
+        // TheCocktailDB 호출 url - "Search cocktail by name" method
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    // 2. 메인 페이지 출력용
+    public List<CocktailsTO> fetchCocktailData() {
+
+        System.out.println("[Test] fetchCocktailData without parameter");
+        // TheCocktailDB 호출 url - "Lookup a random cocktail" method
+        String url = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    public List<CocktailsTO> parseJsonToCocktailsTOList (String url){
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
 
         // JSON 데이터 가져오기
@@ -66,4 +82,5 @@ public class CocktailExternalApiService {
         }
         return cocktailsMapper.convertToCocktailsTOList(cocktails);
     }
+
 }

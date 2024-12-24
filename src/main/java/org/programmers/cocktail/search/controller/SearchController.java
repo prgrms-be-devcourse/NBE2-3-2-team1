@@ -2,11 +2,13 @@ package org.programmers.cocktail.search.controller;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.CommentsTO;
 import org.programmers.cocktail.search.dto.UsersTO;
+import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailLikesService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
@@ -42,6 +44,24 @@ public class SearchController {
 
     @Autowired
     CommentsService commentsService;
+
+//    // 테스트용 -> 삭제 에정
+//    @Autowired
+//    CocktailExternalApiService cocktailExternalApiService;
+//
+//    // 테스트용 -> 삭제 에정
+//    @GetMapping("/test")
+//    public ResponseEntity<List<CocktailsTO>> test() {
+//
+////        cocktailExternalApiService.fetchCocktailData("orange");
+//        cocktailExternalApiService.fetchCocktailData();
+//        System.out.println("updateNameByName");
+//        int result = cocktailsService.updateNameByName("Orangeade1", "Orangeade");
+//
+//        System.out.println("affected row: " + result);
+//        return ResponseEntity.ok(cocktailExternalApiService.fetchCocktailData());
+//    }
+
 
     @GetMapping("/favorites/cocktails/{cocktailId}")
     public ResponseEntity<Integer> isFavoritedByUser(HttpSession session, @PathVariable String cocktailId){
