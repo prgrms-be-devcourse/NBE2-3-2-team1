@@ -1,34 +1,60 @@
-package org.programmers.cocktail.suggestion.service;
+package org.programmers.cocktail.search.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.programmers.cocktail.suggestion.dto.CocktailsTO;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
+import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
-public class CocktailExternalApiImageURL {
+public class CocktailExternalApiService {
+
     @Autowired
     private RestTemplate restTemplate;
 
-    public String getCocktailImageURL(String cocktailName) {
-        // API 호출
+    @Autowired
+    private CocktailsMapper cocktailsMapper;
+
+    // 1. Cocktail 검색용
+    public List<CocktailsTO> fetchCocktailData(String cocktailName) {
+
+        System.out.println("[Test] fetchCocktailData with parameter");
+
+        // TheCocktailDB 호출 url - "Search cocktail by name" method
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    // 2. 메인 페이지 출력용
+    public List<CocktailsTO> fetchCocktailData() {
+
+        System.out.println("[Test] fetchCocktailData without parameter");
+        // TheCocktailDB 호출 url - "Lookup a random cocktail" method
+        String url = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    public List<CocktailsTO> parseJsonToCocktailsTOList (String url){
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
 
         // JSON 데이터 가져오기
         JsonNode drinksNode = response.getBody().get("drinks");
         if (drinksNode == null || drinksNode.isEmpty()) {
             // 외부 API에 검색결과 없는 경우 빈 리스트 반환
-            return "";
+            return Collections.emptyList();
         }
 
         // 검색된 모든 칵테일 처리
-        List<CocktailsTO> cocktails = new ArrayList<>();
+        List<Cocktails> cocktails = new ArrayList<>();
         for (JsonNode drinkNode : drinksNode) {
             String name = drinkNode.get("strDrink").asText();
             StringBuilder ingredientsBuilder = new StringBuilder();
@@ -52,8 +78,9 @@ public class CocktailExternalApiImageURL {
             String ingredients = ingredientsBuilder.toString().replaceAll(", $", "");
 
             // ProcessedCocktail 객체 생성
-            cocktails.add(new CocktailsTO(0L, name, ingredients,"", recipes, category, alcoholic, image_url, 0L, 0L));
+            cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
         }
-        return cocktails.get(0).getImage_url();
+        return cocktailsMapper.convertToCocktailsTOList(cocktails);
     }
+
 }
