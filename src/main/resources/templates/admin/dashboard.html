@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10000cocktail admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="#">
+    <style>
+        /* 기본 레이아웃 구조 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0; /* 여기서 padding-top: 56px; 제거 */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 네비게이션 바 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            background-color: white !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1031; /* z-index 값 증가 */
+        }
+
+        /* wrapper 수정 */
+        .wrapper {
+            display: flex;
+            min-height: calc(100vh - 56px);
+            position: relative;
+            margin-top: 0; /* margin-top 제거 */
+        }
+
+        /* 사이드바 수정 */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            position: fixed;
+            top: 56px; /* navbar 높이만큼 떨어뜨림 */
+            left: 0;
+            bottom: 0; /* bottom 추가 */
+            overflow-y: auto;
+            z-index: 1030;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* 메인 컨텐츠 영역 수정 */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 220px;
+            padding: 20px;
+            padding-top: 76px; /* 혹은 56px + 여유분 등 적절히 조정 */
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 360px;
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        /* 반응형 디자인 수정 */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            /* 모바일에서 사이드바가 열렸을 때 배경 오버레이 */
+            .sidebar.show::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: -1;
+            }
+        }
+        /* 나머지 스타일은 그대로 유지 */
+
+        /* 배경색 클래스 */
+        .bg-views { background-color: #e3f2fd; }
+        .bg-users { background-color: #e8f5e9; }
+        .bg-comments { background-color: #fce4ec; }
+
+        /* 추가 유틸리티 */
+        .overflow-hidden {
+            overflow: hidden !important;
+        }
+
+    </style>
+</head>
+<body>
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">10000cocktail admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarAdmin">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle"></i> 관리자
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 사이드바 -->
+<div class="wrapper">
+<nav class="sidebar">
+    <h4 class="sidebar-heading">관리 메뉴</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link active" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 대시보드</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/users"><i class="fas fa-user-cog"></i> 계정 관리</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/admin/comments"><i class="fas fa-comments"></i> 댓글 관리</a>
+        </li>
+    </ul>
+</nav>
+
+<!-- 메인 컨텐츠 -->
+<main class="main-wrapper">
+    <h2>대시보드</h2>
+
+    <!-- 추천 칵테일 섹션 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5>인기 칵테일 통계</h5>
+            <div class="row">
+                <!-- 칵테일 1 카드 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0" th:text="${list.get(0).getName()}"></h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-eye"></i> 조회수</div>
+                                <div class="fw-bold" th:text="${list.get(0).getHits()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-comments"></i> 댓글수</div>
+                                <div class="fw-bold" th:text="${list.get(0).getComments()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div><i class="fas fa-thumbs-up"></i> 추천수</div>
+                                <div class="fw-bold" th:text="${list.get(0).getLikes()}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 칵테일 2 카드 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0" th:text="${list.get(1).getName()}"></h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-eye"></i> 조회수</div>
+                                <div class="fw-bold" th:text="${list.get(1).getHits()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-comments"></i> 댓글수</div>
+                                <div class="fw-bold" th:text="${list.get(1).getComments()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div><i class="fas fa-thumbs-up"></i> 추천수</div>
+                                <div class="fw-bold" th:text="${list.get(1).getLikes()}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 칵테일 3 카드 -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="card-title mb-0" th:text="${list.get(2).getName()}"></h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-eye"></i> 조회수</div>
+                                <div class="fw-bold" th:text="${list.get(2).getHits()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <div><i class="fas fa-comments"></i> 댓글수</div>
+                                <div class="fw-bold" th:text="${list.get(2).getComments()}"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div><i class="fas fa-thumbs-up"></i> 추천수</div>
+                                <div class="fw-bold" th:text="${list.get(2).getLikes()}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 차트 섹션 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5>통계 데이터</h5>
+            <ul class="nav nav-tabs mb-3" id="chartTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="views-tab" data-bs-toggle="tab" data-bs-target="#viewsChart" type="button" role="tab" aria-controls="views" aria-selected="true">누적 조회수</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#usersChart" type="button" role="tab" aria-controls="users" aria-selected="false">누적 사용자수</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="comments-tab" data-bs-toggle="tab" data-bs-target="#commentsChart" type="button" role="tab" aria-controls="comments" aria-selected="false">누적 댓글수</button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="chartTabContent">
+                <div class="tab-pane fade show active" id="viewsChart" role="tabpanel" aria-labelledby="views-tab">
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="viewsChartCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="usersChart" role="tabpanel" aria-labelledby="users-tab">
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="usersChartCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="commentsChart" role="tabpanel" aria-labelledby="comments-tab">
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="commentsChartCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상태 카드 섹션 -->
+    <div class="row mt-4">
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card status-card bg-views">
+                <div class="card-header"><i class="fas fa-eye"></i> 조회수 성장률</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${hitsGrowthRate}"></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card status-card bg-users">
+                <div class="card-header"><i class="fas fa-users"></i> 유저 성장률</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${userGrowthRate}"></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12 mb-4">
+            <div class="card status-card bg-comments">
+                <div class="card-header"><i class="fas fa-comments"></i> 댓글 성장률</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${commentGrowthRate}"></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+
+<!-- JavaScript 파일 로드 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 탭 전환시 차트 리사이즈를 위한 이벤트 리스너
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(button => {
+        button.addEventListener('shown.bs.tab', () => {
+            window.dispatchEvent(new Event('resize'));
+        });
+    });
+
+    var hitsLogData = /*[[${HitsLog}]]*/;
+
+    var usersLogData = /*[[${usersList}]]*/;
+
+    var commentsLogData = /*[[${commentsList}]]*/;
+
+
+    // 조회수 차트
+    const viewsChart = new Chart(document.getElementById('viewsChartCanvas').getContext('2d'), {
+        type: 'line', // 직선형 그래프로 변경
+        data: {
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
+            datasets: [{
+                label: '누적 조회수',
+                data: hitsLogData,
+                borderColor: 'rgba(52, 152, 219, 1)',
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                fill: true,
+                tension: 0 // 직선을 위해 0으로 설정
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + '회';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 사용자 차트
+    const usersChart = new Chart(document.getElementById('usersChartCanvas').getContext('2d'), {
+        type: 'line', // 직선형 그래프로 변경
+        data: {
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
+            datasets: [{
+                label: '누적 사용자 수',
+                data: usersLogData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0 // 직선을 위해 0으로 설정
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + '명';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 댓글 차트
+    const commentsChart = new Chart(document.getElementById('commentsChartCanvas').getContext('2d'), {
+        type: 'line', // 직선형 그래프로 변경
+        data: {
+            labels: ['6일 전', '5일 전', '4일 전', '3일 전', '2일 전', '1일 전', '오늘'],
+            datasets: [{
+                label: '누적 댓글 수',
+                data: commentsLogData, // 예제 데이터
+                borderColor: 'rgba(231, 76, 60, 1)',
+                backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                fill: true,
+                tension: 0 // 직선을 위해 0으로 설정
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + '건';
+                        }
+                    }
+                }
+            }
+        }
+
+    });
+    // 모든 차트 리사이즈
+    viewsChart.resize();
+    usersChart.resize();
+    commentsChart.resize();
+    /*]]>*/
+</script>
+</body>
+</html>

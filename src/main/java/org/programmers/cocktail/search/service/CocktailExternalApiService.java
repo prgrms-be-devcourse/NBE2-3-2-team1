@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
+import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,31 @@ public class CocktailExternalApiService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Cocktails> fetchCocktailData(String cocktailName) {
-        // API 호출
+    @Autowired
+    private CocktailsMapper cocktailsMapper;
+
+    // 1. Cocktail 검색용
+    public List<CocktailsTO> fetchCocktailData(String cocktailName) {
+
+        System.out.println("[Test] fetchCocktailData with parameter");
+
+        // TheCocktailDB 호출 url - "Search cocktail by name" method
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    // 2. 메인 페이지 출력용
+    public List<CocktailsTO> fetchCocktailData() {
+
+        System.out.println("[Test] fetchCocktailData without parameter");
+        // TheCocktailDB 호출 url - "Lookup a random cocktail" method
+        String url = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
+
+        return parseJsonToCocktailsTOList(url);
+    }
+
+    public List<CocktailsTO> parseJsonToCocktailsTOList (String url){
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
 
         // JSON 데이터 가져오기
@@ -56,6 +80,7 @@ public class CocktailExternalApiService {
             // ProcessedCocktail 객체 생성
             cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
         }
-        return cocktails;
+        return cocktailsMapper.convertToCocktailsTOList(cocktails);
     }
+
 }

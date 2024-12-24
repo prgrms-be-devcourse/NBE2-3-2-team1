@@ -1,6 +1,7 @@
 package org.programmers.cocktail.admin.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.TotalHitsLog;
 import org.programmers.cocktail.repository.totalhitslog.TotalHitsLogRepository;
@@ -16,11 +17,22 @@ public class HitsLogService {
         this.totalHitsLogRepository = totalHitsLogRepository;
     }
 
-    public Optional<TotalHitsLog> getYesterdayLog() {
-        LocalDateTime yesterdayStart = LocalDateTime.now().minusDays(1);
-        LocalDateTime yesterdayEnd = yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
+    public long getYesterdayLog() {
+        LocalDateTime yesterday = LocalDateTime.now().minusDays(1).withHour(23).withMinute(59).withSecond(59);
 
-        return totalHitsLogRepository.findByRecordedAtBetween(yesterdayStart, yesterdayEnd);
+        return totalHitsLogRepository.getYesterdayLog(yesterday);
+    }
+
+    public long getTodayLog() {
+        LocalDateTime today = LocalDateTime.now();
+
+        return totalHitsLogRepository.getTodayLog(today);
+    }
+
+    public List<Long> getListLog() {
+        LocalDateTime today = LocalDateTime.now();
+
+        return totalHitsLogRepository.getListLog(today);
     }
 
 }
