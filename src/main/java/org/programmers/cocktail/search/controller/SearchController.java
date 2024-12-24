@@ -1,79 +1,362 @@
 package org.programmers.cocktail.search.controller;
 
-import java.util.Collections;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Optional;
-import org.programmers.cocktail.entity.Cocktails;
-import org.programmers.cocktail.search.repository.CocktailsJpaRepository;
+import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
+import org.programmers.cocktail.search.dto.CocktailLikesTO;
+import org.programmers.cocktail.search.dto.CocktailListsTO;
+import org.programmers.cocktail.search.dto.CocktailsTO;
+import org.programmers.cocktail.search.dto.CommentsTO;
+import org.programmers.cocktail.search.dto.UsersTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
+import org.programmers.cocktail.search.service.CocktailLikesService;
+import org.programmers.cocktail.search.service.CocktailListsService;
+import org.programmers.cocktail.search.service.CocktailsService;
+import org.programmers.cocktail.search.service.CommentsService;
+import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/api")
 public class SearchController {
 
     @Autowired
-    CocktailsJpaRepository cocktailsJpaRepository;
+    CocktailsService cocktailsService;
 
     @Autowired
-    CocktailExternalApiService cocktailExternalApiService;
+    UsersService usersService;
 
-    @GetMapping("/search/cocktails")
-    public ResponseEntity<List<Cocktails>> getCocktailSearchResults(@RequestParam String userInput) {
+    @Autowired
+    CocktailListsService cocktailListsService;
 
-        // 검색결과 설정
-        String keyword = userInput;
+    @Autowired
+    CocktailLikesService cocktailLikesService;
 
-        //1. DB에 검색결과 있는지 확인
-        List<Cocktails> cocktailSearchList = cocktailsJpaRepository.findByNameContaining(keyword);
+    @Autowired
+    CommentsService commentsService;
 
-        if(!cocktailSearchList.isEmpty()) {
-            //DB에 결과가 있는 경우 반환
-            System.out.println("Data exists in Local DB");
-            return ResponseEntity.ok(cocktailSearchList);
-        }
-        //2. (DB에 결과가 없는경우) API에서 검색
-        System.out.println("No data in local DB. Fetching Data from Extenal API...");
+    @GetMapping("/favorites/cocktails/{cocktailId}")
+    public ResponseEntity<Integer> isFavoritedByUser(HttpSession session, @PathVariable String cocktailId){
 
-        // 2-1) 외부 API에서 가져온 cocktail 정보를 DB에 저장
-        cocktailSearchList = cocktailExternalApiService.fetchCocktailData(keyword);
+        final int PRESENT = 1;
+        final int ABSENT = 0;
 
+        // 1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        System.out.println("loginSessionInfo: " + loginSessionInfo);
 
-        for(Cocktails cocktail : cocktailSearchList){
-            System.out.println("new cocktail added to Local DB");
-            cocktailsJpaRepository.save(cocktail);
-        }
-
-        // 2-2) DB에 저장된 데이터를 가져와서 반환
-        cocktailSearchList = cocktailsJpaRepository.findByNameContaining(keyword);
-
-        if(cocktailSearchList.isEmpty()) {
-            System.out.println("No matching results found in Local DB and Extenal API");
-            // 결과가 없는 경우 204 상태코드 반환
-            return ResponseEntity.noContent().build();
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
-        return ResponseEntity.ok(cocktailSearchList);
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        //3. userid, cocktailid가 cocktail_lists에 존재하는지 확인
+        // SUCCESS: 1, FAIL: 0
+        int isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+
+        if(isCocktailListsPresent==0){
+            return ResponseEntity.ok(ABSENT);// 즐겨찾기 조회 성공(즐겨찾기 없는 경우 - 200 반환)
+        }
+
+        return ResponseEntity.ok(PRESENT);   // 즐겨찾기 조회 성공(즐겨찾기 있는 경우 - 200반환)
     }
 
-    @GetMapping("/search/cocktails/{cocktailId}")
-    public ResponseEntity<Cocktails> getCocktailInfoById(@PathVariable String cocktailId){
-        Optional<Cocktails> cocktailByIdOptional = cocktailsJpaRepository.findById(Long.parseLong(cocktailId));
-        if(cocktailByIdOptional.isPresent()) {
-            Cocktails cocktailById = cocktailByIdOptional.get();
-            return ResponseEntity.ok(cocktailById);
+    @PostMapping("/favorites/cocktails/{cocktailId}")
+    public ResponseEntity<Void> addFavoritesByUser(HttpSession session, @PathVariable String cocktailId){
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null") ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
-        // 결과가 없는 경우 204 상태코드 반환
-        return ResponseEntity.noContent().build();
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        // 3. cocktail_lists에 user_id, cocktail_id 저장
+        CocktailListsTO cocktailListsTO = new CocktailListsTO();
+        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailListInsertResult = cocktailListsService.insertCocktailList(cocktailListsTO);
+
+        if(cocktailListInsertResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
+        }
+
+        return ResponseEntity.noContent().build();      //DB추가 성공
     }
 
+    @DeleteMapping("/favorites/cocktails/{cocktailId}")
+    public ResponseEntity<Void> deleteFavoritesByUser(HttpSession session, @PathVariable String cocktailId){
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        // 3. cocktail_lists에서 user_id, cocktail_id 삭제
+        CocktailListsTO cocktailListsTO = new CocktailListsTO();
+        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailListDeleteResult = cocktailListsService.deleteCocktailList(cocktailListsTO);
+
+        if(cocktailListDeleteResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
+        }
+
+        return ResponseEntity.noContent().build();      //DB삭제 성공
+    }
+
+    @GetMapping("/likes/cocktails/{cocktailId}")
+    public ResponseEntity<Integer> isLikedByUser(HttpSession session, @PathVariable String cocktailId) {
+
+        final int PRESENT = 1;
+        final int ABSENT = 0;
+
+        // 1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        //3. userid, cocktailid가 cocktail_likes에 존재하는지 확인
+        // SUCCESS: 1, FAIL: 0
+        int isCocktailLikesPresent = cocktailLikesService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+
+        if(isCocktailLikesPresent==0){
+            return ResponseEntity.ok(ABSENT);// 좋아요 조회 성공(좋아요 없는 경우 - 200 반환)
+        }
+
+        return ResponseEntity.ok(PRESENT);       // 좋아요 조회 성공(좋아요 있는 경우 - 200반환)
+    }
+
+    @PostMapping("/likes/cocktails/{cocktailId}")
+    public ResponseEntity<Void> addLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        // 3. cocktail_likes에 user_id, cocktail_id 저장
+        CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
+        cocktailLikesTO.setUserId(userInfo.getId());
+        cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailLikesInsertResult = cocktailLikesService.insertCocktailLikes(cocktailLikesTO);
+
+        if(cocktailLikesInsertResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
+        }
+
+        // cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
+
+        // cocktails테이블에 cocktailsLikes 값 업데이트
+        CocktailsTO cocktailsTO = new CocktailsTO();
+        cocktailsTO.setId(Long.parseLong(cocktailId));
+        cocktailsTO.setLikes(cocktailLikesCountById);
+
+        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
+
+        // SUCCESS: 1, FAIL: 0
+        if(cocktailLikesCountUpdateResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패(500반환)
+        }
+
+        return ResponseEntity.noContent().build();      //DB추가 성공
+    }
+
+    @DeleteMapping("/likes/cocktails/{cocktailId}")
+    public ResponseEntity<Void> deleteLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        // 3. cocktail_likes에서 user_id, cocktail_id 삭제
+        CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
+        cocktailLikesTO.setUserId(userInfo.getId());
+        cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int cocktailLikesDeleteResult = cocktailLikesService.deleteCocktailLikes(cocktailLikesTO);
+
+        if(cocktailLikesDeleteResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
+        }
+
+        // cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
+
+        // cocktails테이블에 cocktailsLikes 값 업데이트
+        CocktailsTO cocktailsTO = new CocktailsTO();
+        cocktailsTO.setId(Long.parseLong(cocktailId));
+        cocktailsTO.setLikes(cocktailLikesCountById);
+
+        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
+
+        // SUCCESS: 1, FAIL: 0
+        if(cocktailLikesCountUpdateResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패
+        }
+
+        return ResponseEntity.noContent().build();      //DB삭제 성공
+    }
+
+    @GetMapping("/reviews/cocktails/{cocktailId}")
+    public ResponseEntity<List<CommentsTO>> loadCocktailComments(@PathVariable String cocktailId) {
+
+
+        List<CommentsTO> commentsTOList = commentsService.findByCocktailId(Long.parseLong(cocktailId));
+
+        System.out.println("commentsTOList: "+ commentsTOList);
+        if(commentsTOList.isEmpty()||commentsTOList==null){
+            System.out.println("commentsTOListisempty");
+            return ResponseEntity.noContent().build();      // 상태코드 204 전송
+        }
+
+        return ResponseEntity.ok(commentsTOList);
+
+    }
+
+    @PostMapping("/reviews/cocktails/{cocktailId}")
+    public ResponseEntity<Void> registerCocktailComments(HttpSession session, @PathVariable String cocktailId,
+        @RequestBody CommentsTO commentsTOFromClient) {
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        // 2. userid 정보가져오기
+        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        if(userInfo==null){
+            // 유저 정보 가져올 수 없음(500반환)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        CommentsTO commentsTO = new CommentsTO();
+        commentsTO.setContent(commentsTOFromClient.getContent());
+        commentsTO.setUserId(userInfo.getId());
+        commentsTO.setCocktailId(Long.parseLong(cocktailId));
+
+        // SUCCESS: 1, FAIL: 0
+        int commentsInsertResult = commentsService.insertComments(commentsTO);
+
+        if(commentsInsertResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
+        }
+
+        return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
+    }
+
+    @DeleteMapping("/reviews/cocktails/{reviewId}")
+    public ResponseEntity<Void> deleteCocktailComments(HttpSession session, @PathVariable String reviewId) {
+
+        //1. 로그인 상태 확인
+        // 테스트용
+        // session.setAttribute("semail", "cde@cde.com");
+        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
+        // System.out.println("loginSessionInfo: " + loginSessionInfo);
+
+        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
+        }
+
+        CommentsTO commentsTO = new CommentsTO();
+        commentsTO.setId(Long.parseLong(reviewId));
+
+        int commentsDeleteResult = commentsService.deleteById(commentsTO);
+
+        // SUCCESS: 1, FAIL: 0
+        if(commentsDeleteResult==0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // DB삭제 실패(500반환))
+        }
+        return ResponseEntity.noContent().build();        // DB삭제 성공(204반환)
+    }
 }

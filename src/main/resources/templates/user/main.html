@@ -80,27 +80,27 @@
       margin-bottom: 10px;
     }
 
-    .cocktail-ingredients, .cocktail-method, .cocktail-abv {
+    .cocktail-ingredients, .cocktail-recipes, .cocktail-category, .cocktail-alcohol {
       margin-bottom: 15px;
     }
 
-    .cocktail-description {
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
+    /*.cocktail-description {*/
+    /*  font-size: 16px;*/
+    /*  margin-bottom: 20px;*/
+    /*}*/
   </style>
 </head>
 <body>
 
 <!-- 네비게이션 바 -->
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
+  <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
-    <a href="user.html">
-      <img src="line.png">
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
+    <a href="/api/login">
+      <img src="/images/line.png">
     </a>
   </div>
 </div>
@@ -111,60 +111,35 @@
   <div class="content">
     <!-- 왼쪽 칵테일 이미지 -->
     <div class="left-section">
-      <img src="https://via.placeholder.com/400x300" alt="칵테일 이미지" class="cocktail-image" id="cocktailImage">
+      <img th:src="${cocktailSearchList[0].image_url}" alt="칵테일 이미지" class="cocktail-image" id="cocktailImage">
     </div>
 
     <!-- 오른쪽 칵테일 상세 정보 -->
     <div class="right-section">
-      <div class="cocktail-name" id="cocktailName">칵테일 이름</div>
+      <div class="cocktail-name" id="cocktailName" th:text="${cocktailSearchList[0].name}"></div>
 
       <div class="cocktail-ingredients">
         <strong>재료:</strong>
-        <p id="cocktailIngredients">칵테일 재료</p>
+        <p id="cocktailIngredients" th:text="${cocktailSearchList[0].ingredients}"></p>
       </div>
 
-      <div class="cocktail-method">
+      <div class="cocktail-recipes">
         <strong>제조법:</strong>
-        <p id="cocktailMethod">칵테일 제조법</p>
+        <p id="cocktailRecipes" th:text="${cocktailSearchList[0].recipes}"></p>
       </div>
 
-      <div class="cocktail-abv">
-        <strong>도수:</strong>
-        <p id="cocktailABV">칵테일 도수</p>
+      <div class="cocktail-category">
+        <strong>카테고리:</strong>
+        <p id="cocktailCategory" th:text="${cocktailSearchList[0].category}"></p>
       </div>
 
-      <div class="cocktail-description">
-        <strong>설명:</strong>
-        <p id="cocktailDescription">칵테일 설명</p>
+      <div class="cocktail-alcohol">
+        <strong>알콜 여부:</strong>
+        <p id="cocktailAlcohol" th:text="${cocktailSearchList[0].alcoholic}"></p>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  // API에서 칵테일 정보 가져오는 함수 (예시로 임의의 데이터 사용)
-  function fetchCocktailDetails() {
-    const cocktailData = {
-      name: "마티니",
-      ingredients: "진, 드라이 베르무트, 올리브 또는 레몬 껍질",
-      method: "진과 드라이 베르무트를 얼음과 함께 흔든 뒤 차가운 글라스에 따르고 올리브나 레몬 껍질을 장식합니다.",
-      abv: "약 30%",
-      description: "마티니는 진과 드라이 베르무트를 베이스로 한 클래식한 칵테일로, 고급스러움과 간결함을 동시에 갖춘 음료입니다. 전통적인 칵테일의 대표격이라 할 수 있습니다.",
-      image: "https://via.placeholder.com/400x300"
-    };
-
-    // API 응답 데이터로 칵테일 정보 업데이트
-    document.getElementById('cocktailName').textContent = cocktailData.name;
-    document.getElementById('cocktailIngredients').textContent = cocktailData.ingredients;
-    document.getElementById('cocktailMethod').textContent = cocktailData.method;
-    document.getElementById('cocktailABV').textContent = cocktailData.abv;
-    document.getElementById('cocktailDescription').textContent = cocktailData.description;
-    document.getElementById('cocktailImage').src = cocktailData.image;
-  }
-
-  // 페이지 로드 시 칵테일 정보 불러오기
-  fetchCocktailDetails();
-</script>
 
 </body>
 </html>

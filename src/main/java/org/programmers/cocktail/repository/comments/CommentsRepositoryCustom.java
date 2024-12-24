@@ -13,4 +13,6 @@ public interface CommentsRepositoryCustom {
     List<Long> countCommentsList(LocalDateTime today);
 
     Page<Comments> searchByKeyword(String keyword, Pageable pageable);
+
 }
+
