@@ -1,0 +1,245 @@
+/*favorite.css*/
+body {
+    margin: 0;
+    font-family: Arial, sans-serif; /* 통일된 폰트 */
+    font-size: 16px; /* 기본 폰트 크기 */
+    font-weight: normal; /* 기본 폰트 굵기 */
+    background-color: #fff;
+    color: #333;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #333;
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fcd62c;
+    padding: 50px 0;
+    margin: 0 auto; /* 부모 요소 기준 중앙 정렬 */
+}
+
+.search-input {
+    width: 30%;
+    padding: 10px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8); /* 밝은 흰색 텍스트 */
+    border-radius: 15px;
+    border: 1px solid transparent;
+    background-color: rgba(62, 62, 62, 0.58);
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.8); /* 밝은 흰색 텍스트 */
+    font-style: italic;
+    opacity: 1; /* 텍스트 불투명도 설정 */
+}
+
+.search-button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.content-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.left-section {
+    flex: 1;
+    padding-right: 20px;
+    text-align: center;
+}
+
+.right-section {
+    flex: 2;
+    padding-left: 20px;
+}
+
+.cocktail-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.cocktail-name {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.cocktail-ingredients, .cocktail-method, .cocktail-abv {
+    margin-bottom: 15px;
+}
+
+.cocktail-description {
+    margin-bottom: 15px;
+}
+
+.comment-section {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comment-input {
+    width: calc(100% - 120px);
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+}
+
+.comment-button {
+    padding: 10px 20px;
+    background-color: #fcd62c;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.comment-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.comment-list .comment-item {
+    margin-bottom: 15px; /* 댓글 간격 설정 */
+    padding: 10px; /* 댓글 내부 여백 설정 */
+    border-bottom: 1px solid #ddd; /* 댓글 구분선 추가 */
+    background-color: #f9f9f9; /* 댓글 배경색 */
+    border-radius: 5px; /* 댓글 모서리를 둥글게 */
+}
+
+.comment-list .comment-item:last-child {
+    margin-bottom: 0; /* 마지막 댓글의 간격 제거 */
+}
+
+.comment-item .comment-header {
+    font-size: 14px; /* 헤더 텍스트 크기 */
+    color: #555; /* 헤더 텍스트 색상 */
+    margin-bottom: 5px; /* 헤더와 내용 간격 */
+}
+
+.comment-item .comment-content {
+    font-size: 16px; /* 댓글 본문 텍스트 크기 */
+    color: #333; /* 댓글 본문 텍스트 색상 */
+}
+
+
+.like-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 좋아요와 즐겨찾기 간격 */
+}
+
+.like, .favorite {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.likeEmoji, .favoriteEmoji {
+    font-size: 36px; /* 이모티콘 크기 */
+    cursor: pointer;
+    transition: color 0.3s; /* 색상 전환 효과 */
+    color: #ccc;
+}
+
+.label {
+    font-size: 14px; /* 좋아요와 즐겨찾기 라벨의 공통 폰트 크기 */
+    font-weight: bold; /* 굵기도 통일 */
+    color: #333; /* 통일된 텍스트 색상 */
+    margin-top: 4px; /* 라벨과 이모티콘 간격 */
+}
+
+/* 활성화 상태 */
+.likeEmoji.liked {
+    color: #ff5555; /* 좋아요 활성화 시 빨간색 */
+}
+
+.favoriteEmoji.favorited {
+    color: #ffd700; /* 즐겨찾기 활성화 시 노란색 */
+}
+
+
+
+
+
+
+
+
+
+
+/* Review Form */
+.review-form {
+    margin-bottom: 20px;
+}
+
+.review-form textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.review-list {
+    margin-top: 20px;
+}
+
+.review {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+}
+
+.review .review-header {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.review .review-content {
+    font-size: 16px;
+}
