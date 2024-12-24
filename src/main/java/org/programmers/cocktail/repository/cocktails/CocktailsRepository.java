@@ -13,7 +13,5 @@ public interface CocktailsRepository extends JpaRepository<Cocktails, Long>, Coc
     List<Cocktails> findAllByOrderByLikesDesc();
     List<Cocktails> findByNameContaining(String userInput);
 
-//    // 테스트용 -> 삭제 예정
-//    List<Cocktails> findByName(String oldName);
 }
 

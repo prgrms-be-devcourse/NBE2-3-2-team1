@@ -45,24 +45,6 @@ public class SearchController {
     @Autowired
     CommentsService commentsService;
 
-//    // 테스트용 -> 삭제 에정
-//    @Autowired
-//    CocktailExternalApiService cocktailExternalApiService;
-//
-//    // 테스트용 -> 삭제 에정
-//    @GetMapping("/test")
-//    public ResponseEntity<List<CocktailsTO>> test() {
-//
-////        cocktailExternalApiService.fetchCocktailData("orange");
-//        cocktailExternalApiService.fetchCocktailData();
-//        System.out.println("updateNameByName");
-//        int result = cocktailsService.updateNameByName("Orangeade1", "Orangeade");
-//
-//        System.out.println("affected row: " + result);
-//        return ResponseEntity.ok(cocktailExternalApiService.fetchCocktailData());
-//    }
-
-
     @GetMapping("/favorites/cocktails/{cocktailId}")
     public ResponseEntity<Integer> isFavoritedByUser(HttpSession session, @PathVariable String cocktailId){
 
