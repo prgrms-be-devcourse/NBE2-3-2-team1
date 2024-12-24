@@ -11,17 +11,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginService {
 
-    public LoginService(UsersRepository usersRepository,
-        UsersRepositoryCustom usersRepositoryCustom) {
+    public LoginService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
-        this.usersRepositoryCustom = usersRepositoryCustom;
     }
 
     @Autowired
     private final UsersRepository usersRepository;
 
-    @Autowired
-    private final UsersRepositoryCustom usersRepositoryCustom;
 
 
     public int insert(UserRegisterDto to) {
@@ -36,7 +32,7 @@ public class LoginService {
 
     public Users findByEmail(String email) {
 
-        Users users = this.usersRepositoryCustom.findByEmail(email);
+        Users users = this.usersRepository.findsByEmail(email);
 
         return users;
     }
@@ -44,7 +40,7 @@ public class LoginService {
 
     public int updateUser(String name, String password, Long id) {
 
-        int flag = this.usersRepositoryCustom.updateById(name, password, id);
+        int flag = this.usersRepository.updateById(name, password, id);
 
         return flag;
     }

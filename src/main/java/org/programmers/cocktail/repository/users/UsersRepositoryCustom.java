@@ -9,19 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface UsersRepositoryCustom extends JpaRepository<Users, Long> {
+public interface UsersRepositoryCustom {
 
-    @Query(value = "select u from users u where u.email = :email")
-    Users findByEmail(String email);
-
-    @Query(value = "select u from users u where u.email = :email and u.password = :password")
-    Users findByEmailAndPassword(String email, String password);
-
-    @Modifying
-    @Transactional
-    @Query(value = "update users u set u.name = :name, u.password = :password where u.id = :id")
-    int updateById(String name, String password, Long id);
-  
     Page<Users> searchByKeyword(String keyword, Pageable pageable);
 
 }
