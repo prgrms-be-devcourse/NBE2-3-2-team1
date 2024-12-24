@@ -32,7 +32,7 @@
   <!-- 칵테일 리스트 -->
   <div class="cocktail-list" id="cocktail-list">
     <!-- 서버에서 전달된 데이터로 리스트 생성 -->
-    <div th:if="${cocktailSearchList.empty}" class="no-results">검색 결과가 없습니다.</div>
+    <div th:if="${#lists.isEmpty(cocktailSearchList)}" class="no-results">검색 결과가 없습니다.</div>
     <div th:each="cocktail : ${cocktailSearchList}" class="cocktail-item">
       <a th:href="@{/search/cocktails/{id}(id=${cocktail.id})}" class="cocktail-link">
         <img th:src="${cocktail.image_url}" th:alt="${cocktail.name}">
