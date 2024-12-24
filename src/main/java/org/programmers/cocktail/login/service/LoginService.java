@@ -11,39 +11,40 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginService {
 
-    @Autowired
-    private UsersRepository usersRepository;
+    public LoginService(UsersRepository usersRepository,
+        UsersRepositoryCustom usersRepositoryCustom) {
+        this.usersRepository = usersRepository;
+        this.usersRepositoryCustom = usersRepositoryCustom;
+    }
 
     @Autowired
-    private UsersRepositoryCustom usersRepositoryCustom;
+    private final UsersRepository usersRepository;
+
+    @Autowired
+    private final UsersRepositoryCustom usersRepositoryCustom;
+
 
     public int insert(UserRegisterDto to) {
         int flag = 0;
 
         Users users = new Users(to.getEmail(), to.getName(), to.getPassword());
 
-        usersRepository.save( users );
+        this.usersRepository.save( users );
 
         return flag;
     }
 
     public Users findByEmail(String email) {
 
-        Users users = usersRepositoryCustom.findByEmail(email);
+        Users users = this.usersRepositoryCustom.findByEmail(email);
 
         return users;
     }
 
-//    public Users selectByEmailandPassword(String email, String password) {
-//
-//        Users users = usersRepositoryCustom.findByEmailAndPassword(email, password);
-//
-//        return users;
-//    }
 
     public int updateUser(String name, String password, Long id) {
 
-        int flag = usersRepositoryCustom.updateById(name, password, id);
+        int flag = this.usersRepositoryCustom.updateById(name, password, id);
 
         return flag;
     }
@@ -53,9 +54,9 @@ public class LoginService {
 
         System.out.println("deleteUser(Long id): " + id + ")");
 
-        usersRepository.deleteById(id);
+        this.usersRepository.deleteById(id);
 
-        if ( usersRepository.existsById(id) ) {
+        if ( this.usersRepository.existsById(id) ) {
             return 0;
         } else {
             return 1;

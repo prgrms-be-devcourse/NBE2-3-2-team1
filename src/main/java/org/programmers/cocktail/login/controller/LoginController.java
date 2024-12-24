@@ -49,101 +49,10 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-//    @RequestMapping("/google_login")
-//    public String google_login(HttpServletRequest request) {
-//        String client_id = "[CLIENT ID]";
-//        String redirect_uri = "{contextPath}"+"/google_redirect";
-//        String state = RandomStringUtils.randomAlphabetic(10);   // 랜덤 문자열 생성
-//        String login_url = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code"
-//            + "&client_id=" + client_id
-//            + "&redirect_uri=" + redirect_uri
-//            + "&state=" + state
-//            + "&scope=email profile";
-//
-//        request.getSession().setAttribute("state", state);
-//
-//        return "redirect:" + login_url;
-//    }
-//
-//
-//    @RequestMapping("/google_redirect")
-//    public String google_redirect(HttpServletRequest request) {
-//        // 구글에서 전달해준 code, state 값 가져오기
-//        String code = request.getParameter("code");
-//        String state = request.getParameter("state");
-//
-//        // 세션에 저장해둔 state값 가져오기
-//        String session_state = String.valueOf(request.getSession().getAttribute("state"));
-//
-//        // CSRF 공격 방지를 위해 state 값 비교
-//        if (!state.equals(session_state)) {
-//            System.out.println("세션 불일치");
-//            request.getSession().removeAttribute("state");
-//            return "/sns/sns_error";
-//        }
-//
-//        String tokenURL = "https://oauth2.googleapis.com/token";
-//        String client_id = "[CLIENT ID]";
-//        String client_secret = "[CLIENT SECRET]";
-//        String redirect_uri = "{contextPath}" + "/google_redirect";
-//
-//        // body data 생성
-//        MultiValueMap<String, String> parameter = new LinkedMultiValueMap<>();
-//        parameter.add("grant_type", "authorization_code");
-//        parameter.add("client_id", client_id);
-//        parameter.add("client_secret", client_secret);
-//        parameter.add("code", code);
-//        parameter.add("redirect_uri", redirect_uri);
-//
-//        // request header 설정
-//        HttpHeaders headers = new HttpHeaders();
-//        // Content-type을 application/x-www-form-urlencoded 로 설정
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        // header 와 body로 Request 생성
-//        HttpEntity<?> entity = new HttpEntity<>(parameter, headers);
-//
-//        try {
-//            RestTemplate restTemplate = new RestTemplate();
-//            // 응답 데이터(json)를 Map 으로 받을 수 있도록 관련 메시지 컨버터 추가
-//            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-//
-//            // Post 방식으로 Http 요청
-//            // 응답 데이터 형식은 Hashmap 으로 지정
-//            ResponseEntity<HashMap> result = restTemplate.postForEntity(tokenURL, entity, HashMap.class);
-//            Map<String, String> resMap = result.getBody();
-//
-//            // 리턴받은 access_token 가져오기
-//            String access_token = resMap.get("access_token");
-//
-//            String userInfoURL = "https://www.googleapis.com/userinfo/v2/me";
-//            // Header에 access_token 삽입
-//            headers.set("Authorization", "Bearer "+access_token);
-//
-//            // Request entity 생성
-//            HttpEntity<?> userInfoEntity = new HttpEntity<>(headers);
-//
-//            // GET 방식으로 Http 요청
-//            // 응답 데이터 형식은 Hashmap 으로 지정
-//            ResponseEntity<HashMap> userResult = restTemplate.exchange(userInfoURL, HttpMethod.GET, userInfoEntity, HashMap.class);
-//            Map<String, String> userResultMap = userResult.getBody();
-//
-//            //응답 데이터 확인
-//            System.out.println(userResultMap);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        request.getSession().removeAttribute("state");
-//
-//        return "/sns/sns_result";
-//    }
-
 
     @GetMapping("/register")
     public String showRegisterForm() {
-        return "user/register"; // "register.html" 템플릿을 반환
+        return "user/register";
     }
 
     // 회원가입
@@ -156,6 +65,7 @@ public class LoginController {
     {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(password);
 
@@ -189,7 +99,7 @@ public class LoginController {
 
     @GetMapping("/login")
     public String showLoginPage() {
-        return "user/login"; // "login.html" 템플릿을 반환
+        return "user/login";
     }
 
 
@@ -203,8 +113,7 @@ public class LoginController {
         HttpSession session,
         Model model
     ) {
-        System.out.println("email: " + email);
-        System.out.println("password: " + password);
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         //DB에서 이메일, 패스워드 가져오기
@@ -214,15 +123,10 @@ public class LoginController {
 
         int flag = 3;
 
-        //System.out.println("users.getEmail(): " + users.getEmail());
-        //System.out.println("users.getPassword(): " + users.getPassword());
-
         if( users != null ) {
 
             if (email.equals(users.getEmail()) && encoder.matches(password, users.getPassword())) {
                 flag = 0;
-
-                System.out.println("flag0: " + flag);
 
                 // session 부여
                 // 이후 세션에 저장된 semail 값은 사용자가 페이지를 이동하더라도 유지되며, 다른 요청에서 접근할 수 있음
@@ -232,7 +136,6 @@ public class LoginController {
 
             } else {
                 flag = 1;
-                System.out.println("flag1: " + flag);
                 response.put("message", "이메일 또는 비밀번호가 일치하지 않습니다.");
             }
         } else {
@@ -240,22 +143,19 @@ public class LoginController {
             response.put("message", "존재하지 않는 회원입니다.");
         }
 
-        // 모델에 flag 값을 전달
         response.put("flag", flag);
 
-        return ResponseEntity.ok(response);  // JSON 형태로 반환
+        return ResponseEntity.ok(response);
     }
 
 
-    // session 확인 후 session 존재하면(=로그인 되어 있으면) mypage로 이동(구현 예정)
+    // session 확인 후 session 존재하면(=로그인 되어 있으면) mypage로 이동
     @PostMapping("/logout_ok")
     public String logout_ok(HttpSession session) {
 
-        System.out.println("session.getAttributeBefore: " + session.getAttribute("semail"));
-
         session.invalidate();
 
-        return "redirect:/api/login"; // JSON 형태로 반환
+        return "redirect:/api/login";
     }
 
     @PostMapping("/login_complete")
@@ -265,7 +165,6 @@ public class LoginController {
         int flag = 2;
 
         if (session.getAttribute("semail") != null ) {
-            System.out.println("login_complete semail: " + session.getAttribute("semail"));
             flag = 0;
         } else {
             flag = 1;
@@ -364,10 +263,6 @@ public class LoginController {
             cocktailsDtos.add(cocktailsTo);
         }
 
-        // 칵테일 정보 잘 가져오는지 확인
-//        for (CocktailsDto c : cocktailsDtos) {
-//            System.out.println("CocktailsDto: " + c);
-//        }
         Users users = loginService.findByEmail(email);
         if( email != null && users.getId() != null) {
 
@@ -385,18 +280,14 @@ public class LoginController {
                 }
             }
 
-            for (CocktailsDto c : ct) {
-                System.out.println("CocktailsDto: " + c);
-            }
 
             model.addAttribute("ct", ct);
             flag = 0;
-            //return "user/mypage";
+
         } else {
             flag = 1;
             response.put("message", "로그인해야 합니다.");
-            // redirectAttributes.addFlashAttribute("message", "로그인해야 합니다.");
-            //return "redirect:/login";
+
         }
 
         response.put("flag", flag);
@@ -420,16 +311,12 @@ public class LoginController {
         int flag = 2;
 
         Users users = loginService.findByEmail( email );
-        System.out.println("modify_ok: " + users.getEmail());
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(password);
 
-        System.out.println("users.getId(): " + users.getId());
-        System.out.println("name : " + name );
 
         int result = loginService.updateUser( name, encodedPassword, users.getId());
-        System.out.println("result: " + result );
 
         if (result > 0) {
             flag = 0;
@@ -463,11 +350,9 @@ public class LoginController {
         @RequestParam("password") String password,
         HttpSession session
     ) {
-
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         System.out.println("withdrawal_ok 호출");
-        System.out.println("email: " + email);
-        System.out.println("password: " + password);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
         Map<String, Object> response = new HashMap<>();
 
         int flag = 2;

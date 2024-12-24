@@ -6,7 +6,7 @@
   <title>마이 페이지</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
-    /* 기존 스타일 유지 */
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -107,26 +107,26 @@
 
     .cocktail-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 한 행에 3개 */
-      gap: 20px; /* 아이템 간 간격 */
-      padding: 20px; /* 컨테이너 여백 */
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
     }
 
 
     #cocktailTable td {
-      width: 33%; /* 한 줄에 3개씩 표시 */
+      width: 33%;
       padding: 10px;
       box-sizing: border-box;
     }
 
     #cocktailTable img {
-      width: 100%; /* 이미지가 <td>의 크기에 맞게 크기 조정 */
-      height: auto; /* 비율 유지 */
+      width: 100%;
+      height: auto;
     }
 
     .cocktail-list img {
-      width: 100%; /* 이미지가 td 요소에 맞게 크기 조정 */
-      height: auto; /* 비율 유지 */
+      width: 100%;
+      height: auto;
     }
 
     .cocktail-item {
@@ -135,7 +135,7 @@
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      height: 180px; /* 고정 높이 설정 */
+      height: 180px;
       padding: 10px;
       background-color: rgb(252, 214, 44);
       border-radius: 10px;
@@ -179,10 +179,10 @@
       font-size: 16px;
       color: #333;
       line-height: 1.2;
-      max-height: 40px; /* 두 줄 높이에 맞춤 */
-      overflow: hidden; /* 내용이 넘칠 경우 숨김 */
-      text-overflow: ellipsis; /* 넘친 텍스트에 말줄임표 추가 */
-      white-space: normal; /* 텍스트 줄바꿈 허용 */
+      max-height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
     }
 
     .cocktail-item .view-btn:hover {
@@ -210,16 +210,10 @@
     <a href="#">인기 칵테일</a>
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
-<!--    <a href="#" onclick="checkLogin()">-->
-<!--      <img src="/images/line.png">-->
-<!--    </a>-->
     <button class="logout-btn" onclick="logout()">로그아웃</button>
   </div>
 </div>
 
-<!--<div class="right">-->
-<!--  <button class="logout-btn" onclick="logout()">로그아웃</button>-->
-<!--</div>-->
 
 <div class="header">My Page</div>
 
@@ -243,7 +237,7 @@
     비밀번호<br>
     <input type="password" id="password" name="password" placeholder="password" required><br>
 
-    <div class="error-message" id="error-message"></div> <!-- 실패 메시지 출력 영역 -->
+    <div class="error-message" id="error-message"></div>
 
     <div>
       <hr style="border: 1px solid #dddddd;">
@@ -254,10 +248,6 @@
 
     이름<br>
     <input type="text" id="name" name="name" placeholder="이름" th:value="${to.name}" required><br>
-<!--    전화번호<br>-->
-<!--    <input type="text" placeholder="전화번호"><br>-->
-<!--    생년월일<br>-->
-<!--    <input type="date" placeholder="생년월일">-->
     <div class="btn">
       <button type="submit" id="modifyButton">수정</button>
       <button type="button" id="deleteButton">탈퇴</button>
@@ -272,11 +262,11 @@
     var password = document.getElementById("password").value;
     var name = document.getElementById("name").value;
 
-    // 서버로 로그인 요청을 보냄 (AJAX로 구현)
+
     $.ajax({
-      url: '/api/modify_ok',  // 서버의 POST 요청 URL
-      type: 'POST',      // POST 요청
-      data: {            // 폼 데이터 전송
+      url: '/api/modify_ok',
+      type: 'POST',
+      data: {
         email: email,
         password: password,
         name: name
@@ -285,12 +275,10 @@
         // 서버 응답 처리
         if (response.flag === 0) {
           alert(response.message);
-          // 수정 성공 시 마이페이지로 이동
 
           window.location.href = "/api/login";
 
         } else {
-          // 수정 실패 시 메시지 출력
           alert(response.message);
 
           window.location.href = "/api/mypage";
@@ -340,7 +328,6 @@
     }
   }
 
-  // 페이지 로드 시, 서버에서 받아온 데이터를 기반으로 리스트 렌더링
   renderCocktailList(cocktailData);
 
   // 로그아웃 처리 함수
@@ -360,7 +347,6 @@
     });
   }
 
-  // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
   function checkLogin() {
     $.ajax({
       url: '/api/login_complete',  // 로그인 상태 확인 API
@@ -371,13 +357,13 @@
           window.location.href = '/api/mypage';
         } else {
           // 세션이 없으면 login 페이지로 이동
-          alert(response.message);  // "로그인해야 합니다."
+          alert(response.message);
           window.location.href = '/api/login';
         }
       },
       error: function (xhr, status, error) {
         alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
+        window.location.href = '/api/login';
       }
     });
   }
