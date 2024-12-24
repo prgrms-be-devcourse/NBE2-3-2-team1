@@ -15,12 +15,14 @@ public class DashboardCocktailResponse {
     private String imageUrl;
     private Long hits;
     private Long likes;
+    private Long comments;
 
-    public DashboardCocktailResponse(String name, String imageUrl, Long hits, Long likes) {
+    public DashboardCocktailResponse(String name, String imageUrl, Long hits, Long likes, Long comments) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.hits = hits;
         this.likes = likes;
+        this.comments = comments;
     }
 
 }

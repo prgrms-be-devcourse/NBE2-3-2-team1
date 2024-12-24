@@ -4,143 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>칵테일 검색</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      color: #333;
-    }
-
-    .navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .navbar a {
-      text-decoration: none;
-      color: #333;
-      margin: 0 10px;
-      font-weight: bold;
-    }
-
-    .header {
-      background-color: transparent;
-      color: #000000;
-      text-align: center;
-      padding: 20px 0;
-      font-size: 34px;
-      font-weight: bold;
-    }
-
-    .main-text {
-      background-color: #dddddd;
-      color: #000000;
-      text-align: center;
-      padding: 10px 40px;
-      font-size: 30px;
-      width: 50%;
-      height: 40px;
-      outline: none;
-      border: 0;
-      border-radius: 15px;
-      display: inline-block;
-    }
-
-    .container {
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      align-items: center;
-      margin: 40px 20px;
-      background-color: transparent;
-    }
-
-    /* 검색 관련 스타일 */
-    .search-container {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #fcd62c;
-      padding: 50px 0; /* 위 아래 간격 추가 */
-    }
-
-    .search-input {
-      width: 30%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 15px;
-      border: 1px solid transparent;
-      background-color: rgba(62, 62, 62, 0.58);
-    }
-
-    .search-button {
-      padding: 10px 20px;
-      background-color: #ffffff;
-      color: #000000;
-      font-size: 16px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .text {
-      background-color: #dddddd;
-      color: #000000;
-      text-align: left; /* 왼쪽 정렬 */
-      padding: 7px 15px;
-      font-size: 15px;
-      width: auto; /* 텍스트 크기에 맞춰 너비 조정 */
-      height: 26px;
-      outline: none;
-      border: 0;
-      border-radius: 15px;
-      margin: 5px 0;
-      display: inline-block; /* 텍스트가 왼쪽에 정렬되도록 조정 */
-    }
-
-  </style>
-  <script>
-    function handleSearch() {
-      const searchQuery = document.querySelector('.search-input').value.trim();
-      if (searchQuery) {
-        // 입력한 검색어를 URL 쿼리 파라미터로 추가
-        const url = `search2.html?q=${encodeURIComponent(searchQuery)}`;
-        window.location.href = url; // 해당 URL로 이동
-      } else {
-        alert('검색어를 입력해주세요.');
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/css/search1.css">
 </head>
 <body>
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
+  <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
-    <a href="mypage.html">
-      <img src="../../static/images/line.png">
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
+    <a href="/api/login">
+      <img src="/images/line.png">
     </a>
   </div>
 </div>
 
 <div class="container">
+  <form id="searchForm" action="/search/cocktailresults" method="post">
+    <div class="search-container">
+      <input type="text" class="search-input" name="userInput" placeholder="검색어를 입력해주세요" required>
+      <button class="search-button">Search</button>
+    </div>
+  </form>
+</div>
 
-  <!-- 검색 입력창 및 버튼 -->
-  <div class="search-container">
-    <input type="text" class="search-input">
-    <button class="search-button" onclick="handleSearch()">검색</button>
-  </div>
-
+<div class="container">
   <br><br>
   <div class="main-text">당신의 칵테일을 찾아보세요!</div>
 
