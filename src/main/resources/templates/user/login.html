@@ -179,10 +179,25 @@
       success: function(response) {
         if (response.flag === 0) {
           // 세션이 있으면 mypage로 이동
-          window.location.href = '/api/mypage';
+          if (document.referrer && document.referrer !== window.location.href) {
+            console.log('이전 페이지:', document.referrer);
+
+            // 이전 페이지가 히스토리 스택에서 두 번째 이전 페이지인지 판단하고 이동
+            if (window.history.length > 2) {
+              console.log('이전 이전 페이지로 이동');
+              window.history.go(-2); // 두 번째 이전 페이지로 이동
+            } else {
+              console.log('이전 페이지로 이동');
+              window.location.href = document.referrer; // 기본 이전 페이지로 이동
+            }
+          } else {
+            // 이전 페이지가 없거나 로그인 페이지일 경우 기본적으로 mypage로 이동
+            console.log('이전 페이지가 없거나 로그인 페이지일 경우 기본적으로 mypage로 이동');
+            window.location.href = '/api/mypage';
+          }
         } else {
           alert(response.message); // "로그인해야 합니다."
-          window.location.href = '/api/login';
+          window.location.href = '/api/login';  // 로그인 페이지로 이동
         }
       },
       error: function(xhr, status, error) {

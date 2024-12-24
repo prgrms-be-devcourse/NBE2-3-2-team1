@@ -326,7 +326,7 @@
 
         // 칵테일 이름과 이미지를 동적으로 추가
         cocktailItem.innerHTML = `
-          <button class="cocktail-btn" type="button" onclick="window.location.href='/api/search/cocktails/${cocktail.id}'">
+          <button class="cocktail-btn" type="button" onclick="window.location.href='/search/cocktails/${cocktail.id}'">
             <img src="${cocktail.image_url}" alt="${cocktail.name}">
             <div class="title">${cocktail.name}</div>
           </button>

@@ -146,6 +146,32 @@
     });
   }
 
+  // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
+  function checkLogin() {
+    $.ajax({
+      url: '/api/login_complete',  // 로그인 상태 확인 API
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          // 세션이 있으면 mypage로 이동
+          if (document.referrer && document.referrer !== window.location.href && !document.referrer.includes('/api/login')) {
+            window.location.href = document.referrer;
+          } else {
+            // 이전 페이지가 없거나 로그인 페이지일 경우 기본적으로 mypage로 이동
+            window.location.href = '/api/mypage';
+          }
+        } else {
+          alert(response.message); // "로그인해야 합니다."
+          window.location.href = '/api/login';  // 로그인 페이지로 이동
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
+      }
+    });
+  }
+
 
 </script>
 

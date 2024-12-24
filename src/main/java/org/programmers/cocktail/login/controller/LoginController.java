@@ -1,11 +1,13 @@
 package org.programmers.cocktail.login.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.programmers.cocktail.entity.CocktailLists;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.entity.Users;
@@ -15,14 +17,22 @@ import org.programmers.cocktail.login.service.LoginService;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -38,6 +48,97 @@ public class LoginController {
 
     @Autowired
     private LoginService loginService;
+
+//    @RequestMapping("/google_login")
+//    public String google_login(HttpServletRequest request) {
+//        String client_id = "[CLIENT ID]";
+//        String redirect_uri = "{contextPath}"+"/google_redirect";
+//        String state = RandomStringUtils.randomAlphabetic(10);   // 랜덤 문자열 생성
+//        String login_url = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code"
+//            + "&client_id=" + client_id
+//            + "&redirect_uri=" + redirect_uri
+//            + "&state=" + state
+//            + "&scope=email profile";
+//
+//        request.getSession().setAttribute("state", state);
+//
+//        return "redirect:" + login_url;
+//    }
+//
+//
+//    @RequestMapping("/google_redirect")
+//    public String google_redirect(HttpServletRequest request) {
+//        // 구글에서 전달해준 code, state 값 가져오기
+//        String code = request.getParameter("code");
+//        String state = request.getParameter("state");
+//
+//        // 세션에 저장해둔 state값 가져오기
+//        String session_state = String.valueOf(request.getSession().getAttribute("state"));
+//
+//        // CSRF 공격 방지를 위해 state 값 비교
+//        if (!state.equals(session_state)) {
+//            System.out.println("세션 불일치");
+//            request.getSession().removeAttribute("state");
+//            return "/sns/sns_error";
+//        }
+//
+//        String tokenURL = "https://oauth2.googleapis.com/token";
+//        String client_id = "[CLIENT ID]";
+//        String client_secret = "[CLIENT SECRET]";
+//        String redirect_uri = "{contextPath}" + "/google_redirect";
+//
+//        // body data 생성
+//        MultiValueMap<String, String> parameter = new LinkedMultiValueMap<>();
+//        parameter.add("grant_type", "authorization_code");
+//        parameter.add("client_id", client_id);
+//        parameter.add("client_secret", client_secret);
+//        parameter.add("code", code);
+//        parameter.add("redirect_uri", redirect_uri);
+//
+//        // request header 설정
+//        HttpHeaders headers = new HttpHeaders();
+//        // Content-type을 application/x-www-form-urlencoded 로 설정
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//        // header 와 body로 Request 생성
+//        HttpEntity<?> entity = new HttpEntity<>(parameter, headers);
+//
+//        try {
+//            RestTemplate restTemplate = new RestTemplate();
+//            // 응답 데이터(json)를 Map 으로 받을 수 있도록 관련 메시지 컨버터 추가
+//            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+//
+//            // Post 방식으로 Http 요청
+//            // 응답 데이터 형식은 Hashmap 으로 지정
+//            ResponseEntity<HashMap> result = restTemplate.postForEntity(tokenURL, entity, HashMap.class);
+//            Map<String, String> resMap = result.getBody();
+//
+//            // 리턴받은 access_token 가져오기
+//            String access_token = resMap.get("access_token");
+//
+//            String userInfoURL = "https://www.googleapis.com/userinfo/v2/me";
+//            // Header에 access_token 삽입
+//            headers.set("Authorization", "Bearer "+access_token);
+//
+//            // Request entity 생성
+//            HttpEntity<?> userInfoEntity = new HttpEntity<>(headers);
+//
+//            // GET 방식으로 Http 요청
+//            // 응답 데이터 형식은 Hashmap 으로 지정
+//            ResponseEntity<HashMap> userResult = restTemplate.exchange(userInfoURL, HttpMethod.GET, userInfoEntity, HashMap.class);
+//            Map<String, String> userResultMap = userResult.getBody();
+//
+//            //응답 데이터 확인
+//            System.out.println(userResultMap);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        request.getSession().removeAttribute("state");
+//
+//        return "/sns/sns_result";
+//    }
 
 
     @GetMapping("/register")
