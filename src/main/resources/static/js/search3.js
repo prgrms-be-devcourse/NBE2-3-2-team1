@@ -51,9 +51,18 @@ function handleRequest(icon, url, additionalClass, activeSymbol, inactiveSymbol)
   xhr.open("GET", url, true);
   xhr.onreadystatechange = function () {
     if (xhr.readyState === XMLHttpRequest.DONE) {
-      if (xhr.status === 204) {
-          icon.classList.add(additionalClass);
-          icon.innerHTML = activeSymbol;
+      if (xhr.status === 200) {
+          const response = parseInt(xhr.responseText);
+          console.log('additionalclass: '+ additionalClass + ' response: ' + response);
+          if(response===1){
+            icon.classList.add(additionalClass);
+            icon.innerHTML = activeSymbol;
+          }
+          else{
+            icon.classList.remove(additionalClass);
+            icon.innerHTML = inactiveSymbol;
+          }
+
         }
       else {
           // 상태코드 401, 500 공통
