@@ -4,187 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>칵테일 검색</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      color: #333;
-    }
-
-    .navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .navbar a {
-      text-decoration: none;
-      color: #333;
-      margin: 0 10px;
-      font-weight: bold;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 40px 20px;
-      background-color: transparent;
-    }
-
-    /* 검색 관련 스타일 */
-    .search-container {
-      width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #fcd62c;
-      padding: 50px 0; /* 위 아래 간격 추가 */
-    }
-
-    .search-input {
-      width: 30%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 15px;
-      border: 1px solid transparent;
-      background-color: rgba(62, 62, 62, 0.58);
-    }
-
-    .search-button {
-      padding: 10px 20px;
-      background-color: #ffffff;
-      color: #000000;
-      font-size: 16px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-
-    .cocktail-list {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr); /* 3열로 설정 */
-      gap: 30px;
-      margin-top: 50px;
-      width: 80%;
-      max-width: 800px;
-    }
-
-    .cocktail-item {
-      text-align: center;
-      background-color: #f5f5f5;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    .cocktail-item img {
-      width: 100%;
-      height: 150px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .cocktail-name {
-      margin-top: 15px;
-      font-size: 18px;
-      color: #333;
-      font-weight: bold;
-    }
-
-    .cocktail-item:hover {
-      transform: scale(1.05);
-    }
-
-    /* 링크를 버튼처럼 보이게 만들기 */
-    .cocktail-link {
-      text-decoration: none;
-      color: inherit;
-    }
-
-  </style>
+  <link rel="stylesheet" href="/css/search2.css">
 </head>
 <body>
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
+  <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
-    <a href="user.html">
-      <img src="line.png">
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
+    <a href="/api/login">
+      <img src="/images/line.png">
     </a>
   </div>
 </div>
 
 <div class="container">
-  <!-- 검색 입력창 및 버튼 -->
-  <div class="search-container">
-    <input type="text" class="search-input">
-    <button class="search-button" onclick="handleSearch()">Search</button>
-  </div>
-
-  <!-- 칵테일 리스트 -->
-  <div class="cocktail-list" id="cocktail-list">
-    <!-- 칵테일 항목들이 동적으로 생성됩니다. -->
-  </div>
+  <form id="searchForm" action="/search/cocktailresults" method="post">
+    <div class="search-container">
+      <input type="text" class="search-input" name="userInput" placeholder="검색어를 입력해주세요" required>
+      <button class="search-button">Search</button>
+    </div>
+  </form>
 </div>
 
-<script>
-  // 검색 버튼 클릭 시 실행되는 함수
-  function handleSearch() {
-    const searchQuery = document.querySelector('.search-input').value.trim();
-    if (searchQuery) {
-      // 실제 API URL로 수정
-      const apiUrl = `https://example.com/search?q=${encodeURIComponent(searchQuery)}`;
-
-      // API에서 데이터 받아오기
-      fetch(apiUrl)
-      .then(response => response.json())
-      .then(data => {
-        // 검색된 칵테일 리스트 동적으로 생성
-        const cocktailListElement = document.getElementById('cocktail-list');
-        cocktailListElement.innerHTML = ''; // 기존 리스트 초기화
-
-        // API로부터 받은 칵테일 데이터 반복
-        data.forEach(cocktail => {
-          const cocktailItem = document.createElement('a');
-          cocktailItem.href = `search3.html?cocktailId=${cocktail.id}`; // 클릭 시 search3.html로 이동
-
-          const cocktailDiv = document.createElement('div');
-          cocktailDiv.classList.add('cocktail-item');
-
-          const cocktailImage = document.createElement('img');
-          cocktailImage.src = cocktail.imageUrl; // 칵테일 이미지
-          cocktailImage.alt = cocktail.name;
-
-          const cocktailName = document.createElement('div');
-          cocktailName.classList.add('cocktail-name');
-          cocktailName.textContent = cocktail.name; // 칵테일 이름
-
-          cocktailDiv.appendChild(cocktailImage);
-          cocktailDiv.appendChild(cocktailName);
-          cocktailItem.appendChild(cocktailDiv);
-          cocktailListElement.appendChild(cocktailItem);
-        });
-      })
-      .catch(error => {
-        console.error('API 요청 중 오류 발생:', error);
-        alert('칵테일 검색에 실패했습니다.');
-      });
-    } else {
-      alert('검색어를 입력해주세요.');
-    }
-  }
-</script>
-
+<div class="content-container">
+  <!-- 칵테일 리스트 -->
+  <div class="cocktail-list" id="cocktail-list">
+    <!-- 서버에서 전달된 데이터로 리스트 생성 -->
+    <div th:if="${#lists.isEmpty(cocktailSearchList)}" class="no-results">검색 결과가 없습니다.</div>
+    <div th:each="cocktail : ${cocktailSearchList}" class="cocktail-item">
+      <a th:href="@{/search/cocktails/{id}(id=${cocktail.id})}" class="cocktail-link">
+        <img th:src="${cocktail.image_url}" th:alt="${cocktail.name}">
+        <div class="cocktail-name" th:text="${cocktail.name}"></div>
+      </a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
