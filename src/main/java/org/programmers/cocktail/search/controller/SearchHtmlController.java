@@ -24,14 +24,14 @@ public class SearchHtmlController {
 
     // 검색페이지 반환
     @RequestMapping("/search")
-    public String cocktailSearchPage() {
+    public String getCocktailSearchPage() {
         // 검색페이지로 이동
         return "user/search1";
     }
 
     // 검색결과 반환
     @RequestMapping("/search/cocktailresults")
-    public String cocktailSearchResultPage(@RequestParam String userInput, Model model) {
+    public String getCocktailSearchResultPage(@RequestParam String userInput, Model model) {
 
         // 검색결과 설정
         String keyword = userInput;
@@ -78,23 +78,30 @@ public class SearchHtmlController {
 
     // 인기칵테일 페이지 반환
     @RequestMapping("/popular")
-    public String popularCocktailPage() {
+    public String getPopularCocktailPage() {
         // 인기 칵테일페이지로 이동
         return "user/top";
     }
 
     // 추천칵테일 페이지 반환
     @RequestMapping("/recommend")
-    public String recommendCocktailPage() {
+    public String getRecommendCocktailPage() {
         // 인기 칵테일페이지로 이동
         return "user/suggestion";
     }
 
     // 메인페이지 반환
     @RequestMapping("/main")
-    public String mainCocktailPage() {
+    public String getMainCocktailPage() {
         // 메인페이지로 이동
         return "user/main";
+    }
+
+    // 로그인페이지 반환
+    @RequestMapping("/api/login")
+    public String getLoginPage() {
+        // 로그인페이지로 이동
+        return "user/login";
     }
 
     // todo 추천칵테일 반환 컨트롤러 추가 및 프론트 페이지 연결
