@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인</title>
+  <title>탈퇴</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     body {
@@ -28,7 +28,6 @@
       margin: 0 10px;
       font-weight: bold;
     }
-
 
     .header {
       background-color: transparent;
@@ -71,7 +70,7 @@
       background-color: #dddddd;
     }
 
-    .login-btn {
+    .delete-btn {
       width: 130px;
       height: 32px;
       font-size: 15px;
@@ -79,21 +78,9 @@
       border-radius: 15px;
       outline: none;
       padding-left: 10px;
-      background-color: rgb(252, 214, 44);
+      background-color: rgb(252, 44, 44);
       cursor: pointer;
       margin-top: 20px;
-    }
-
-    .user-btn {
-      width: 100px;
-      height: 26px;
-      font-size: 12px;
-      outline: none;
-      padding-left: 10px;
-      color: white;
-      background-color: rgb(0, 0, 0);
-      cursor: pointer;
-      text-align: center;
     }
   </style>
 
@@ -106,90 +93,66 @@
     <a href="#">추천 칵테일</a>
     <a href="#">칵테일 검색</a>
     <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
-    <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
   </div>
 </div>
 
+<div class="header">탈퇴</div>
 
-<div class="header">로그인</div>
-
-<form id="login-form" th:action="@{/api/login_ok}" method="POST" class="container">
+<div class="container">
   <div class="sub-text">
-      이메일<br>
-      <input type="text" id="email" placeholder="email" required><br><br>
+    이메일<br>
+    <input type="text" id="email" placeholder="email" ><br><br>
 
-      비밀번호<br>
-      <input type="password" id="password" placeholder="password" required>
+    비밀번호<br>
+    <input type="password" id="password" placeholder="password">
 
-      <div class="sub-container">
-        <button type="submit" class="login-btn">로그인</button>
-      </div>
-
-      <br><br>
-
-      아직 계정이 없으신가요?
-      <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
+    <div class="sub-container">
+      <button type="button" class="delete-btn" onclick="handleAccountDeletion()">탈퇴</button>
     </div>
-  </form>
+  </div>
 </div>
 
 <script>
-  document.getElementById("login-form").onsubmit = function(event) {
-    event.preventDefault();
+  function handleAccountDeletion() {
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
-    // 서버로 로그인 요청을 보냄
+    // 서버로 계정 삭제 요청을 보냄 (AJAX로 구현)
     $.ajax({
-      url: '/api/login_ok',  // 서버의 POST 요청 URL
-      type: 'POST',      // POST 요청
-      data: {            // 폼 데이터 전송
+      url: '/api/withdrawal_ok',  // 서버의 계정 삭제 URL
+      type: 'POST',           // POST 요청
+      data: {                 // 폼 데이터 전송
         email: email,
         password: password
       },
       success: function(response) {
         // 서버 응답 처리
         if (response.flag === 0) {
-          alert(response.message);
-          // 로그인 성공 시 마이페이지로 이동
+          alert(response.message); // 삭제 성공 메시지
 
-          if (window.history.length > 2) {
-            console.log('이전 이전 페이지로 이동');
-            window.history.go(-1);
-          } else {
-            console.log('마이 페이지로 이동');
-            window.location.href = '/api/mypage';
-          }
-
-        } else if ( response.flag === 1) {
-          // 세션이 없으면 login 페이지로 이동
-          alert(response.message);
-          window.location.href = '/api/login';
+          window.location.href = "/api/withdrawalCompletePage";
         } else {
+
           alert(response.message);
-          window.location.href = '/api/login';
+          window.location.href = "/api/withdrawalPage";
         }
       },
       error: function(xhr, status, error) {
         // 서버 오류 처리
-        alert("로그인 실패: " + error);
+        alert("계정 삭제 실패");
       }
     });
   }
+
 
   function checkLogin() {
     $.ajax({
-      url: '/api/login_complete',
+      url: '/api/login_complete',  // 로그인 상태 확인 API
       type: 'POST',
       success: function(response) {
         if (response.flag === 0) {
-            if (window.history.length > 2) {
-              console.log('이전 이전 페이지로 이동');
-              window.history.go(-2);
-            } else {
-              console.log('마이 페이지로 이동');
-              window.location.href = '/api/mypage';
-            }
+          // 세션이 있으면 mypage로 이동
+          window.location.href = '/api/mypage';
 
         } else {
           alert(response.message);
@@ -203,30 +166,7 @@
     });
   }
 
-  function checkLogin2() {
-    $.ajax({
-      url: '/api/login_complete',
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
-        } else {
-          alert(response.message);
-          window.location.href = '/api/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';
-      }
-    });
-  }
 
-
-  // 회원가입 페이지로 이동
-  function goToSignUp() {
-    window.location.href = "/api/register";
-  }
 </script>
 
 </body>

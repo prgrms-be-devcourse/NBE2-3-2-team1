@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이 페이지</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+      height: 30px;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+
+    .navbar .logout-btn {
+      background-color: rgb(255, 0, 0);
+      color: white;
+      border: none;
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+
+    .header {
+      background-color: transparent;
+      color: #000000;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px 20px;
+    }
+
+    .sub-container {
+      display: flex;
+      justify-content: flex-start;
+      flex-direction: column;
+      margin: 20px 20px;
+      width: 50%;
+    }
+
+    .mid-text {
+      background-color: transparent;
+      color: #000000;
+      text-align: left;
+      padding: 10px 0;
+      font-size: 20px;
+    }
+
+    .text {
+      color: #000000;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    input[type="text"], input[type="password"], input[type="date"] {
+      width: 250px;
+      height: 30px;
+      font-size: 15px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background-color: #dddddd;
+      padding: 10px 20px;
+      border: none;
+      color: #000000;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+
+    .cocktail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+
+    #cocktailTable td {
+      width: 33%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    #cocktailTable img {
+      width: 100%;
+      height: auto;
+    }
+
+    .cocktail-list img {
+      width: 100%;
+      height: auto;
+    }
+
+    .cocktail-item {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      height: 180px;
+      padding: 10px;
+      background-color: rgb(252, 214, 44);
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .cocktail-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cocktail-item .title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .cocktail-btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cocktail-btn img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cocktail-btn .title {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #333;
+      line-height: 1.2;
+      max-height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+    }
+
+    .cocktail-item .view-btn:hover {
+      background-color: #cc9b00;
+    }
+
+    .description{
+      background-color: transparent;
+    }
+
+    .btn {
+      text-align: right;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <button class="logout-btn" onclick="logout()">로그아웃</button>
+  </div>
+</div>
+
+
+<div class="header">My Page</div>
+
+<form id="modify-form" th:action="@{/api/modify_ok}" method="POST" class="container">
+  <div class="sub-container">
+    <div class="mid-text">나만의 칵테일</div>
+    <div class="text">나에게 맞는 칵테일을 저장하세요!</div><br>
+
+    <!--내가 찜한 칵테일 목록-->
+    <div id="cocktailList" class="cocktail-grid"></div>
+
+    <div>
+      <hr style="border: 1px solid #dddddd;">
+    </div>
+
+    <div class="mid-text">로그인 정보</div><br>
+    <div class="text">로그인 이메일 및 계정 정보를 확인할 수 있습니다.</div><br>
+
+    이메일<br>
+    <input type="text" id="email" name="email" placeholder="email" th:value="${to.email}" readonly><br>
+    비밀번호<br>
+    <input type="password" id="password" name="password" placeholder="password" required><br>
+
+    <div class="error-message" id="error-message"></div>
+
+    <div>
+      <hr style="border: 1px solid #dddddd;">
+    </div>
+
+    <div class="mid-text">계정 정보</div><br>
+    <div class="text">회원님의 계정 정보를 수정하거나 만개의 칵테일에서 탈퇴할 수 있습니다.</div><br>
+
+    이름<br>
+    <input type="text" id="name" name="name" placeholder="이름" th:value="${to.name}" required><br>
+    <div class="btn">
+      <button type="submit" id="modifyButton">수정</button>
+      <button type="button" id="deleteButton">탈퇴</button>
+    </div>
+  </div>
+</form>
+
+<script th:inline="javascript">
+  document.getElementById("modify-form").onsubmit = function (event) {
+    event.preventDefault();
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+    var name = document.getElementById("name").value;
+
+
+    $.ajax({
+      url: '/api/modify_ok',
+      type: 'POST',
+      data: {
+        email: email,
+        password: password,
+        name: name
+      },
+      success: function (response) {
+        // 서버 응답 처리
+        if (response.flag === 0) {
+          alert(response.message);
+
+          window.location.href = "/api/login";
+
+        } else {
+          alert(response.message);
+
+          window.location.href = "/api/mypage";
+
+        }
+      },
+      error: function (xhr, status, error) {
+        // 서버 오류 처리
+        alert("수정 실패: " + error);
+      }
+    });
+  }
+
+  // 탈퇴 버튼 클릭 이벤트
+  document.getElementById("deleteButton").addEventListener("click", function () {
+    window.location.href = "/api/withdrawalPage";
+  });
+
+
+  // Thymeleaf에서 전달된 ct 데이터를 JavaScript 배열로 변환
+  /*<![CDATA[*/
+  const cocktailData = /*[[${ct}]]*/ [];
+  /*]]>*/ // Thymeleaf에서 ct 리스트를 JavaScript 배열로 변환
+
+  function renderCocktailList(cocktailData) {
+    const cocktailListElement = document.getElementById('cocktailList');
+
+    // 배열이 비어 있지 않으면 동적으로 리스트 생성
+    if (cocktailData && cocktailData.length > 0) {
+      cocktailData.forEach(cocktail => {
+        const cocktailItem = document.createElement('td');
+        cocktailItem.classList.add('cocktail-item');
+
+        // 칵테일 이름과 이미지를 동적으로 추가
+        cocktailItem.innerHTML = `
+          <button class="cocktail-btn" type="button" onclick="window.location.href='/search/cocktails/${cocktail.id}'">
+            <img src="${cocktail.image_url}" alt="${cocktail.name}">
+            <div class="title">${cocktail.name}</div>
+          </button>
+        `;
+
+        cocktailListElement.appendChild(cocktailItem);
+      });
+    } else {
+      // 찜한 칵테일이 없을 경우 메시지 표시
+      cocktailListElement.innerHTML = "<p>찜한 칵테일이 없습니다.</p>";
+    }
+  }
+
+  renderCocktailList(cocktailData);
+
+  // 로그아웃 처리 함수
+  function logout() {
+    // 세션 정보를 삭제하는 로그아웃 처리
+    $.ajax({
+      url: '/api/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
+      type: 'POST',
+      success: function (response) {
+        // "로그아웃" 메시지를 띄우고 로그인 페이지로 리디렉션
+        alert('로그아웃');
+        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
+      },
+      error: function (xhr, status, error) {
+        alert('로그아웃 실패: ' + error);
+      }
+    });
+  }
+
+  function checkLogin() {
+    $.ajax({
+      url: '/api/login_complete',  // 로그인 상태 확인 API
+      type: 'POST',
+      success: function (response) {
+        if (response.flag === 0) {
+          // 세션이 있으면 mypage로 이동
+          window.location.href = '/api/mypage';
+        } else {
+          // 세션이 없으면 login 페이지로 이동
+          alert(response.message);
+          window.location.href = '/api/login';
+        }
+      },
+      error: function (xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/api/login';
+      }
+    });
+  }
+</script>
+</body>
+</html>
