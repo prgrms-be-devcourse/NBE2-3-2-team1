@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>칵테일 추천</title>
+  <style>
+    /* 기존 스타일 유지 */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      background-color: #FFD700;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      margin: 40px 20px;
+    }
+
+    .card-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 300px;
+      height: 350px;
+      margin: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+      color: inherit;
+      background-color: #f5f5f5;
+      border: none;
+      cursor: pointer;
+    }
+
+    .card-button img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .card-button:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s;
+    }
+
+    /* Popup 관련 스타일 */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .popup {
+      width: 400px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .popup-header {
+      background-color: #FFD700;
+      color: #fff;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .popup-header .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .question-box {
+      background-color: #FFD700;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .answer-button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #D3D3D3;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .answer-button:hover {
+      background-color: #B0B0B0;
+    }
+
+    .start-btn {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #dddddd;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    /* 두 번째 및 마지막 팝업 스타일 */
+    .second-popup, .final-popup {
+      display: none;
+      flex-direction: column;
+    }
+  </style>
+  <script type="text/javascript">
+    var query = '';
+    function openPopup(popupId) {
+      document.getElementById(popupId).style.display = 'flex';
+    }
+
+    function closePopup(popupId) {
+      document.getElementById(popupId).style.display = 'none';
+    }
+
+    // 칵테일 추천 팝업 진행 함수
+    function showNextPopup(currentPopupId, nextPopupId) {
+      document.getElementById(currentPopupId).style.display = 'none';
+      document.getElementById(nextPopupId).style.display = 'block';
+    }
+
+    function showFinalPopup(currentPopupId, nextPopupId) {
+      document.getElementById(currentPopupId).style.display = 'none';
+      document.getElementById(nextPopupId).style.display = 'block';
+    }
+
+    // 술자리 유형 팝업 진행 함수
+    function showNextPopupType(currentPopupId, nextPopupId) {
+      document.getElementById(currentPopupId).style.display = 'none';
+      document.getElementById(nextPopupId).style.display = 'block';
+    }
+
+    function showFinalPopupType(currentPopupId, nextPopupId) {
+      document.getElementById(currentPopupId).style.display = 'none';
+      document.getElementById(nextPopupId).style.display = 'block';
+    }
+
+    function initializeQuery(firstQuery){
+      query = firstQuery;
+    }
+
+    function addQuery(additionalQuery){
+      query = query+'/'+additionalQuery;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const cocktailSuggestionButton = document.getElementById("cocktailSuggestion");
+
+      // 클릭 이벤트 등록
+      cocktailSuggestionButton.addEventListener("click", function () {
+        if (!query) {
+          alert("추천할 칵테일 데이터를 먼저 선택해주세요!");
+          return;
+        }
+
+        // chatGPT api 받으러 이동
+        console.log("cocktailSuggestion clicked. Query:", query);
+        const url = `/api/suggestion/detail?query=${encodeURIComponent(query)}`;
+
+        // 페이지 이동
+        window.location.href = url;
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const cocktailSuggestionButton = document.getElementById("cocktailPlace");
+
+      // 클릭 이벤트 등록
+      cocktailSuggestionButton.addEventListener("click", function () {
+        if (!query) {
+          alert("추천할 칵테일 데이터를 먼저 선택해주세요!");
+          return;
+        }
+
+        // chatGPT api 받으러 이동
+        console.log("cocktailPlace clicked. Query:", query);
+        const url = `/api/suggestion/place?query=${encodeURIComponent(query)}`;
+
+        // 페이지 이동
+        window.location.href = url;
+      });
+    });
+
+  </script>
+</head>
+<body>
+<div class="navbar">
+  <a href="#">만 개의 칵테일</a>
+  <div>
+    <a href="#">인기 칵테일</a>
+    <a href="#">추천 칵테일</a>
+    <a href="#">칵테일 검색</a>
+    <a href="user.html">
+      <img src="line.png">
+    </a>
+  </div>
+</div>
+
+<div class="header">칵테일 추천</div>
+
+<div class="container">
+  <button class="card-button" onclick="openPopup('popupSweet')">
+    <img src="/images/cocktailSuggestion.jpg" alt="달콤한 칵테일">
+    <div class="card-content">
+      <div class="card-title">나만의 칵테일 추천</div>
+      <div class="card-description">인공지능이 추천해주는 나를 위한 칵테일! 지금 칵테일 땡기지 않아요?</div>
+    </div>
+  </button>
+
+  <button class="card-button" onclick="openPopup('popupType')">
+    <img src="/images/barImage1.jpg" alt="술자리 유형">
+    <div class="card-content">
+      <div class="card-title">나의 술자리 유형은?</div>
+      <div class="card-description">나의 술자리 유형에 따라 어울리는 칵테일 알아보기!</div>
+    </div>
+  </button>
+</div>
+
+<!-- 달콤한 칵테일 추천 팝업 -->
+<div class="popup-overlay" id="popupSweet">
+  <div class="popup">
+    <div class="popup-header">
+      나만의 칵테일 추천
+      <button class="close-btn" onclick="closePopup('popupSweet')">&times;</button>
+    </div>
+
+    <!-- Start 화면 -->
+    <div id="startPopup">
+      <h2>나만의 칵테일 추천</h2>
+      <p>인공지능이 추천해주는 나를 위한 칵테일! 지금 바로 테스트를 시작하세요.</p>
+      <button onclick="showNextPopup('startPopup', 'firstQuestion')" class="start-btn">Start</button>
+    </div>
+
+    <!-- 첫 번째 질문 화면 -->
+    <div id="firstQuestion" style="display:none;">
+      <div class="question-box">
+        <h2>Q1</h2>
+        <p>칵테일 도수는 어떤 걸로 원해?</p>
+      </div>
+      <button class="answer-button" onclick="showFinalPopup('firstQuestion', 'secondQuestion');initializeQuery('high alcohol')">높은 도수</button>
+      <button class="answer-button" onclick="showFinalPopup('firstQuestion', 'secondQuestion');initializeQuery('middle alcohol')">중간 도수</button>
+      <button class="answer-button" onclick="showFinalPopup('firstQuestion', 'secondQuestion');initializeQuery('low alcohol')">낮은 도수</button>
+    </div>
+
+    <!-- 두 번째 질문 화면 -->
+    <div id="secondQuestion" style="display: none">
+      <div class="question-box">
+        <h2>Q2</h2>
+        <p>얼마나 달달한 칵테일을 원해?</p>
+      </div>
+      <button class="answer-button" onclick="showFinalPopup('secondQuestion', 'finalPopup');addQuery('high sugar')">많이 달게!</button>
+      <button class="answer-button" onclick="showFinalPopup('secondQuestion', 'finalPopup');addQuery('middle sugar')">적당한 정도!</button>
+      <button class="answer-button" onclick="showFinalPopup('secondQuestion', 'finalPopup');addQuery('low sugar')">덜 달게!</button>
+    </div>
+
+    <!-- 마지막 팝업 화면 -->
+    <div id="finalPopup" style="display:none;">
+      <br/>
+      <br/>
+      <button id="cocktailSuggestion" style="padding: 10px 20px; background-color: #FFD700; border: none; color: #fff; border-radius: 5px; cursor: pointer;">칵테일 추천 결과는?</button><br>
+
+      <button class="answer-button" onclick="showFinalPopup('finalPopup', 'startPopup')" style="padding: 10px 20px; background-color: transparent; border: none; color: rgba(62,62,62,0.58); cursor: pointer; font-size: 12px;">다시하기</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- 나의 술자리 유형 팝업 -->
+<div class="popup-overlay" id="popupType">
+  <div class="popup">
+    <div class="popup-header">
+      나의 술자리 유형 테스트
+      <button class="close-btn" onclick="closePopup('popupType')">&times;</button>
+    </div>
+
+    <!-- Start 화면 -->
+    <div id="startPopupType">
+      <h2>나의 술자리 유형</h2>
+      <p>내게 맞는 술자리 유형을 알아보세요!</p>
+      <button onclick="showNextPopupType('startPopupType', 'firstQuestionType')" class="start-btn">Start</button>
+    </div>
+
+    <!-- 첫 번째 질문 화면 -->
+    <div id="firstQuestionType" style="display:none;">
+      <div class="question-box">
+        <h2>Q1</h2>
+        <p>술약속이 잡혔다! 내가 원하는 모임 장소는?</p>
+      </div>
+      <button class="answer-button" onclick="showNextPopupType('firstQuestionType', 'secondPopupType');initializeQuery('match hot place')">핫플</button>
+      <button class="answer-button" onclick="showNextPopupType('firstQuestionType', 'secondPopupType');initializeQuery('match bar')">바</button>
+      <button class="answer-button" onclick="showNextPopupType('firstQuestionType', 'secondPopupType');initializeQuery('match club')">신나는 곳</button>
+      <button class="answer-button" onclick="showNextPopupType('firstQuestionType', 'secondPopupType');initializeQuery('match near home')">집 근처</button>
+    </div>
+
+    <!-- 두 번째 질문 화면 -->
+    <div id="secondPopupType" style="display:none;">
+      <div class="question-box">
+        <h2>Q2</h2>
+        <p>모임 장소 도착! 안주 골라야 하는데... 뭐 먹지?</p>
+      </div>
+      <button class="answer-button" onclick="showFinalPopupType('secondPopupType', 'finalPopupType');addQuery('eat with snack')">기본 과자 안주</button>
+      <button class="answer-button" onclick="showFinalPopupType('secondPopupType', 'finalPopupType');addQuery('eat with fruit')">과일 안주</button>
+      <button class="answer-button" onclick="showFinalPopupType('secondPopupType', 'finalPopupType');addQuery('eat with fries')">튀김류</button>
+      <button class="answer-button" onclick="showFinalPopupType('secondPopupType', 'finalPopupType');addQuery('eat with meal')">식사 메뉴</button>
+    </div>
+
+    <!-- 마지막 팝업 화면 -->
+    <div id="finalPopupType" style="display:none;">
+      <br/>
+      <br/>
+      <button id="cocktailPlace" style="padding: 10px 20px; background-color: #FFD700; border: none; color: #fff; border-radius: 5px; cursor: pointer;">추천 받기</button><br>
+      <button class="answer-button" onclick="showFinalPopupType('finalPopupType', 'startPopupType')" style="padding: 10px 20px; background-color: transparent; border: none; color: rgba(62,62,62,0.58); cursor: pointer; font-size: 12px;">다시하기</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

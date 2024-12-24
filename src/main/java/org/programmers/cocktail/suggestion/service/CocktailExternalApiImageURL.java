@@ -1,23 +1,21 @@
-package org.programmers.cocktail.search.service;
+package org.programmers.cocktail.suggestion.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.programmers.cocktail.entity.Cocktails;
+import org.programmers.cocktail.suggestion.dto.CocktailsTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class CocktailExternalApiService {
-
+public class CocktailExternalApiImageURL {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Cocktails> fetchCocktailData(String cocktailName) {
+    public String getCocktailImageURL(String cocktailName) {
         // API 호출
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
         ResponseEntity<JsonNode> response = restTemplate.getForEntity(url, JsonNode.class);
@@ -26,11 +24,11 @@ public class CocktailExternalApiService {
         JsonNode drinksNode = response.getBody().get("drinks");
         if (drinksNode == null || drinksNode.isEmpty()) {
             // 외부 API에 검색결과 없는 경우 빈 리스트 반환
-            return Collections.emptyList();
+            return "";
         }
 
         // 검색된 모든 칵테일 처리
-        List<Cocktails> cocktails = new ArrayList<>();
+        List<CocktailsTO> cocktails = new ArrayList<>();
         for (JsonNode drinkNode : drinksNode) {
             String name = drinkNode.get("strDrink").asText();
             StringBuilder ingredientsBuilder = new StringBuilder();
@@ -54,8 +52,8 @@ public class CocktailExternalApiService {
             String ingredients = ingredientsBuilder.toString().replaceAll(", $", "");
 
             // ProcessedCocktail 객체 생성
-            cocktails.add(new Cocktails(name, ingredients, recipes, category, alcoholic, image_url, 0L, 0L));
+            cocktails.add(new CocktailsTO(0L, name, ingredients,"", recipes, category, alcoholic, image_url, 0L, 0L));
         }
-        return cocktails;
+        return cocktails.get(0).getImage_url();
     }
 }
