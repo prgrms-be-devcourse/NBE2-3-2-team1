@@ -38,6 +38,7 @@ spring:
       resources:
         static-locations: classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/public/, file:images/
 
+
 springdoc:
   swagger-ui:
     groups-order: DESC # 그룹 순서를 내림차순으로 설정
