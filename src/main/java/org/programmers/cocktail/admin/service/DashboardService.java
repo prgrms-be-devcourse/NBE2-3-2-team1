@@ -46,14 +46,20 @@ public class DashboardService {
                 .imageUrl(cocktail.getImage_url())
                 .hits(cocktail.getHits())
                 .likes(cocktail.getLikes())
+                .comments((long) cocktail.getComments().size())
                 .build())
             .toList();
     }
 
-    public int countByRoleUser() {
-        return authoritiesRepository.countByRole("ROLE_USER");
+    public Long countByRoleUser() {
+        Long countByRole = (long) authoritiesRepository.countByRole("ROLE_USER");
+        log.info("countByRole: {}", countByRole);
+        return countByRole;
     }
 
+    public List<Long> countUserTotalList() {
+        return authoritiesRepository.countUserTotalList(LocalDateTime.now());
+    }
     public Long countComments() {
         return (long) commentsRepository.findAll().size();
     }
@@ -62,16 +68,19 @@ public class DashboardService {
         return usersRepository.findById(id);
     }
 
-    public Long getTotalHits() {
-        return cocktailsRepository.getTotalHits();
-    }
-
     public Long countTotalUserUntilYesterday() {
-        return authoritiesRepository.countTotalUserUntilYesterday("USER_ROLE", LocalDateTime.now());
+        log.info("localDateTime: {}", LocalDateTime.now());
+        Long countTotalUserUntilYesterday = authoritiesRepository.countTotalUserUntilYesterday("ROLE_USER", LocalDateTime.now());
+        log.info("countTotalUserUntilYesterday: {}", countTotalUserUntilYesterday);
+        return countTotalUserUntilYesterday;
     }
 
     public Long countTotalCommentsUntilYesterday() {
         return commentsRepository.countTotalCommentsUntilYesterday(LocalDateTime.now());
+    }
+
+    public List<Long> countCommentsList() {
+        return commentsRepository.countCommentsList(LocalDateTime.now());
     }
 
 }

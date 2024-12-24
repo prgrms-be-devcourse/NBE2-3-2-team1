@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface CommentsRepository extends JpaRepository<Comments, Long>, CommentsRepositoryCustom {
+
+    void deleteById(Long id);
+
     @Query(value ="select cmt from comments cmt where cmt.cocktails.id = :cocktailId")
     List<Comments> findByCocktailId(Long cocktailId);
 

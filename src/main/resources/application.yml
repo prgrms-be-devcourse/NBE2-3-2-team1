@@ -60,3 +60,9 @@ openai:
   api:
     key: ${API_KEY}
     url: ${API_URL}
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
