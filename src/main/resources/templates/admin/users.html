@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10000cocktail admin - 댓글 관리</title>
+    <title>10000cocktail admin - 계정 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" href="#">
@@ -136,26 +136,26 @@
         <h4 class="sidebar-heading">관리 메뉴</h4>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fas fa-tachometer-alt"></i> 대시보드</a>
+                <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> 대시보드</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#"><i class="fas fa-user-cog"></i> 계정 관리</a>
+                <a class="nav-link active" href="/admin/users"><i class="fas fa-user-cog"></i> 계정 관리</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="#"><i class="fas fa-comments"></i> 댓글 관리</a>
+                <a class="nav-link" href="/admin/comments"><i class="fas fa-comments"></i> 댓글 관리</a>
             </li>
         </ul>
     </nav>
 
     <!-- 메인 컨텐츠 -->
     <main class="main-wrapper">
-        <h2>댓글 관리</h2>
+        <h2>계정 관리</h2>
 
         <!-- 검색 폼(예시) -->
-        <form class="row g-3 mb-3" method="get" th:action="@{/admin/comments}">
+        <form class="row g-3 mb-3" method="get" th:action="@{/admin/users/search}">
             <div class="col-auto">
-                <input type="text" name="keyword" class="form-control" placeholder="댓글 내용 검색"
-                       th:value="${param.keyword}">
+                <input type="text" name="keyword" class="form-control" placeholder="계정 이름 혹은 이메일 검색" 
+                       th:value="${keyword}">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">
@@ -164,41 +164,56 @@
             </div>
         </form>
 
-        <!-- 댓글 목록(예시) -->
+        <!-- 계정 목록(예시) -->
         <div class="table-responsive shadow-sm">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">내용</th>
-                        <th scope="col">작성자</th>
-                        <th scope="col">작성일</th>
-                        <th scope="col">관련 칵테일</th>
-                        <th scope="col" style="width:120px;">관리</th>
+                        <th scope="col">이메일</th>
+                        <th scope="col">이름</th>
+                        <th scope="col">등록일</th>
+                        <th scope="col">최근 수정일</th>
+                        <th scope="col" style="width:100px;">관리</th>
                     </tr>
                 </thead>
                 <tbody>
-                <!-- 예시: comments 목록 -->
-                <tr th:each="comment, iStat : ${comments}">
+                <!-- 예시: users 목록 -->
+                <tr th:each="user, iStat : ${users}">
                     <th scope="row" th:text="${iStat.index + 1}">1</th>
-                    <td th:text="${comment.content}">이 칵테일 정말 맛있네요!</td>
-                    <td th:text="${comment.authorName}">홍길동</td>
-                    <td th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-02 13:00</td>
-                    <td th:text="${comment.cocktailName}">Margarita</td>
+                    <td th:text="${user.email}">user@example.com</td>
+                    <td th:text="${user.name}">홍길동</td>
+                    <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 09:00</td>
+                    <td th:text="${#temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm')}">2024-01-02 10:30</td>
                     <td>
                         <!-- 수정, 삭제 버튼 예시 -->
-                        <a th:href="@{/admin/comments/edit/{id}(id=${comment.id})}" class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i>
-                        </a>
                         <button type="button" class="btn btn-sm btn-danger"
-                                th:onclick="'if(confirm(\'정말 이 댓글을 삭제하시겠습니까?\')) location.href=\'/admin/comments/delete/'+${comment.id}+'\';'">
+                                th:onclick="'if(confirm(\'정말 삭제하시겠습니까?\')) sendDeleteRequest('+${user.id}+');'">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        <script>
+                            function sendDeleteRequest(userId) {
+                                fetch(`/api/users/delete/${userId}`, {
+                                    method: 'DELETE'
+                                }).then(response => {
+                                    if (response.ok) {
+                                        alert('삭제되었습니다.');
+                                        location.reload(); // 삭제 후 페이지 새로고침
+                                    } else {
+                                        response.json().then(data => {
+                                            alert(data.message || '삭제에 실패했습니다.');
+                                        });
+                                    }
+                                }).catch(error => {
+                                    alert('오류가 발생했습니다: ' + error.message);
+                                });
+                            }
+                        </script>
                     </td>
                 </tr>
                 <!-- 데이터가 없을 때 표시 -->
-                <tr th:if="${#lists.isEmpty(comments)}">
-                    <td colspan="6" class="text-center">등록된 댓글이 없습니다.</td>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="7" class="text-center">등록된 계정이 없습니다.</td>
                 </tr>
                 </tbody>
             </table>
@@ -208,19 +223,20 @@
         <nav aria-label="Page navigation" th:if="${totalPages > 1}">
             <ul class="pagination justify-content-center mt-3">
                 <li class="page-item" th:classappend="${page == 1} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/comments(page=${page-1}, keyword=${param.keyword})}" aria-label="Previous">
+                    <a class="page-link" th:href="@{/admin/users(page=${page - 1}, keyword=${param.keyword})}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
 
+                <!-- 페이지 번호 반복 -->
                 <li class="page-item" th:each="p : ${#numbers.sequence(1, totalPages)}"
                     th:classappend="${p == page} ? ' active'">
-                    <a class="page-link" th:href="@{/admin/comments(page=${p}, keyword=${param.keyword})}"
+                    <a class="page-link" th:href="@{/admin/users(page=${p}, keyword=${param.keyword})}"
                        th:text="${p}">1</a>
                 </li>
 
                 <li class="page-item" th:classappend="${page == totalPages} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/comments(page=${page+1}, keyword=${param.keyword})}" aria-label="Next">
+                    <a class="page-link" th:href="@{/admin/users(page=${page+1}, keyword=${param.keyword})}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

@@ -3,11 +3,18 @@ package org.programmers.cocktail.repository.totalhitslog;
 import static org.programmers.cocktail.entity.QTotalHitsLog.totalHitsLog;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.programmers.cocktail.entity.Comments;
 import org.programmers.cocktail.entity.TotalHitsLog;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -57,4 +64,6 @@ public class TotalHitsLogRepositoryImpl implements TotalHitsLogRepositoryCustom 
         }
         return logs;
     }
+
+
 }

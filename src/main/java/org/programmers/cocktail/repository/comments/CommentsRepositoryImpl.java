@@ -1,14 +1,24 @@
 package org.programmers.cocktail.repository.comments;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.programmers.cocktail.entity.Comments;
 import org.programmers.cocktail.entity.QComments;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 public class CommentsRepositoryImpl implements CommentsRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     public CommentsRepositoryImpl(JPAQueryFactory queryFactory) {
@@ -51,5 +61,24 @@ public class CommentsRepositoryImpl implements CommentsRepositoryCustom {
         }
 
         return lists;
+    }
+
+    @Override
+    public Page<Comments> searchByKeyword(String keyword, Pageable pageable) {
+        String jpql = "select c from comments c where lower(c.content) like :keyword";
+
+        List<Comments> comments = entityManager.createQuery(jpql, Comments.class)
+            .setParameter("keyword", "%" + keyword.toLowerCase() + "%")
+            .setFirstResult((int) pageable.getOffset())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+
+
+        String countJpql = "SELECT COUNT(c) FROM comments c WHERE LOWER(c.content) LIKE :keyword";
+        Long total = entityManager.createQuery(countJpql, Long.class)
+            .setParameter("keyword", "%"+keyword.toLowerCase() + "%")
+            .getSingleResult();
+
+        return new PageImpl<>(comments, pageable, total);
     }
 }
