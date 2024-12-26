@@ -87,11 +87,11 @@
 </head>
 <body>
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
+  <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
     <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
   </div>
 </div>
@@ -119,7 +119,7 @@
 
     // 서버로 계정 삭제 요청을 보냄 (AJAX로 구현)
     $.ajax({
-      url: '/api/withdrawal_ok',  // 서버의 계정 삭제 URL
+      url: '/withdrawal_ok',  // 서버의 계정 삭제 URL
       type: 'POST',           // POST 요청
       data: {                 // 폼 데이터 전송
         email: email,
@@ -130,11 +130,11 @@
         if (response.flag === 0) {
           alert(response.message); // 삭제 성공 메시지
 
-          window.location.href = "/api/withdrawalCompletePage";
+          window.location.href = "/withdrawalCompletePage";
         } else {
 
           alert(response.message);
-          window.location.href = "/api/withdrawalPage";
+          window.location.href = "/withdrawalPage";
         }
       },
       error: function(xhr, status, error) {
@@ -147,21 +147,21 @@
 
   function checkLogin() {
     $.ajax({
-      url: '/api/login_complete',  // 로그인 상태 확인 API
+      url: '/login_complete',
       type: 'POST',
       success: function(response) {
         if (response.flag === 0) {
-          // 세션이 있으면 mypage로 이동
-          window.location.href = '/api/mypage';
+          console.log('마이 페이지로 이동');
+          window.location.href = '/mypage';
 
         } else {
           alert(response.message);
-          window.location.href = '/api/login';
+          window.location.href = '/login';
         }
       },
       error: function(xhr, status, error) {
         alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';
+        window.location.href = '/login';
       }
     });
   }

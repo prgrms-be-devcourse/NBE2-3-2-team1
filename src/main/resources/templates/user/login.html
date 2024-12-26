@@ -1,232 +1,228 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #fff;
-      color: #333;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #333;
+        }
 
-    .navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
-    }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+        }
 
-    .navbar a {
-      text-decoration: none;
-      color: #333;
-      margin: 0 10px;
-      font-weight: bold;
-    }
+        .navbar a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 10px;
+            font-weight: bold;
+        }
 
 
-    .header {
-      background-color: transparent;
-      color: #000000;
-      text-align: center;
-      padding: 20px 0;
-      font-size: 24px;
-      font-weight: bold;
-    }
+        .header {
+            background-color: transparent;
+            color: #000000;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    .container {
-      display: flex;
-      justify-content: center;
-      margin: 40px 20px;
-    }
+        .container {
+            display: flex;
+            justify-content: center;
+            margin: 40px 20px;
+        }
 
-    .sub-container {
-      display: flex;
-      justify-content: center;
-      margin: auto;
-    }
+        .sub-container {
+            display: flex;
+            justify-content: center;
+            margin: auto;
+        }
 
-    .sub-text {
-      background-color: transparent;
-      color: #000000;
-      text-align: left;
-      padding: 20px 0;
-      font-size: 15px;
-    }
+        .sub-text {
+            background-color: transparent;
+            color: #000000;
+            text-align: left;
+            padding: 20px 0;
+            font-size: 15px;
+        }
 
-    input[type="text"], input[type="password"] {
-      display: flex;
-      width: 250px;
-      height: 32px;
-      font-size: 15px;
-      border: 0;
-      border-radius: 15px;
-      outline: none;
-      padding-left: 10px;
-      background-color: #dddddd;
-    }
+        input[type="text"], input[type="password"] {
+            display: flex;
+            width: 250px;
+            height: 32px;
+            font-size: 15px;
+            border: 0;
+            border-radius: 15px;
+            outline: none;
+            padding-left: 10px;
+            background-color: #dddddd;
+        }
 
-    .login-btn {
-      width: 130px;
-      height: 32px;
-      font-size: 15px;
-      border: 0;
-      border-radius: 15px;
-      outline: none;
-      padding-left: 10px;
-      background-color: rgb(252, 214, 44);
-      cursor: pointer;
-      margin-top: 20px;
-    }
+        .login-btn {
+            width: 130px;
+            height: 32px;
+            font-size: 15px;
+            border: 0;
+            border-radius: 15px;
+            outline: none;
+            padding-left: 10px;
+            background-color: rgb(252, 214, 44);
+            cursor: pointer;
+            margin-top: 20px;
+        }
 
-    .user-btn {
-      width: 100px;
-      height: 26px;
-      font-size: 12px;
-      outline: none;
-      padding-left: 10px;
-      color: white;
-      background-color: rgb(0, 0, 0);
-      cursor: pointer;
-      text-align: center;
-    }
-  </style>
+        .user-btn {
+            width: 100px;
+            height: 26px;
+            font-size: 12px;
+            outline: none;
+            padding-left: 10px;
+            color: white;
+            background-color: rgb(0, 0, 0);
+            cursor: pointer;
+            text-align: center;
+        }
+    </style>
 
 </head>
 <body>
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
-  <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
-    <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
-    <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
-  </div>
+    <a href="/main">만 개의 칵테일</a>
+    <div>
+        <a href="/popular">인기 칵테일</a>
+        <a href="/recommend">추천 칵테일</a>
+        <a href="/search">칵테일 검색</a>
+        <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
+        <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
+    </div>
 </div>
 
 
 <div class="header">로그인</div>
 
-<form id="login-form" th:action="@{/api/login_ok}" method="POST" class="container">
-  <div class="sub-text">
-      이메일<br>
-      <input type="text" id="email" placeholder="email" required><br><br>
+<form id="login-form" th:action="@{/login_ok}" method="POST" class="container">
+    <div class="sub-text">
+        이메일<br>
+        <input type="text" id="email" placeholder="email" required><br><br>
 
-      비밀번호<br>
-      <input type="password" id="password" placeholder="password" required>
+        비밀번호<br>
+        <input type="password" id="password" placeholder="password" required>
 
-      <div class="sub-container">
-        <button type="submit" class="login-btn">로그인</button>
-      </div>
+        <div class="sub-container">
+            <button type="submit" class="login-btn">로그인</button>
+        </div>
 
-      <br><br>
+        <br><br>
 
-      아직 계정이 없으신가요?
-      <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
+        아직 계정이 없으신가요?
+        <button type="button" class="user-btn" onclick="goToSignUp()">회원가입</button>
     </div>
-  </form>
+</form>
 </div>
 
 <script>
-  document.getElementById("login-form").onsubmit = function(event) {
-    event.preventDefault();
-    var email = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
+    document.getElementById("login-form").onsubmit = function(event) {
+        event.preventDefault();
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
 
-    // 서버로 로그인 요청을 보냄
-    $.ajax({
-      url: '/api/login_ok',  // 서버의 POST 요청 URL
-      type: 'POST',      // POST 요청
-      data: {            // 폼 데이터 전송
-        email: email,
-        password: password
-      },
-      success: function(response) {
-        // 서버 응답 처리
-        if (response.flag === 0) {
-          alert(response.message);
-          // 로그인 성공 시 마이페이지로 이동
+        // 서버로 로그인 요청을 보냄
+        $.ajax({
+            url: '/login_ok',  // 서버의 POST 요청 URL
+            type: 'POST',      // POST 요청
+            data: {            // 폼 데이터 전송
+                email: email,
+                password: password
+            },
+            success: function(response) {
+                // 서버 응답 처리
+                if (response.flag === 0) {
+                    alert(response.message);
+                    // 로그인 성공 시 마이페이지로 이동
 
-          if (window.history.length > 2) {
-            console.log('이전 이전 페이지로 이동');
-            window.history.go(-1);
-          } else {
-            console.log('마이 페이지로 이동');
-            window.location.href = '/api/mypage';
-          }
+                    if (window.history.length > 2) {
+                        console.log('이전 이전 페이지로 이동');
+                        window.history.go(-2);
+                    } else {
+                        console.log('마이 페이지로 이동');
+                        window.location.href = '/mypage';
+                    }
 
-        } else if ( response.flag === 1) {
-          // 세션이 없으면 login 페이지로 이동
-          alert(response.message);
-          window.location.href = '/api/login';
-        } else {
-          alert(response.message);
-          window.location.href = '/api/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        // 서버 오류 처리
-        alert("로그인 실패: " + error);
-      }
-    });
-  }
-
-  function checkLogin() {
-    $.ajax({
-      url: '/api/login_complete',
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-            if (window.history.length > 2) {
-              console.log('이전 이전 페이지로 이동');
-              window.history.go(-2);
-            } else {
-              console.log('마이 페이지로 이동');
-              window.location.href = '/api/mypage';
+                } else if ( response.flag === 1) {
+                    // 세션이 없으면 login 페이지로 이동
+                    alert(response.message);
+                    window.location.href = '/login';
+                } else {
+                    alert(response.message);
+                    window.location.href = '/login';
+                }
+            },
+            error: function(xhr, status, error) {
+                // 서버 오류 처리
+                alert("로그인 실패: " + error);
             }
+        });
+    }
 
-        } else {
-          alert(response.message);
-          window.location.href = '/api/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';
-      }
-    });
-  }
+    function checkLogin() {
+        $.ajax({
+            url: '/login_complete',
+            type: 'POST',
+            success: function(response) {
+                if (response.flag === 0) {
 
-  function checkLogin2() {
-    $.ajax({
-      url: '/api/login_complete',
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
-        } else {
-          alert(response.message);
-          window.location.href = '/api/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';
-      }
-    });
-  }
+                    console.log('마이 페이지로 이동');
+                    window.location.href = '/mypage';
+
+                } else {
+                    alert(response.message);
+                    window.location.href = '/login';
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('로그인 상태 확인 실패: ' + error);
+                window.location.href = '/login';
+            }
+        });
+    }
+
+    function checkLogin2() {
+        $.ajax({
+            url: '/login_complete',
+            type: 'POST',
+            success: function(response) {
+                if (response.flag === 0) {
+                    alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
+                } else {
+                    alert(response.message);
+                    window.location.href = '/login';
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('로그인 상태 확인 실패: ' + error);
+                window.location.href = '/login';
+            }
+        });
+    }
 
 
-  // 회원가입 페이지로 이동
-  function goToSignUp() {
-    window.location.href = "/api/register";
-  }
+    // 회원가입 페이지로 이동
+    function goToSignUp() {
+        window.location.href = "/register";
+    }
 </script>
 
 </body>

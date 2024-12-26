@@ -75,12 +75,6 @@ public class SearchHtmlController {
         return "user/search2";
     }
 
-    // 인기칵테일 페이지 반환
-    @RequestMapping("/popular")
-    public String getPopularCocktailPage() {
-        // 인기 칵테일페이지로 이동
-        return "user/top";
-    }
 
     // 추천칵테일 페이지 반환
     @RequestMapping("/recommend")

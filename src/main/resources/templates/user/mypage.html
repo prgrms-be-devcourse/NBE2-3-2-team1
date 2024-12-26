@@ -205,11 +205,11 @@
 </head>
 <body>
 <div class="navbar">
-  <a href="#">만 개의 칵테일</a>
+  <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="#">인기 칵테일</a>
-    <a href="#">추천 칵테일</a>
-    <a href="#">칵테일 검색</a>
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
     <button class="logout-btn" onclick="logout()">로그아웃</button>
   </div>
 </div>
@@ -217,7 +217,7 @@
 
 <div class="header">My Page</div>
 
-<form id="modify-form" th:action="@{/api/modify_ok}" method="POST" class="container">
+<form id="modify-form" th:action="@{/modify_ok}" method="POST" class="container">
   <div class="sub-container">
     <div class="mid-text">나만의 칵테일</div>
     <div class="text">나에게 맞는 칵테일을 저장하세요!</div><br>
@@ -264,7 +264,7 @@
 
 
     $.ajax({
-      url: '/api/modify_ok',
+      url: '/modify_ok',
       type: 'POST',
       data: {
         email: email,
@@ -276,12 +276,12 @@
         if (response.flag === 0) {
           alert(response.message);
 
-          window.location.href = "/api/login";
+          window.location.href = "/login";
 
         } else {
           alert(response.message);
 
-          window.location.href = "/api/mypage";
+          window.location.href = "/mypage";
 
         }
       },
@@ -294,7 +294,7 @@
 
   // 탈퇴 버튼 클릭 이벤트
   document.getElementById("deleteButton").addEventListener("click", function () {
-    window.location.href = "/api/withdrawalPage";
+    window.location.href = "/withdrawalPage";
   });
 
 
@@ -334,12 +334,12 @@
   function logout() {
     // 세션 정보를 삭제하는 로그아웃 처리
     $.ajax({
-      url: '/api/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
+      url: '/logout_ok',  // 로그아웃 API (서버에서 세션을 종료하도록)
       type: 'POST',
       success: function (response) {
         // "로그아웃" 메시지를 띄우고 로그인 페이지로 리디렉션
         alert('로그아웃');
-        window.location.href = '/api/login';  // 로그인 페이지로 리디렉션
+        window.location.href = '/login';  // 로그인 페이지로 리디렉션
       },
       error: function (xhr, status, error) {
         alert('로그아웃 실패: ' + error);
@@ -347,26 +347,6 @@
     });
   }
 
-  function checkLogin() {
-    $.ajax({
-      url: '/api/login_complete',  // 로그인 상태 확인 API
-      type: 'POST',
-      success: function (response) {
-        if (response.flag === 0) {
-          // 세션이 있으면 mypage로 이동
-          window.location.href = '/api/mypage';
-        } else {
-          // 세션이 없으면 login 페이지로 이동
-          alert(response.message);
-          window.location.href = '/api/login';
-        }
-      },
-      error: function (xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/api/login';
-      }
-    });
-  }
 </script>
 </body>
 </html>

@@ -188,9 +188,27 @@
                     <td>
                         <!-- 수정, 삭제 버튼 예시 -->
                         <button type="button" class="btn btn-sm btn-danger"
-                                th:onclick="'if(confirm(\'정말 이 댓글을 삭제하시겠습니까?\')) location.href=\'/admin/comments/delete/'+${comment.id}+'\';'">
+                                th:onclick="'if(confirm(\'정말 삭제하시겠습니까?\')) sendDeleteRequest('+${comment.id}+');'">
                             <i class="fas fa-trash-alt"></i>
                         </button>
+                        <script>
+                            function sendDeleteRequest(commentId) {
+                                fetch(`/api/comments/delete/${commentId}`, {
+                                    method: 'DELETE'
+                                }).then(response => {
+                                    if (response.ok) {
+                                        alert('삭제되었습니다.');
+                                        location.reload(); // 삭제 후 페이지 새로고침
+                                    } else {
+                                        response.json().then(data => {
+                                            alert(data.message || '삭제에 실패했습니다.');
+                                        });
+                                    }
+                                }).catch(error => {
+                                    alert('오류가 발생했습니다: ' + error.message);
+                                });
+                            }
+                        </script>
                     </td>
                 </tr>
                 <!-- 데이터가 없을 때 표시 -->
