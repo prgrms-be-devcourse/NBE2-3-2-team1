@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인기 칵테일 순위</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #333;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    .header {
+      background-color: transparent;
+      color: #000000;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 34px;
+      font-weight: bold;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 40px 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      width: 80%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #bce2fd;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+    }
+
+    .rank-item:hover {
+      background-color: #f7f7f7;
+    }
+
+    .rank-number {
+      font-size: 24px;
+      font-weight: bold;
+      width: 30px;
+      text-align: center;
+      background-color: transparent;
+      border-radius: 50%;
+      color: #fff;
+      margin-right: 15px;
+    }
+
+    .rank-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 15px;
+    }
+
+    .rank-content {
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+
+    .rank-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .rank-description-container {
+      width: 50%; /* 설명을 담을 작은 컨테이너 크기 */
+      background-color: transparent;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      color: #777;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="/main">만 개의 칵테일</a>
+  <div>
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
+    <a href="/search">칵테일 검색</a>
+    <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
+    <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
+  </div>
+</div>
+
+<div class="header">
+  인기 칵테일 순위
+</div>
+
+<div class="container">
+  <!-- 칵테일 정보를 반복적으로 출력 -->
+  <div th:each="cocktail, iterStat : ${list}" class="rank-item">
+    <a th:href="@{/list/detail/{id}(id=${cocktail.id})}"
+       style="display: flex; width: 100%; height: 100%; text-decoration: none; color: inherit;">
+      <div class="rank-number" th:text="${iterStat.index + 1}"></div>
+      <img th:src="${cocktail.image_url}" alt="칵테일 이미지">
+      <div class="rank-content">
+        <div class="rank-title" th:text="${cocktail.name}"></div>
+        <div class="rank-description-container">
+          <span>좋아요 수: </span><span th:text="${cocktail.likes}"></span>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<script>
+  function checkLogin() {
+    $.ajax({
+      url: '/login_complete',
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          console.log('마이 페이지로 이동');
+          window.location.href = '/mypage';
+
+        } else {
+          alert(response.message);
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  function checkLogin2() {
+    $.ajax({
+      url: '/login_complete',
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
+        } else {
+          alert(response.message);
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';
+      }
+    });
+  }
+
+</script>
+
+</body>
+</html>
