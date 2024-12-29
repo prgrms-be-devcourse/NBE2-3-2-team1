@@ -12,19 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/list")
+@RequestMapping("/popular")
 public class ListController {
     @Autowired
     ListService listService;
     @Autowired
     private CocktailsRepository cocktailsRepository;
 
-    @GetMapping("")
-    public String list() {
-        return "user/top";
-    }
 
-    @GetMapping("/show")
+    @GetMapping("")
     public String show(Model model) {
         List<ListCocktail> list = listService.showList();
 
@@ -41,7 +37,7 @@ public class ListController {
         ListCocktail cocktail = listService.getCocktailById(id);
 
         // 칵테일 정보를 모델에 추가
-        model.addAttribute("cocktail", cocktail);
+        model.addAttribute("cocktailById", cocktail);
 
         // search3.html로 이동
         return "user/search3"; // 상세 페이지를 위한 템플릿 이름

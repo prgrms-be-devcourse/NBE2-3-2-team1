@@ -4,6 +4,7 @@ package org.programmers.cocktail.repository.cocktail_lists;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.programmers.cocktail.entity.CocktailLists;
+import org.programmers.cocktail.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,6 @@ public interface CocktailListsRepository extends JpaRepository<CocktailLists, Lo
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(value ="Delete from cocktail_lists clist where clist.users.id = :userId and clist.cocktails.id = :cocktailId")
     int deleteByUserIdAndCocktailId(Long userId, Long cocktailId);
+
+    void deleteAllByUsers(Users users);
 }

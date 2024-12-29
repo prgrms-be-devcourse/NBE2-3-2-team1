@@ -7,8 +7,12 @@ import org.programmers.cocktail.admin.dto.UserResponse;
 import org.programmers.cocktail.entity.Users;
 import org.programmers.cocktail.exception.ErrorCode;
 import org.programmers.cocktail.global.exception.BadRequestException;
+import org.programmers.cocktail.global.exception.NotFoundException;
 import org.programmers.cocktail.global.response.ApiResponse;
 import org.programmers.cocktail.repository.authorities.AuthoritiesRepository;
+import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepository;
+import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
+import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,11 +27,24 @@ public class AdminUserService {
 
     private final UsersRepository usersRepository;
 
+    private final CommentsRepository commentsRepository;
+
+    private final CocktailListsRepository cocktaillistsRepository;
+
+    private final CocktailLikesRepository cocktailLikesRepository;
+    private final AuthoritiesRepository authoritiesRepository;
+
     @Autowired
     public AdminUserService(
-        UsersRepository usersRepository
-    ) {
+        UsersRepository usersRepository, CommentsRepository commentsRepository,
+        CocktailListsRepository cocktaillistsRepository,
+        CocktailLikesRepository cocktailLikesRepository,
+        AuthoritiesRepository authoritiesRepository) {
         this.usersRepository = usersRepository;
+        this.commentsRepository = commentsRepository;
+        this.cocktaillistsRepository = cocktaillistsRepository;
+        this.cocktailLikesRepository = cocktailLikesRepository;
+        this.authoritiesRepository = authoritiesRepository;
     }
 
     public Page<UserResponse> findAllByAuthorities_Role(String role, Pageable pageable) {
@@ -37,9 +54,19 @@ public class AdminUserService {
 
     @Transactional
     public void deleteById(long id) {
+
+        Users user = usersRepository.findById(id).orElseThrow();
         try {
-            usersRepository.deleteById(id);
+            cocktailLikesRepository.deleteAllByUsers(user);
+            commentsRepository.deleteAllByUsers(user);
+            cocktaillistsRepository.deleteAllByUsers(user);
+
+            authoritiesRepository.deleteAllByUsers(user);
+
+            usersRepository.delete(user);
+
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

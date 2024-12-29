@@ -3,6 +3,7 @@ package org.programmers.cocktail.list.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.list.dto.ListCocktail;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ListService {
     private final CocktailsRepository cocktailsRepository;
 
@@ -32,6 +34,8 @@ public class ListService {
 
             result.add(listCocktail);
         }
+
+        log.info(result.toString());
 
         return result;
 

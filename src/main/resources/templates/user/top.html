@@ -127,7 +127,7 @@
 <div class="container">
   <!-- 칵테일 정보를 반복적으로 출력 -->
   <div th:each="cocktail, iterStat : ${list}" class="rank-item">
-    <a th:href="@{/list/detail/{id}(id=${cocktail.id})}"
+    <a th:href="@{/popular/detail/{id}(id=${cocktail.id})}"
        style="display: flex; width: 100%; height: 100%; text-decoration: none; color: inherit;">
       <div class="rank-number" th:text="${iterStat.index + 1}"></div>
       <img th:src="${cocktail.image_url}" alt="칵테일 이미지">
