@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>칵테일 추천</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     /* 기존 스타일 유지 */
     body {
@@ -260,12 +261,11 @@
 <div class="navbar">
   <a href="/main">만 개의 칵테일</a>
   <div>
-    <a href="/api/list">인기 칵테일</a>
-    <a href="/api/suggestion/">추천 칵테일</a>
+    <a href="/popular">인기 칵테일</a>
+    <a href="/recommend">추천 칵테일</a>
     <a href="/search">칵테일 검색</a>
-    <a href="/api/login">
-      <img src="/images/line.png">
-    </a>
+    <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
+    <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
   </div>
 </div>
 
@@ -387,6 +387,49 @@
 
   </div>
 </div>
+
+<script>
+  function checkLogin() {
+    $.ajax({
+      url: '/login_complete',
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          console.log('마이 페이지로 이동');
+          window.location.href = '/mypage';
+
+        } else {
+          alert(response.message);
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  function checkLogin2() {
+    $.ajax({
+      url: '/login_complete',
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
+        } else {
+          alert(response.message);
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';
+      }
+    });
+  }
+
+</script>
 
 </body>
 </html>
