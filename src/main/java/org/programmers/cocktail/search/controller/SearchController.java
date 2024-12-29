@@ -111,7 +111,7 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
         }
 
-        return ResponseEntity.noContent().build();      //DB추가 성공
+        return ResponseEntity.noContent().build();      //DB추가 성공(204반환)
     }
 
     @DeleteMapping("/favorites/cocktails/{cocktailId}")
@@ -184,7 +184,7 @@ public class SearchController {
     }
 
     @PostMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Void> addLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+    public ResponseEntity<Long> addLikesByUser(HttpSession session, @PathVariable String cocktailId) {
 
         //1. 로그인 상태 확인
         // 테스트용
@@ -230,11 +230,11 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패(500반환)
         }
 
-        return ResponseEntity.noContent().build();      //DB추가 성공
+        return ResponseEntity.ok(cocktailLikesCountById);      //DB추가 성공(200반환, 좋아요갯수 반환)
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Void> deleteLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+    public ResponseEntity<Long> deleteLikesByUser(HttpSession session, @PathVariable String cocktailId) {
 
         //1. 로그인 상태 확인
         // 테스트용
@@ -280,7 +280,7 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패
         }
 
-        return ResponseEntity.noContent().build();      //DB삭제 성공
+        return ResponseEntity.ok(cocktailLikesCountById);      //DB삭제 성공(200반환, 좋아요 갯수 반환)
     }
 
     @GetMapping("/reviews/cocktails/{cocktailId}")
