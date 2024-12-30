@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.support.SessionStatus;
 
 
 @RestController
@@ -46,23 +48,19 @@ public class SearchController {
     CommentsService commentsService;
 
     @GetMapping("/favorites/cocktails/{cocktailId}")
-    public ResponseEntity<Integer> isFavoritedByUser(HttpSession session, @PathVariable String cocktailId){
+    public ResponseEntity<Integer> isFavoritedByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId,
+        SessionStatus sessionStatus){
 
         final int PRESENT = 1;
         final int ABSENT = 0;
 
         // 1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -80,20 +78,15 @@ public class SearchController {
     }
 
     @PostMapping("/favorites/cocktails/{cocktailId}")
-    public ResponseEntity<Void> addFavoritesByUser(HttpSession session, @PathVariable String cocktailId){
+    public ResponseEntity<Void> addFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null") ){
+        if(sessionValue == null || sessionValue.equals("null") ){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -115,20 +108,15 @@ public class SearchController {
     }
 
     @DeleteMapping("/favorites/cocktails/{cocktailId}")
-    public ResponseEntity<Void> deleteFavoritesByUser(HttpSession session, @PathVariable String cocktailId){
+    public ResponseEntity<Void> deleteFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -150,23 +138,18 @@ public class SearchController {
     }
 
     @GetMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Integer> isLikedByUser(HttpSession session, @PathVariable String cocktailId) {
+    public ResponseEntity<Integer> isLikedByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
         final int PRESENT = 1;
         final int ABSENT = 0;
 
         // 1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -184,20 +167,15 @@ public class SearchController {
     }
 
     @PostMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Long> addLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+    public ResponseEntity<Long> addLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -234,20 +212,15 @@ public class SearchController {
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
-    public ResponseEntity<Long> deleteLikesByUser(HttpSession session, @PathVariable String cocktailId) {
+    public ResponseEntity<Long> deleteLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -300,21 +273,16 @@ public class SearchController {
     }
 
     @PostMapping("/reviews/cocktails/{cocktailId}")
-    public ResponseEntity<Void> registerCocktailComments(HttpSession session, @PathVariable String cocktailId,
+    public ResponseEntity<Void> registerCocktailComments(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId,
         @RequestBody CommentsTO commentsTOFromClient) {
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
         // 2. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(loginSessionInfo);
+        UsersTO userInfo = usersService.findByEmail(sessionValue);
         if(userInfo==null){
             // 유저 정보 가져올 수 없음(500반환)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -336,15 +304,10 @@ public class SearchController {
     }
 
     @DeleteMapping("/reviews/cocktails/{reviewId}")
-    public ResponseEntity<Void> deleteCocktailComments(HttpSession session, @PathVariable String reviewId) {
+    public ResponseEntity<Void> deleteCocktailComments(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String reviewId) {
 
         //1. 로그인 상태 확인
-        // 테스트용
-        // session.setAttribute("semail", "cde@cde.com");
-        String loginSessionInfo = String.valueOf(session.getAttribute("semail"));
-        // System.out.println("loginSessionInfo: " + loginSessionInfo);
-
-        if(loginSessionInfo == null || loginSessionInfo.equals("null")){
+        if(sessionValue == null || sessionValue.equals("null")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();        // 로그인 실패(401반환)
         }
 
