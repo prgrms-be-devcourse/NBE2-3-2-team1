@@ -103,6 +103,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.createError(e.getMessage()));
     }
 
+    // 세션 인증 실패시 에러
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Void> handleUnauthorizedException(){
+        //  HTTP 상태코드 401 반환
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     // 위의 경우를 제외한 모든 에러 500
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception e) {
