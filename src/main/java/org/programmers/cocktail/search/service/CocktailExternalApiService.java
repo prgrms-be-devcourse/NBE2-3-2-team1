@@ -25,8 +25,6 @@ public class CocktailExternalApiService {
     // 1. Cocktail 검색용
     public List<CocktailsTO> fetchCocktailData(String cocktailName) {
 
-        System.out.println("[Test] fetchCocktailData with parameter");
-
         // TheCocktailDB 호출 url - "Search cocktail by name" method
         String url = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + cocktailName;
 

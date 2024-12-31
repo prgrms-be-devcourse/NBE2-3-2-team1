@@ -34,11 +34,11 @@ public class CocktailsService {
         return Collections.emptyList();
     }
 
-    public int insertNewCocktailDB(CocktailsTO cocktailsTO) {
+    public int insertNewCocktailDBbyList(List<CocktailsTO> cocktailsTOList) {
         try {
-            //TO->Entity 변환
-            Cocktails cocktails = cocktailsMapper.convertToCocktails(cocktailsTO);
-            cocktailsRepository.save(cocktails);
+            //List<TO>->List<Entity> 변환
+            List<Cocktails> cocktailsList = cocktailsMapper.convertToCocktailsList(cocktailsTOList);
+            cocktailsRepository.saveAll(cocktailsList);
             return SUCCESS;    //저장성공
         } catch (Exception e) {
             System.out.println("[저장실패] : "+e.getMessage());

@@ -1,5 +1,6 @@
 package org.programmers.cocktail.search.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.programmers.cocktail.search.dto.CocktailsTO;
@@ -9,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SearchHtmlController {
@@ -51,14 +54,11 @@ public class SearchHtmlController {
         // 2-1) 외부 API에서 가져온 cocktail 정보를 DB에 저장
         cocktailSearchList = cocktailExternalApiService.fetchCocktailData(keyword);
 
-        for(CocktailsTO cocktail : cocktailSearchList){
-            System.out.println("new cocktail adding to Local DB");
-            int cocktailInsertResult = cocktailsService.insertNewCocktailDB(cocktail);
+        int cocktailInsertByListResult = cocktailsService.insertNewCocktailDBbyList(cocktailSearchList);
 
-            if(cocktailInsertResult==0){
-                // todo 데이터 삽입 실패시 프론트에 alert 띄울지 고민
-                System.out.println("[에러] New Cocktail Data Insertion Failed");
-            }
+        if(cocktailInsertByListResult==0){
+            // todo 데이터 삽입 실패시 프론트에 alert 띄울지 고민
+            System.out.println("[에러] New Cocktail Data Insertion Failed");
         }
 
         // 2-2) DB에 저장된 데이터를 가져와서 반환
