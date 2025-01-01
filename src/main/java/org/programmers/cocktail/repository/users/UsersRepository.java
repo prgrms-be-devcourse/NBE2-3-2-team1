@@ -3,6 +3,7 @@ package org.programmers.cocktail.repository.users;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import org.programmers.cocktail.admin.dto.UserRequest;
 import org.programmers.cocktail.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,5 +34,7 @@ public interface UsersRepository extends JpaRepository<Users, Long>, UsersReposi
     @Transactional
     @Query(value = "update users u set u.name = :name, u.password = :password where u.id = :id")
     int updateById(String name, String password, Long id);
+
+    boolean existsByEmailAndPassword(String email, String password);
 
 }
