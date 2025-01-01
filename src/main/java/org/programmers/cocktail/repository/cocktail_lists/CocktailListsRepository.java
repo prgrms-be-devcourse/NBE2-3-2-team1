@@ -14,7 +14,6 @@ public interface CocktailListsRepository extends JpaRepository<CocktailLists, Lo
     @Query(value ="select clist from cocktail_lists clist where clist.users.id = :userId and clist.cocktails.id = :cocktailId")
     Optional<CocktailLists> findByUserIdAndCocktailId(Long userId, Long cocktailId);
 
-    @Transactional
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query(value ="Delete from cocktail_lists clist where clist.users.id = :userId and clist.cocktails.id = :cocktailId")
     int deleteByUserIdAndCocktailId(Long userId, Long cocktailId);
