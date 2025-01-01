@@ -1,21 +1,17 @@
 package org.programmers.cocktail.search.controller;
 
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import org.programmers.cocktail.global.Utility.SearchUtils;
 import org.programmers.cocktail.global.annotation.RequireLogin;
-import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.CommentsTO;
-import org.programmers.cocktail.search.dto.UsersTO;
-import org.programmers.cocktail.search.service.CocktailExternalApiService;
+import org.programmers.cocktail.search.enums.ActionType;
 import org.programmers.cocktail.search.service.CocktailLikesService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
 import org.programmers.cocktail.search.service.CommentsService;
-import org.programmers.cocktail.search.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +29,6 @@ import org.springframework.web.bind.support.SessionStatus;
 @RestController
 @RequestMapping("/api")
 public class SearchController {
-
-    @Autowired
-    CocktailsService cocktailsService;
 
     @Autowired
     CocktailListsService cocktailListsService;
@@ -58,8 +51,7 @@ public class SearchController {
         final int PRESENT = 1;
         final int ABSENT = 0;
 
-        //userid, cocktailid가 cocktail_lists에 존재하는지 확인
-        // SUCCESS: 1, FAIL: 0
+        //userid, cocktailid가 cocktail_lists에 존재하는지 확인( SUCCESS: 1, FAIL: 0 )
         int isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(searchUtils.searchUserByUserEmail(sessionValue).getId(), Long.parseLong(cocktailId));
 
         if(isCocktailListsPresent==0){
@@ -73,7 +65,7 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Void> addFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
-        // 1.cocktail_lists에 user_id, cocktail_id 저장
+        // cocktail_lists에 user_id, cocktail_id 저장
         CocktailListsTO cocktailListsTO = new CocktailListsTO();
         cocktailListsTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
@@ -82,7 +74,7 @@ public class SearchController {
         int cocktailListInsertResult = cocktailListsService.insertCocktailList(cocktailListsTO);
 
         if(cocktailListInsertResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
+            throw new RuntimeException("Failed to add a new favorite to the cocktail_lists table"); // DB추가 실패(500반환)
         }
 
         return ResponseEntity.noContent().build();      //DB추가 성공(204반환)
@@ -92,7 +84,7 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Void> deleteFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
-        // 1. cocktail_lists에서 user_id, cocktail_id 삭제
+        // cocktail_lists에서 user_id, cocktail_id 삭제
         CocktailListsTO cocktailListsTO = new CocktailListsTO();
         cocktailListsTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
@@ -101,7 +93,7 @@ public class SearchController {
         int cocktailListDeleteResult = cocktailListsService.deleteCocktailList(cocktailListsTO);
 
         if(cocktailListDeleteResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
+            throw new RuntimeException("Failed to add a new favorite to the cocktail_lists table"); // DB삭제 실패(500반환)
         }
 
         return ResponseEntity.noContent().build();      //DB삭제 성공
@@ -114,12 +106,11 @@ public class SearchController {
         final int PRESENT = 1;
         final int ABSENT = 0;
 
-        //1. userid, cocktailid가 cocktail_likes에 존재하는지 확인
-        // SUCCESS: 1, FAIL: 0
+        // userid, cocktailid가 cocktail_likes에 존재하는지 확인(SUCCESS: 1, FAIL: 0)
         int isCocktailLikesPresent = cocktailLikesService.findByUserIdAndCocktailId(searchUtils.searchUserByUserEmail(sessionValue).getId(), Long.parseLong(cocktailId));
 
         if(isCocktailLikesPresent==0){
-            return ResponseEntity.ok(ABSENT);// 좋아요 조회 성공(좋아요 없는 경우 - 200 반환)
+            return ResponseEntity.ok(ABSENT);  // 좋아요 조회 성공(좋아요 없는 경우 - 200 반환)
         }
 
         return ResponseEntity.ok(PRESENT);       // 좋아요 조회 성공(좋아요 있는 경우 - 200반환)
@@ -129,68 +120,14 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Long> addLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        // 1. cocktail_likes에 user_id, cocktail_id 저장
-        CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
-        cocktailLikesTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
-        cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
-
-        // SUCCESS: 1, FAIL: 0
-        int cocktailLikesInsertResult = cocktailLikesService.insertCocktailLikes(cocktailLikesTO);
-
-        if(cocktailLikesInsertResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
-        }
-
-        // 2. cocktailId에 해당하는 cocktailsLikes 값 가져오기
-        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
-
-        // 3. cocktails테이블에 cocktailsLikes 값 업데이트
-        CocktailsTO cocktailsTO = new CocktailsTO();
-        cocktailsTO.setId(Long.parseLong(cocktailId));
-        cocktailsTO.setLikes(cocktailLikesCountById);
-
-        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
-
-        // SUCCESS: 1, FAIL: 0
-        if(cocktailLikesCountUpdateResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패(500반환)
-        }
-
-        return ResponseEntity.ok(cocktailLikesCountById);      //DB추가 성공(200반환, 좋아요갯수 반환)
+        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, ActionType.ADD));      //DB추가 성공(200반환, 좋아요갯수 반환)
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
     @RequireLogin
     public ResponseEntity<Long> deleteLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        // 1. cocktail_likes에서 user_id, cocktail_id 삭제
-        CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
-        cocktailLikesTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
-        cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
-
-        // SUCCESS: 1, FAIL: 0
-        int cocktailLikesDeleteResult = cocktailLikesService.deleteCocktailLikes(cocktailLikesTO);
-
-        if(cocktailLikesDeleteResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
-        }
-
-        // 2. cocktailId에 해당하는 cocktailsLikes 값 가져오기
-        Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
-
-        // 3. cocktails테이블에 cocktailsLikes 값 업데이트
-        CocktailsTO cocktailsTO = new CocktailsTO();
-        cocktailsTO.setId(Long.parseLong(cocktailId));
-        cocktailsTO.setLikes(cocktailLikesCountById);
-
-        int cocktailLikesCountUpdateResult = cocktailsService.updateCocktailLikesCount(cocktailsTO);
-
-        // SUCCESS: 1, FAIL: 0
-        if(cocktailLikesCountUpdateResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();     // 칵테일 좋아요 업데이트 실패
-        }
-
-        return ResponseEntity.ok(cocktailLikesCountById);      //DB삭제 성공(200반환, 좋아요 갯수 반환)
+        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, ActionType.DELETE));      //DB삭제 성공(200반환, 좋아요 갯수 반환)
     }
 
     @GetMapping("/reviews/cocktails/{cocktailId}")
@@ -222,7 +159,7 @@ public class SearchController {
         int commentsInsertResult = commentsService.insertComments(commentsTO);
 
         if(commentsInsertResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
+            throw new RuntimeException("Failed to add a new Comment to the comments table"); // DB추가 실패(500반환)
         }
 
         return ResponseEntity.noContent().build();        // DB추가 성공(204반환)
@@ -239,7 +176,7 @@ public class SearchController {
 
         // SUCCESS: 1, FAIL: 0
         if(commentsDeleteResult==0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // DB삭제 실패(500반환))
+            throw new RuntimeException("Failed to delete a Comment in the comments table"); // DB삭제 실패(500반환)
         }
         return ResponseEntity.noContent().build();        // DB삭제 성공(204반환)
     }
