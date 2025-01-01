@@ -34,7 +34,6 @@ public class CocktailExternalApiService {
     // 2. 메인 페이지 출력용
     public List<CocktailsTO> fetchCocktailData() {
 
-        System.out.println("[Test] fetchCocktailData without parameter");
         // TheCocktailDB 호출 url - "Lookup a random cocktail" method
         String url = "https://www.thecocktaildb.com/api/json/v1/1/random.php";
 

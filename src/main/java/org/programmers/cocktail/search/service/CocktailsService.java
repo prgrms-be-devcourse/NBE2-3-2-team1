@@ -53,9 +53,11 @@ public class CocktailsService {
         return cocktailsTO;
     }
 
+    @Transactional
     public int updateCocktailHits(CocktailsTO cocktailsTO) {
 
-        Optional<Cocktails> cocktailsOptional = cocktailsRepository.findById(cocktailsTO.getId());
+        // Pessimistic Lock 적용
+        Optional<Cocktails> cocktailsOptional = cocktailsRepository.findByIdWithPessimisticLock(cocktailsTO.getId());
 
         if(!cocktailsOptional.isPresent()){
             return FAIL;        // 칵테일 불러오기 실패

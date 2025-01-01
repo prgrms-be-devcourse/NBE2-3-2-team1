@@ -102,23 +102,10 @@ public class SearchHtmlController {
         return "user/main";
     }
 
-    // 로그인페이지 반환
-//    @RequestMapping("/api/login")
-//    public String getLoginPage() {
-//        // 로그인페이지로 이동
-//        return "user/login";
-//    }
-
-    // todo 추천칵테일 반환 컨트롤러 추가 및 프론트 페이지 연결
-
     // 칵테일 상세 페이지 반환
     @RequestMapping("/search/cocktails/{cocktailId}")
     public String getCocktailInfoById(@PathVariable String cocktailId, Model model) {
-        System.out.println("cocktailId : " +cocktailId);
-        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
 
-        System.out.println(cocktailsById);
-        model.addAttribute("cocktailById", cocktailsById);
         // 특정 칵테일 상세페이지 조회시 해당 칵테일 hit 증가
         CocktailsTO cocktailsTO = new CocktailsTO();
         cocktailsTO.setId(Long.parseLong((cocktailId)));
@@ -130,6 +117,9 @@ public class SearchHtmlController {
         {
             System.out.println("[에러] Cocktail Hits Update Failed");
         }
+
+        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
+        model.addAttribute("cocktailById", cocktailsById);
 
         // todo 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
         // todo 리스트 상세페이지 구현되면 상세페이지 반환하도록 설정
