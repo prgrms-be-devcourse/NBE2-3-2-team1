@@ -2,6 +2,7 @@ package org.programmers.cocktail.search.controller;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import org.programmers.cocktail.global.Utility.SearchUtils;
 import org.programmers.cocktail.global.annotation.RequireLogin;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
@@ -37,9 +38,6 @@ public class SearchController {
     CocktailsService cocktailsService;
 
     @Autowired
-    UsersService usersService;
-
-    @Autowired
     CocktailListsService cocktailListsService;
 
     @Autowired
@@ -47,6 +45,10 @@ public class SearchController {
 
     @Autowired
     CommentsService commentsService;
+
+    @Autowired
+    SearchUtils searchUtils;
+
 
     @GetMapping("/favorites/cocktails/{cocktailId}")
     @RequireLogin
@@ -56,16 +58,9 @@ public class SearchController {
         final int PRESENT = 1;
         final int ABSENT = 0;
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        //2. userid, cocktailid가 cocktail_lists에 존재하는지 확인
+        //userid, cocktailid가 cocktail_lists에 존재하는지 확인
         // SUCCESS: 1, FAIL: 0
-        int isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+        int isCocktailListsPresent = cocktailListsService.findByUserIdAndCocktailId(searchUtils.searchUserByUserEmail(sessionValue).getId(), Long.parseLong(cocktailId));
 
         if(isCocktailListsPresent==0){
             return ResponseEntity.ok(ABSENT);// 즐겨찾기 조회 성공(즐겨찾기 없는 경우 - 200 반환)
@@ -78,16 +73,9 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Void> addFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        // 2. cocktail_lists에 user_id, cocktail_id 저장
+        // 1.cocktail_lists에 user_id, cocktail_id 저장
         CocktailListsTO cocktailListsTO = new CocktailListsTO();
-        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
@@ -104,16 +92,9 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Void> deleteFavoritesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId){
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        // 2. cocktail_lists에서 user_id, cocktail_id 삭제
+        // 1. cocktail_lists에서 user_id, cocktail_id 삭제
         CocktailListsTO cocktailListsTO = new CocktailListsTO();
-        cocktailListsTO.setUserId(userInfo.getId());
+        cocktailListsTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailListsTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
@@ -133,16 +114,9 @@ public class SearchController {
         final int PRESENT = 1;
         final int ABSENT = 0;
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        //2. userid, cocktailid가 cocktail_likes에 존재하는지 확인
+        //1. userid, cocktailid가 cocktail_likes에 존재하는지 확인
         // SUCCESS: 1, FAIL: 0
-        int isCocktailLikesPresent = cocktailLikesService.findByUserIdAndCocktailId(userInfo.getId(), Long.parseLong(cocktailId));
+        int isCocktailLikesPresent = cocktailLikesService.findByUserIdAndCocktailId(searchUtils.searchUserByUserEmail(sessionValue).getId(), Long.parseLong(cocktailId));
 
         if(isCocktailLikesPresent==0){
             return ResponseEntity.ok(ABSENT);// 좋아요 조회 성공(좋아요 없는 경우 - 200 반환)
@@ -155,16 +129,9 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Long> addLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        // 2. cocktail_likes에 user_id, cocktail_id 저장
+        // 1. cocktail_likes에 user_id, cocktail_id 저장
         CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
-        cocktailLikesTO.setUserId(userInfo.getId());
+        cocktailLikesTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
@@ -174,10 +141,10 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB추가 실패(500반환)
         }
 
-        // 3. cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        // 2. cocktailId에 해당하는 cocktailsLikes 값 가져오기
         Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
 
-        // 4. cocktails테이블에 cocktailsLikes 값 업데이트
+        // 3. cocktails테이블에 cocktailsLikes 값 업데이트
         CocktailsTO cocktailsTO = new CocktailsTO();
         cocktailsTO.setId(Long.parseLong(cocktailId));
         cocktailsTO.setLikes(cocktailLikesCountById);
@@ -196,16 +163,9 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Long> deleteLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
-        // 2. cocktail_likes에서 user_id, cocktail_id 삭제
+        // 1. cocktail_likes에서 user_id, cocktail_id 삭제
         CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
-        cocktailLikesTO.setUserId(userInfo.getId());
+        cocktailLikesTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
@@ -215,10 +175,10 @@ public class SearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // DB삭제 실패(500반환)
         }
 
-        // 3. cocktailId에 해당하는 cocktailsLikes 값 가져오기
+        // 2. cocktailId에 해당하는 cocktailsLikes 값 가져오기
         Long cocktailLikesCountById = cocktailLikesService.countCocktailLikesById(cocktailLikesTO);
 
-        // 4. cocktails테이블에 cocktailsLikes 값 업데이트
+        // 3. cocktails테이블에 cocktailsLikes 값 업데이트
         CocktailsTO cocktailsTO = new CocktailsTO();
         cocktailsTO.setId(Long.parseLong(cocktailId));
         cocktailsTO.setLikes(cocktailLikesCountById);
@@ -253,16 +213,9 @@ public class SearchController {
     public ResponseEntity<Void> registerCocktailComments(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId,
         @RequestBody CommentsTO commentsTOFromClient) {
 
-        // 1. userid 정보가져오기
-        UsersTO userInfo = usersService.findByEmail(sessionValue);
-        if(userInfo==null){
-            // 유저 정보 가져올 수 없음(500반환)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
         CommentsTO commentsTO = new CommentsTO();
         commentsTO.setContent(commentsTOFromClient.getContent());
-        commentsTO.setUserId(userInfo.getId());
+        commentsTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         commentsTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
