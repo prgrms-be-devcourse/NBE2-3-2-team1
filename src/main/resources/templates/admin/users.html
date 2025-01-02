@@ -223,7 +223,7 @@
         <nav aria-label="Page navigation" th:if="${totalPages > 1}">
             <ul class="pagination justify-content-center mt-3">
                 <li class="page-item" th:classappend="${page == 1} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/users(page=${page - 1}, keyword=${param.keyword})}" aria-label="Previous">
+                    <a class="page-link" th:href="@{/admin/users/search(page=${page - 1}, keyword=${keyword})}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -231,12 +231,12 @@
                 <!-- 페이지 번호 반복 -->
                 <li class="page-item" th:each="p : ${#numbers.sequence(1, totalPages)}"
                     th:classappend="${p == page} ? ' active'">
-                    <a class="page-link" th:href="@{/admin/users(page=${p}, keyword=${param.keyword})}"
+                    <a class="page-link" th:href="@{/admin/users/search(page=${p}, keyword=${keyword})}"
                        th:text="${p}">1</a>
                 </li>
 
                 <li class="page-item" th:classappend="${page == totalPages} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/users(page=${page+1}, keyword=${param.keyword})}" aria-label="Next">
+                    <a class="page-link" th:href="@{/admin/users/search(page=${page+1}, keyword=${keyword})}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
