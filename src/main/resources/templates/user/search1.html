@@ -16,7 +16,6 @@
     <a href="/search">칵테일 검색</a>
     <a href="#" onclick="checkLogin()" class="mypage-link">MyPage</a>
     <a href="#" class="login-link" onclick="checkLogin2()">로그인</a>
-
   </div>
 </div>
 
@@ -33,57 +32,23 @@
   <br><br>
   <div class="main-text">당신의 칵테일을 찾아보세요!</div>
 
-  <br>
-  <div class="text">#마티니</div>
-  <div class="text">#김렛</div>
-  <div class="text">#모히또</div>
-  <div class="text">#마가리타</div>
-  <div class="text">#바카디</div>
+  <div class="buttons">
+    <button id="sortByHits">조회순</button>
+    <button id="sortByLikes">좋아요순</button>
+  </div>
 
+  <br>
+  <div id="cocktail-list">
+    <div class="text">#마티니</div>
+    <div class="text">#김렛</div>
+    <div class="text">#모히또</div>
+    <div class="text">#마가리타</div>
+    <div class="text">#바카디</div>
+  </div>
 </div>
 
-<script>
-  function checkLogin() {
-    $.ajax({
-      url: '/login_complete',
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-          console.log('마이 페이지로 이동');
-          window.location.href = '/mypage';
-
-        } else {
-          alert(response.message);
-          window.location.href = '/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/login';
-      }
-    });
-  }
-
-  function checkLogin2() {
-    $.ajax({
-      url: '/login_complete',
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
-        } else {
-          alert(response.message);
-          window.location.href = '/login';
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/login';
-      }
-    });
-  }
+<script src="/js/search1.js">
 
 </script>
-
 </body>
 </html>

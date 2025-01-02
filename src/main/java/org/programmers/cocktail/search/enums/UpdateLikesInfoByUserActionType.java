@@ -1,6 +1,6 @@
 package org.programmers.cocktail.search.enums;
 
-public enum ActionType {
+public enum UpdateLikesInfoByUserActionType {
     ADD,
     DELETE
 }

@@ -1,19 +1,19 @@
 package org.programmers.cocktail.search.controller;
 
+import java.util.Collections;
 import java.util.List;
 import org.programmers.cocktail.global.Utility.SearchUtils;
 import org.programmers.cocktail.global.annotation.RequireLogin;
-import org.programmers.cocktail.search.dto.CocktailLikesTO;
 import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.dto.CommentsTO;
-import org.programmers.cocktail.search.enums.ActionType;
+import org.programmers.cocktail.search.enums.FindAllByOrderDescActionType;
+import org.programmers.cocktail.search.enums.UpdateLikesInfoByUserActionType;
 import org.programmers.cocktail.search.service.CocktailLikesService;
 import org.programmers.cocktail.search.service.CocktailListsService;
 import org.programmers.cocktail.search.service.CocktailsService;
 import org.programmers.cocktail.search.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,17 +31,40 @@ import org.springframework.web.bind.support.SessionStatus;
 public class SearchController {
 
     @Autowired
-    CocktailListsService cocktailListsService;
+    private CocktailsService cocktailsService;
 
     @Autowired
-    CocktailLikesService cocktailLikesService;
+    private CocktailListsService cocktailListsService;
 
     @Autowired
-    CommentsService commentsService;
+    private CocktailLikesService cocktailLikesService;
 
     @Autowired
-    SearchUtils searchUtils;
+    private CommentsService commentsService;
 
+    @Autowired
+    private SearchUtils searchUtils;
+
+    @GetMapping("/cocktails/top/{criteria}")
+    public ResponseEntity<List<CocktailsTO>> getTopHitsCocktails(@PathVariable String criteria){
+
+        List<CocktailsTO> cocktailsDescTOList = Collections.EMPTY_LIST;
+
+        if(criteria.equals("likes")){
+            cocktailsDescTOList = cocktailsService.findAllByOrderDesc(FindAllByOrderDescActionType.ORDER_BY_LIKES);
+        }
+        else if(criteria.equals("hits")){
+            cocktailsDescTOList = cocktailsService.findAllByOrderDesc(FindAllByOrderDescActionType.ORDER_BY_HITS);
+        }
+
+        List<CocktailsTO> top5cocktails = cocktailsDescTOList.size() >5 ? cocktailsDescTOList.subList(0, 5) : cocktailsDescTOList;
+
+        if(top5cocktails.isEmpty()){
+            throw new RuntimeException("Failed to get Top Likes Cocktails"); // TopLikesCocktail 가져오기 실패(500반환)
+        }
+
+        return ResponseEntity.ok(top5cocktails);
+    }
 
     @GetMapping("/favorites/cocktails/{cocktailId}")
     @RequireLogin
@@ -120,14 +143,14 @@ public class SearchController {
     @RequireLogin
     public ResponseEntity<Long> addLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, ActionType.ADD));      //DB추가 성공(200반환, 좋아요갯수 반환)
+        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, UpdateLikesInfoByUserActionType.ADD));      //DB추가 성공(200반환, 좋아요갯수 반환)
     }
 
     @DeleteMapping("/likes/cocktails/{cocktailId}")
     @RequireLogin
     public ResponseEntity<Long> deleteLikesByUser(@SessionAttribute(value = "semail", required = false) String sessionValue, @PathVariable String cocktailId) {
 
-        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, ActionType.DELETE));      //DB삭제 성공(200반환, 좋아요 갯수 반환)
+        return ResponseEntity.ok(cocktailLikesService.updateLikesInfoByUser(sessionValue, cocktailId, UpdateLikesInfoByUserActionType.DELETE));      //DB삭제 성공(200반환, 좋아요 갯수 반환)
     }
 
     @GetMapping("/reviews/cocktails/{cocktailId}")

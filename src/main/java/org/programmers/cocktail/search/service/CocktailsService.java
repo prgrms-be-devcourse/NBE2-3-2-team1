@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
-import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
 import org.programmers.cocktail.search.dto.CocktailsTO;
+import org.programmers.cocktail.search.enums.FindAllByOrderDescActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +23,23 @@ public class CocktailsService {
     @Autowired
     private CocktailsMapper cocktailsMapper;
 
+    public List<CocktailsTO> findAllByOrderDesc(FindAllByOrderDescActionType findAllByOrderDescActionType) {
+
+        List<Cocktails> cocktailsDescList;
+
+        if(findAllByOrderDescActionType == FindAllByOrderDescActionType.ORDER_BY_LIKES){
+            cocktailsDescList = cocktailsRepository.findAllByOrderByLikesDesc();
+        }
+        else{
+            cocktailsDescList = cocktailsRepository.findAllByOrderByHitsDesc();
+        }
+
+        return cocktailsMapper.convertToCocktailsTOList(cocktailsDescList);
+    }
+
     public List<CocktailsTO> findByNameContaining(String keyword) {
 
-        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
+        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameOrIngredients(keyword);
 
         if(!cocktailSearchList.isEmpty()) {
             return cocktailsMapper.convertToCocktailsTOList(cocktailSearchList);

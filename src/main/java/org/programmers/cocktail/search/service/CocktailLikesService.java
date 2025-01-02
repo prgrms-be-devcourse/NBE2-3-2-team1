@@ -3,20 +3,12 @@ package org.programmers.cocktail.search.service;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.programmers.cocktail.entity.CocktailLikes;
-import org.programmers.cocktail.entity.CocktailLists;
 import org.programmers.cocktail.global.Utility.SearchUtils;
 import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepository;
-import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositoryCustom;
-import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositoryImpl;
-import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryCustom;
-import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositoryImpl;
 import org.programmers.cocktail.search.dto.CocktailLikesTO;
-import org.programmers.cocktail.search.dto.CocktailListsTO;
 import org.programmers.cocktail.search.dto.CocktailsTO;
-import org.programmers.cocktail.search.enums.ActionType;
+import org.programmers.cocktail.search.enums.UpdateLikesInfoByUserActionType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,14 +30,14 @@ public class CocktailLikesService {
     private CocktailsService cocktailsService;
 
     @Transactional
-    public Long updateLikesInfoByUser(String sessionValue, String cocktailId, ActionType actionType) {
+    public Long updateLikesInfoByUser(String sessionValue, String cocktailId, UpdateLikesInfoByUserActionType updateLikesInfoByUserActionType) {
         // 1. cocktail_likes에서 user_id, cocktail_id 삭제
         CocktailLikesTO cocktailLikesTO = new CocktailLikesTO();
         cocktailLikesTO.setUserId(searchUtils.searchUserByUserEmail(sessionValue).getId());
         cocktailLikesTO.setCocktailId(Long.parseLong(cocktailId));
 
         // SUCCESS: 1, FAIL: 0
-        if(actionType == ActionType.ADD){
+        if(updateLikesInfoByUserActionType == UpdateLikesInfoByUserActionType.ADD){
             int cocktailLikesInsertResult = insertCocktailLikes(cocktailLikesTO);
 
             if(cocktailLikesInsertResult==0){
