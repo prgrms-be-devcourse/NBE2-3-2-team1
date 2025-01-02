@@ -75,12 +75,12 @@ public class SearchHtmlController {
     // 추천칵테일 페이지 반환
     @RequestMapping("/recommend")
     public String getRecommendCocktailPage() {
-        // 인기 칵테일페이지로 이동
+        // 추천 칵테일페이지로 이동
         return "user/suggestion";
     }
 
     // 메인페이지 반환
-    @RequestMapping("/main")
+    @RequestMapping("/")
     public String getMainCocktailPage(Model model) {
         List<CocktailsTO> cocktailSearchList = cocktailExternalApiService.fetchCocktailData();
 
