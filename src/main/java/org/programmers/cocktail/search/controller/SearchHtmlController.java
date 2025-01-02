@@ -6,7 +6,6 @@ import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,14 +50,11 @@ public class SearchHtmlController {
         // 2-1) 외부 API에서 가져온 cocktail 정보를 DB에 저장
         cocktailSearchList = cocktailExternalApiService.fetchCocktailData(keyword);
 
-        for(CocktailsTO cocktail : cocktailSearchList){
-            System.out.println("new cocktail adding to Local DB");
-            int cocktailInsertResult = cocktailsService.insertNewCocktailDB(cocktail);
+        int cocktailInsertByListResult = cocktailsService.insertNewCocktailDBbyList(cocktailSearchList);
 
-            if(cocktailInsertResult==0){
-                // todo 데이터 삽입 실패시 프론트에 alert 띄울지 고민
-                System.out.println("[에러] New Cocktail Data Insertion Failed");
-            }
+        if(cocktailInsertByListResult==0){
+            // todo 데이터 삽입 실패시 프론트에 alert 띄울지 고민
+            System.out.println("[에러] New Cocktail Data Insertion Failed");
         }
 
         // 2-2) DB에 저장된 데이터를 가져와서 반환
@@ -79,15 +75,14 @@ public class SearchHtmlController {
     // 추천칵테일 페이지 반환
     @RequestMapping("/recommend")
     public String getRecommendCocktailPage() {
-        // 인기 칵테일페이지로 이동
+        // 추천 칵테일페이지로 이동
         return "user/suggestion";
     }
 
     // 메인페이지 반환
-    @RequestMapping("/main")
+    @RequestMapping("/")
     public String getMainCocktailPage(Model model) {
         List<CocktailsTO> cocktailSearchList = cocktailExternalApiService.fetchCocktailData();
-        System.out.println("getMainCocktailPage: " + cocktailSearchList);
 
         // 1. 랜덤 칵테일 불러오기 실패시
         if(cocktailSearchList == null || cocktailSearchList.isEmpty()) {
@@ -102,23 +97,10 @@ public class SearchHtmlController {
         return "user/main";
     }
 
-    // 로그인페이지 반환
-//    @RequestMapping("/api/login")
-//    public String getLoginPage() {
-//        // 로그인페이지로 이동
-//        return "user/login";
-//    }
-
-    // todo 추천칵테일 반환 컨트롤러 추가 및 프론트 페이지 연결
-
     // 칵테일 상세 페이지 반환
     @RequestMapping("/search/cocktails/{cocktailId}")
     public String getCocktailInfoById(@PathVariable String cocktailId, Model model) {
-        System.out.println("cocktailId : " +cocktailId);
-        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
 
-        System.out.println(cocktailsById);
-        model.addAttribute("cocktailById", cocktailsById);
         // 특정 칵테일 상세페이지 조회시 해당 칵테일 hit 증가
         CocktailsTO cocktailsTO = new CocktailsTO();
         cocktailsTO.setId(Long.parseLong((cocktailId)));
@@ -130,6 +112,9 @@ public class SearchHtmlController {
         {
             System.out.println("[에러] Cocktail Hits Update Failed");
         }
+
+        CocktailsTO cocktailsById = cocktailsService.findById(Long.parseLong(cocktailId));
+        model.addAttribute("cocktailById", cocktailsById);
 
         // todo 프론트페이지에서 cocktailById가 null인 경우 alert 띄우도록 처리 필요
         // todo 리스트 상세페이지 구현되면 상세페이지 반환하도록 설정

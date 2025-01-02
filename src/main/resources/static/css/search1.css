@@ -21,7 +21,6 @@ body {
   font-weight: bold;
 }
 
-
 .main-text {
   background-color: #dddddd;
   color: #000000;
@@ -29,11 +28,8 @@ body {
   padding: 10px 40px;
   font-size: 30px;
   width: 50%;
-  height: 40px;
-  outline: none;
-  border: 0;
   border-radius: 15px;
-  display: inline-block;
+  margin-bottom: 10px; /* 아래 간격을 좁힘 */
 }
 
 .container {
@@ -44,7 +40,7 @@ body {
   background-color: transparent;
 }
 
-#searchForm{
+#searchForm {
   width: 100%;
   max-width: 1200px;
 }
@@ -57,23 +53,21 @@ body {
   align-items: center;
   background-color: #fcd62c;
   padding: 50px 0;
-  margin: 0 auto; /* 부모 요소 기준 중앙 정렬 */
 }
 
 .search-input {
   width: 30%;
   padding: 10px;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8); /* 밝은 흰색 텍스트 */
+  color: rgba(255, 255, 255, 0.8);
   border-radius: 15px;
   border: 1px solid transparent;
   background-color: rgba(62, 62, 62, 0.58);
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.8); /* 밝은 흰색 텍스트 */
+  color: rgba(255, 255, 255, 0.8);
   font-style: italic;
-  opacity: 1; /* 텍스트 불투명도 설정 */
 }
 
 .search-button {
@@ -87,17 +81,40 @@ body {
   margin-left: 10px;
 }
 
+.buttons {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  margin: 10px 0; /* 버튼 위아래 간격을 좁힘 */
+}
+
+.buttons button {
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 0 10px; /* 버튼 간격 */
+}
+
+#cocktail-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 가운데 정렬 */
+  width: 100%;
+  max-width: 400px;
+  margin: 10px auto; /* 리스트 위아래 간격을 좁힘 */
+}
+
 .text {
   background-color: #dddddd;
   color: #000000;
-  text-align: left; /* 왼쪽 정렬 */
+  text-align: left;
   padding: 7px 15px;
   font-size: 15px;
-  width: auto; /* 텍스트 크기에 맞춰 너비 조정 */
-  height: 26px;
-  outline: none;
-  border: 0;
+  width: 100%;
   border-radius: 15px;
   margin: 5px 0;
-  display: inline-block; /* 텍스트가 왼쪽에 정렬되도록 조정 */
+  display: block;
 }

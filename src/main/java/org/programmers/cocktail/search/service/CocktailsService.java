@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import org.programmers.cocktail.entity.Cocktails;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
-import org.programmers.cocktail.repository.cocktails.CocktailsRepositoryImpl;
 import org.programmers.cocktail.search.dto.CocktailsTO;
+import org.programmers.cocktail.search.enums.FindAllByOrderDescActionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +23,23 @@ public class CocktailsService {
     @Autowired
     private CocktailsMapper cocktailsMapper;
 
+    public List<CocktailsTO> findAllByOrderDesc(FindAllByOrderDescActionType findAllByOrderDescActionType) {
+
+        List<Cocktails> cocktailsDescList;
+
+        if(findAllByOrderDescActionType == FindAllByOrderDescActionType.ORDER_BY_LIKES){
+            cocktailsDescList = cocktailsRepository.findAllByOrderByLikesDesc();
+        }
+        else{
+            cocktailsDescList = cocktailsRepository.findAllByOrderByHitsDesc();
+        }
+
+        return cocktailsMapper.convertToCocktailsTOList(cocktailsDescList);
+    }
+
     public List<CocktailsTO> findByNameContaining(String keyword) {
 
-        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameContaining(keyword);
+        List<Cocktails> cocktailSearchList = cocktailsRepository.findByNameOrIngredients(keyword);
 
         if(!cocktailSearchList.isEmpty()) {
             return cocktailsMapper.convertToCocktailsTOList(cocktailSearchList);
@@ -34,11 +48,11 @@ public class CocktailsService {
         return Collections.emptyList();
     }
 
-    public int insertNewCocktailDB(CocktailsTO cocktailsTO) {
+    public int insertNewCocktailDBbyList(List<CocktailsTO> cocktailsTOList) {
         try {
-            //TO->Entity 변환
-            Cocktails cocktails = cocktailsMapper.convertToCocktails(cocktailsTO);
-            cocktailsRepository.save(cocktails);
+            //List<TO>->List<Entity> 변환
+            List<Cocktails> cocktailsList = cocktailsMapper.convertToCocktailsList(cocktailsTOList);
+            cocktailsRepository.saveAll(cocktailsList);
             return SUCCESS;    //저장성공
         } catch (Exception e) {
             System.out.println("[저장실패] : "+e.getMessage());
@@ -53,9 +67,11 @@ public class CocktailsService {
         return cocktailsTO;
     }
 
+    @Transactional
     public int updateCocktailHits(CocktailsTO cocktailsTO) {
 
-        Optional<Cocktails> cocktailsOptional = cocktailsRepository.findById(cocktailsTO.getId());
+        // Pessimistic Lock 적용
+        Optional<Cocktails> cocktailsOptional = cocktailsRepository.findByIdWithPessimisticLock(cocktailsTO.getId());
 
         if(!cocktailsOptional.isPresent()){
             return FAIL;        // 칵테일 불러오기 실패
