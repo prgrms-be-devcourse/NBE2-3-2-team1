@@ -235,65 +235,6 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    @PostMapping("/mypage_ok")
-    public ResponseEntity<Map<String, Object>> myPageOk(
-        HttpSession session,
-        Model model
-        ) {
-
-        System.out.println("mypage_ok 호출");
-
-        Map<String, Object> response = new HashMap<>();
-
-        int flag = 2;
-
-        String email = (String) session.getAttribute("semail");
-        List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
-        List<Cocktails> cocktails = cocktailsRepository.findAll();
-
-        List<CocktailsDto> cocktailsDtos = new ArrayList<>();
-
-        for ( Cocktails cocktail : cocktails ) {
-            CocktailsDto cocktailsTo = new CocktailsDto();
-            cocktailsTo.setId(cocktail.getId());
-            cocktailsTo.setName(cocktail.getName());
-            cocktailsTo.setImage_url(cocktail.getImage_url());
-            cocktailsDtos.add(cocktailsTo);
-        }
-
-        Users users = loginService.findByEmail(email);
-        if( email != null && users.getId() != null) {
-
-            // user, cocktails, cocktaillists 조인해서 user_id타고
-            // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
-            List<CocktailsDto> ct = new ArrayList<>();
-
-            for (CocktailLists cl : cocktailLists) {
-                if ( users.getId().equals( cl.getUsers().getId() ) ) {
-                    for (CocktailsDto c : cocktailsDtos) {
-                        if (cl.getCocktails().getId().equals(c.getId())) {
-                            ct.add( c );
-                        }
-                    }
-                }
-            }
-
-
-            model.addAttribute("ct", ct);
-            flag = 0;
-
-        } else {
-            flag = 1;
-            response.put("message", "로그인해야 합니다.");
-
-        }
-
-        response.put("flag", flag);
-
-        return ResponseEntity.ok(response);
-
-    }
-
     // 이메일은 변경 X
     // 이메일로 유저의 Id를 가져와 비밀번호와 이름을 수정
     @PostMapping("/modify_ok")
@@ -334,12 +275,12 @@ public class LoginController {
 
     @GetMapping("/withdrawalPage")
     public String showWithdrawalPage() {
-        return "user/withdrawalPage"; // "login.html" 템플릿을 반환
+        return "user/withdrawalPage"; 
     }
 
     @GetMapping("/withdrawalCompletePage")
     public String showWithdrawalCompletePage() {
-        return "user/withdrawal_complete"; // "login.html" 템플릿을 반환
+        return "user/withdrawal_complete"; 
     }
 
     @PostMapping("/withdrawal_ok")
@@ -356,8 +297,8 @@ public class LoginController {
         int flag = 2;
 
         Users users = loginService.findByEmail( email );
-        System.out.println("users.getEmail(): " + users.getEmail()); // 잘 나옴
-        System.out.println("users.password(): " + users.getPassword()); // 잘 나옴
+        System.out.println("users.getEmail(): " + users.getEmail()); 
+        System.out.println("users.password(): " + users.getPassword()); 
 
         int result = 0;
         if(email.equals(users.getEmail()) && encoder.matches(password, users.getPassword())) {
