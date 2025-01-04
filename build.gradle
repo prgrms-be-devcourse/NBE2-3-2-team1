@@ -55,6 +55,8 @@ dependencies {
     // MappingJackson2HttpMessageConverter
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 }
 

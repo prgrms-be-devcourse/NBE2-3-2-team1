@@ -23,6 +23,13 @@ public class CocktailsMapper {
         return cocktailsTOList;
     }
 
+    public List<Cocktails> convertToCocktailsList(List<CocktailsTO> cocktailsTOList) {
+        List<Cocktails> cocktailsList = cocktailsTOList.stream()
+            .map(cocktailsTO -> modelMapper.map(cocktailsTO, Cocktails.class))
+            .collect(Collectors.toList());
+        return cocktailsList;
+    }
+
     public Cocktails convertToCocktails(CocktailsTO cocktailsTO) {
         return modelMapper.map(cocktailsTO, Cocktails.class);
     }
