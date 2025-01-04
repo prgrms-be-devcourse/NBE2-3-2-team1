@@ -6,13 +6,15 @@ import org.programmers.cocktail.repository.users.UsersRepository;
 import org.programmers.cocktail.repository.users.UsersRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LoginService {
+public class LoginService implements UserDetailsService {
 
-    public LoginService(UsersRepository usersRepository
-        ) {
+    public LoginService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
@@ -59,4 +61,8 @@ public class LoginService {
         }
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
+    }
 }
