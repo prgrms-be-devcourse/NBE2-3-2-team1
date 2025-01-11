@@ -84,6 +84,8 @@ function handleRequest(icon, url, additionalClass, activeSymbol, inactiveSymbol)
 }
 
 function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol, inactiveSymbol) {
+  const cocktailLikes = document.getElementById("cocktailLikes");
+
   icon.addEventListener("click", () => {
     const xhr = new XMLHttpRequest();
     if (icon.classList.contains(additionalClass)) {
@@ -91,13 +93,17 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
       xhr.open("DELETE", url, true);
       xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 204) {
+          if (xhr.status === 200 || xhr.status === 204) {
             icon.innerHTML = inactiveSymbol;
             icon.classList.remove(additionalClass); // 비활성화
-            location.reload(); //새로고침
+            if(additionalClass=== "liked"){
+              // 좋아요 갯수 업데이트
+              const response = parseInt(xhr.responseText);
+              cocktailLikes.textContent = response+'개';
+            }
           } else if(xhr.status === 401){
             alert('로그인이 필요합니다.');
-            location.href = '/api/login';
+            location.href = '/login';
           }
           else{
             // 상태코드 500 반환시
@@ -115,14 +121,18 @@ function addIconMouseClickEventListener(icon, url, additionalClass, activeSymbol
       xhr.open("POST", url, true);
       xhr.onreadystatechange = function () {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 204) {
+          if (xhr.status === 200 || xhr.status === 204) {
               icon.innerHTML = activeSymbol;
               icon.classList.add(additionalClass); // 활성화
-              location.reload(); //새로고침
+              if(additionalClass=== "liked"){
+                // 좋아요 갯수 업데이트
+                const response = parseInt(xhr.responseText);
+                cocktailLikes.textContent = response+'개';
+              }
             }
           else if(xhr.status === 401){
             alert('로그인이 필요합니다.');
-            location.href = '/api/login';
+            location.href = '/login';
           }
           else{
             // 상태코드 500 반환시
@@ -167,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
           loadComments();
           } else if(xhr.status === 401){
             alert('로그인이 필요합니다.');
-            location.href = '/api/login';
+            location.href = '/login';
             commentInput.value = '';      //댓글 상자 초기화
           } else{
             // 상태코드 500 반환시
@@ -223,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         } else if(xhr.status === 401){
           alert('로그인이 필요합니다.');
-          location.href = '/api/login';
+          location.href = '/login';
         } else{
           // 상태코드 500 반환시
           alert('댓글 삭제에 실패했습니다. 자세한 내용은 관리자에게 문의하세요.');
