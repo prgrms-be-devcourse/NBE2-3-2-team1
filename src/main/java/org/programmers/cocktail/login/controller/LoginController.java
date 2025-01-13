@@ -395,7 +395,7 @@ public class LoginController {
 
     @GetMapping("/withdrawalCompletePage")
     public String showWithdrawalCompletePage() {
-        return "user/withdrawal_complete"; // "login.html" 템플릿을 반환
+        return "user/withdrawal_complete";
     }
 
     @PostMapping("/withdrawal_ok")
@@ -412,8 +412,8 @@ public class LoginController {
         int flag = 2;
 
         Users users = loginService.findByEmail( email );
-        System.out.println("users.getEmail(): " + users.getEmail()); // 잘 나옴
-        System.out.println("users.password(): " + users.getPassword()); // 잘 나옴
+        System.out.println("users.getEmail(): " + users.getEmail());
+        System.out.println("users.password(): " + users.getPassword());
 
         int result = 0;
         if(email.equals(users.getEmail()) && encoder.matches(password, users.getPassword())) {
