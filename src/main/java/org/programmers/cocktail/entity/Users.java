@@ -38,6 +38,12 @@ public class Users {
     private String email;
 
     @Column(nullable = false)
+    private String gender;
+
+    @Column(nullable = false)
+    private int age;
+
+    @Column(nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
