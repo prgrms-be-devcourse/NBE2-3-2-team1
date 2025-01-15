@@ -5,8 +5,7 @@ import co.elastic.clients.elasticsearch.core.BulkResponse;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.programmers.cocktail.elasticsearch.component.ElasticsearchClientComponent;
+import org.programmers.cocktail.elasticsearch.elasticsearch.ElasticsearchClientComponent;
 import org.programmers.cocktail.elasticsearch.dto.ElasticsearchRequest;
 import org.programmers.cocktail.entity.Users;
 import org.programmers.cocktail.entity.Cocktails;
@@ -16,7 +15,6 @@ import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositor
 import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;

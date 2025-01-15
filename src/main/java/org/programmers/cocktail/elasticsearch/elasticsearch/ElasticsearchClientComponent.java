@@ -1,10 +1,9 @@
-package org.programmers.cocktail.elasticsearch.component;
+package org.programmers.cocktail.elasticsearch.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import lombok.Getter;
-import lombok.Value;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.stereotype.Component;

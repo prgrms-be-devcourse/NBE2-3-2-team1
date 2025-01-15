@@ -60,7 +60,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     // https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client
-    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: '8.10.0'
+    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: '8.17.0'
 
 
 }
