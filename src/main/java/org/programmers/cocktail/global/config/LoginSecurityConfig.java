@@ -25,32 +25,7 @@ public class LoginSecurityConfig {
             .authorizeHttpRequests(
                 (authorize) -> {
                     authorize
-//                        .requestMatchers("/main").permitAll()
-//                        .requestMatchers("/register").permitAll()
-//                        .requestMatchers("/register_ok").permitAll()
-//                        .requestMatchers("/login").permitAll()
-//                        .requestMatchers("/login_ok").permitAll()
-//                        .requestMatchers("/login_complete").permitAll()
-//                        .requestMatchers("/logout_ok").permitAll()
-//                        .requestMatchers("/mypage").permitAll()
-//                        .requestMatchers("/mypage_ok").permitAll()
-//                        .requestMatchers("/modify_ok").permitAll()
-//                        .requestMatchers("/withdrawal_ok").permitAll()
-//                        .requestMatchers("/withdrawalPage").permitAll()
-//                        .requestMatchers("/withdrawalCompletePage").permitAll()
-//                        .requestMatchers("/recommend").permitAll()
-//                        .requestMatchers("/search/**").permitAll()
-//                        .requestMatchers("/api/suggestion/**").permitAll()
-//                        .requestMatchers("/popular/**").permitAll() // 이것만 안됨
-//                        .requestMatchers("/popular/detail/**").permitAll()
-//                        .requestMatchers("/templates/user/**").permitAll()
-//                        .requestMatchers("/favorites/**").permitAll()
-//                        .requestMatchers("/likes/**").permitAll()
-//                        .requestMatchers("/reviews/**").permitAll()
-//                        .requestMatchers("/images/**").permitAll()
-//                        .requestMatchers("/css/**").permitAll()
-//                        .requestMatchers("/kakao_login").permitAll()
-//                        .requestMatchers("/login/oauth2/code/kakao/**").permitAll()
+
                         .anyRequest().permitAll(); // 나머지 요청은 인증 필요
                 }
             );

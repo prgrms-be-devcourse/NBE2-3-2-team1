@@ -99,9 +99,6 @@ public class AuthService {
         System.out.println("KakaoUserResponse accessToken: " + accessToken);
         headers.setBearerAuth(accessToken); // Authorization: Bearer {accessToken}
 
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); // 기본으로 "application/x-www-form-urlencoded"
-//        headers.set("Charset", "UTF-8");  // UTF-8 인코딩 설정
-
         headers.set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
@@ -114,7 +111,6 @@ public class AuthService {
             KakaoUserResponse.class // 4. 응답 타입 (KakaoUserResponse 객체로 변환)
         );
 
-        //System.out.println("response.getHeaders(): " + response.getHeaders());
         System.out.println("HTTP Status Code: " + response.getStatusCode());
         KakaoUserResponse kakaoUserResponse = response.getBody();
         System.out.println("KakaoUserResponse: " + kakaoUserResponse);  // 객체 자체의 toString() 호출

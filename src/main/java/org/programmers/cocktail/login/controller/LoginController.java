@@ -52,40 +52,30 @@ public class LoginController {
     public String kakao_login() {
         String client_id = "566c4aba4b5d2b88d82e241bda9f0c37";
         // 리소스에 대한 API 호출을 수신하는 디지털 위치
-        // http://localhost:8080 + 엔드포인트로 구성
+        // http://localhost(ip):8080(port) + 엔드포인트로 구성
         // 로그인이 정상적으로 됐으면 해당 Redirect URI로 code가 넘어옴
         String redirect_uri = "http://localhost:8080/login/oauth2/code/kakao";
-        String state = RandomStringUtils.randomAlphabetic(10);   // 랜덤 문자열 생성
         // response_type은 code로 고정
         // 해당 redirect_uri로 카카오에서 인가코드를 발급해준다는 의미
         String login_url = "https://kauth.kakao.com/oauth/authorize?response_type=code"
             + "&client_id=" + client_id
             + "&redirect_uri=" + redirect_uri
-            //+ "&state=" + state
             + "&scope=profile_nickname, profile_image, account_email";
-
-        //request.getSession().setAttribute("state", state);
 
         return "redirect:" + login_url;
     }
 
-    @Component
-    public class RefererInterceptor implements HandlerInterceptor {
+    @GetMapping("/kakao_logout")
+    public String kakao_logout() {
+        String client_id = "566c4aba4b5d2b88d82e241bda9f0c37";
+        String redirect_uri = "http://localhost:8080/login/oauth2/code/kakao";
+        String logout_url = "https://kauth.kakao.com/oauth/logout"
+            + "&client_id=" + client_id
+            + "&logout_redirect_uri=" + redirect_uri;
 
-        @Override
-        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-            if ("GET".equalsIgnoreCase(request.getMethod())) {
-                HttpSession session = request.getSession();
-                String referer = request.getHeader("Referer");
-
-                // 현재 요청 URL 저장 (로그인 페이지 등은 제외)
-                if (referer != null && !request.getRequestURI().contains("/login")) {
-                    session.setAttribute("prevPage", referer);
-                }
-            }
-            return true;
-        }
+        return "redirect:" + logout_url;
     }
+
 
     @GetMapping("/login/oauth2/code/kakao")
     public RedirectView loginByKakao(@RequestParam("code") String code, HttpServletRequest request) {
@@ -93,17 +83,17 @@ public class LoginController {
         LoginResponse loginResponse = authService.register(code); // 로그인 처리 로직
 
         HttpSession session = request.getSession();
-        //session.setAttribute("accessToken", loginResponse.getAccessToken()); // 세션에 저장
-        session.setAttribute("socialLoginEmail", loginResponse.getEmail()); // 세션에 저장
-        System.out.println("socialLoginEmail: " + loginResponse.getEmail());
+        session.setAttribute("semail", loginResponse.getEmail()); // 세션에 저장
+        System.out.println("semail: " + loginResponse.getEmail());
 
         System.out.println("authService 호출");
 
         // 세션에서 이전 페이지 가져오기
-        String prevPage = (String) session.getAttribute("prevPage");
-        session.removeAttribute("prevPage"); // 사용 후 제거
+        //String prevPage = (String) session.getAttribute("prevPage");
+        //session.removeAttribute("prevPage"); // 사용 후 제거
 
-        String redirectUrl = (prevPage != null) ? prevPage : "/main";
+        //String redirectUrl = (prevPage != null) ? prevPage : "/";
+        String redirectUrl = "/";
         System.out.println("Redirect URL: " + redirectUrl);
         return new RedirectView(redirectUrl);
     }
@@ -156,8 +146,13 @@ public class LoginController {
     }
 
     @GetMapping("/login")
-    public String showLoginPage() {
-        return "user/login";
+    public String showLoginPage(HttpSession session) {
+
+        if ( session.getAttribute("semail") != null ) {
+            return "redirect:/";
+        } else {
+            return "user/login";
+        }
     }
 
 
@@ -168,10 +163,8 @@ public class LoginController {
     public ResponseEntity<Map<String, Object>> login_ok(
         @RequestParam("email") String email,
         @RequestParam("password") String password,
-        //@RequestParam(value = "access_token", required = false) String accessToken,
-        HttpSession session,
-        //HttpServletResponse httpServletResponse,
-        Model model
+        HttpSession session
+
     ) {
         System.out.println("login_ok 호출");
         System.out.println("password: " + password);
@@ -185,11 +178,6 @@ public class LoginController {
         Map<String, Object> response = new HashMap<>();
 
         int flag = 3;
-
-        //String socialLoginEmail = (String) session.getAttribute("socialLoginEmail");
-        //System.out.println("Retrieved socialLoginEmail: " + socialLoginEmail);
-
-//        Users socialLoginUsers = loginService.findByEmail( socialLoginEmail );
 
         if( users != null ) {
 
@@ -236,8 +224,7 @@ public class LoginController {
         Map<String, Object> response = new HashMap<>();
         int flag = 2;
 
-        if (session.getAttribute("semail") != null || session.getAttribute("socialLoginEmail") != null ) {
-            System.out.println("socialLoginEmail: " + session.getAttribute("socialLoginEmail")); // 잘 출력됨
+        if (session.getAttribute("semail") != null  ) {
             flag = 0;
         } else {
             flag = 1;
@@ -255,14 +242,13 @@ public class LoginController {
 
         String email = (String) session.getAttribute("semail");
         System.out.println("mypage email: " + email);
-        String socialLoginEmail = (String) session.getAttribute("socialLoginEmail");
-        System.out.println("mypage socialLoginEmail: " + socialLoginEmail);
 
         // 세션이 있다면
-        if (email != null || socialLoginEmail != null) {
+        //if (email != null || socialLoginEmail != null) {
+        if (email != null ) {
 
             Users users = loginService.findByEmail(email);
-            Users socialLoginUsers = loginService.findByEmail(socialLoginEmail);
+
 
             List<CocktailLists> cocktailLists = cocktailListsRepository.findAll();
             List<Cocktails> cocktails = cocktailsRepository.findAll();
@@ -294,10 +280,10 @@ public class LoginController {
                 List<CocktailsDto> ct = new ArrayList<>();
 
                 for (CocktailLists cl : cocktailLists) {
-                    if ( users.getId().equals( cl.getUsers().getId() ) ) {
+                    if (users.getId().equals(cl.getUsers().getId())) {
                         for (CocktailsDto c : cocktailsDtos) {
                             if (cl.getCocktails().getId().equals(c.getId())) {
-                                ct.add( c );
+                                ct.add(c);
                             }
                         }
                     }
@@ -310,40 +296,8 @@ public class LoginController {
                 model.addAttribute("ct", ct);
 
                 return "user/mypage";
-            } else if ( socialLoginUsers != null ) {
 
-                // 세션에서 이메일을 통해 DB에서 유저 정보를 가져오기
-                // UserRegisterDto 객체에 유저 정보 담기
-                UserRegisterDto to = new UserRegisterDto();
-                to.setId(socialLoginUsers.getId());
-                to.setEmail(socialLoginUsers.getEmail());
-                to.setName(socialLoginUsers.getName());
-                to.setPassword(socialLoginUsers.getPassword());
 
-                // 모델에 유저 정보를 담아서 뷰로 전달
-                model.addAttribute("to", to);
-
-                // user, cocktails, cocktaillists 조인해서 user_id타고
-                // cocktaillists에 저장된 cocktail_id를 타서 cocktail에 가서 칵테일 정보 가져오기
-                List<CocktailsDto> ct = new ArrayList<>();
-
-                for (CocktailLists cl : cocktailLists) {
-                    if ( socialLoginUsers.getId().equals( cl.getUsers().getId() ) ) {
-                        for (CocktailsDto c : cocktailsDtos) {
-                            if (cl.getCocktails().getId().equals(c.getId())) {
-                                ct.add( c );
-                            }
-                        }
-                    }
-                }
-
-                for (CocktailsDto c : ct) {
-                    System.out.println("CocktailsDto: " + c);
-                }
-
-                model.addAttribute("ct", ct);
-
-                return "user/mypage";
             }
         }
 
