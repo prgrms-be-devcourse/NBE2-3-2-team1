@@ -16,6 +16,7 @@ import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepositor
 import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.programmers.cocktail.repository.cocktails.CocktailsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class UserSyncService {
     private final CocktailLikesRepository cocktailLikesRepository;
     private final CommentsRepository commentsRepository;
 
-    private LocalDateTime lastSyncTime = LocalDateTime.MIN;
+    private LocalDateTime lastSyncTime;
 
     public UserSyncService(
         ElasticsearchClientComponent elasticsearchClientComponent,
@@ -47,12 +48,12 @@ public class UserSyncService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 3600000) // 1시간마다 실행
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void syncToElasticsearch() {
         try {
 
             if (lastSyncTime == null) {
-                lastSyncTime = LocalDateTime.MIN; // 기본값 설정
+                lastSyncTime = findMostRecentUpdatedAt();// 기본값 설정
             }
             // 좋아요 데이터 동기화
             syncLikes();
@@ -71,6 +72,10 @@ public class UserSyncService {
         log.info("Starting to sync likes...");
         List<CocktailLikes> likes = cocktailLikesRepository.findByUpdatedAtAfter(lastSyncTime);
         log.info("Found {} likes to sync.", likes.size());
+
+        if (likes.isEmpty()) {
+            return;
+        }
 
         int batchSize = 10000; // 배치 크기 설정
         for (int i = 0; i < likes.size(); i += batchSize) {
@@ -102,6 +107,10 @@ public class UserSyncService {
         log.info("Starting to sync comments...");
         List<Comments> comments = commentsRepository.findByUpdatedAtAfter(lastSyncTime);
         log.info("Found {} comments to sync.", comments.size());
+
+        if (comments.isEmpty()) {
+            return;
+        }
 
         int batchSize = 10000; // 배치 크기 설정
         for (int i = 0; i < comments.size(); i += batchSize) {
@@ -176,5 +185,11 @@ public class UserSyncService {
             .commentContent(comment.getContent())
             .timestamp(comment.getCreatedAt().toString())
             .build();
+    }
+
+    private LocalDateTime findMostRecentUpdatedAt() {
+        LocalDateTime mostRecentLikes = cocktailLikesRepository.findMostRecentUpdatedAt();
+        LocalDateTime mostRecentComments = commentsRepository.findMostRecentUpdatedAt();
+        return mostRecentLikes.isAfter(mostRecentComments) ? mostRecentLikes : mostRecentComments;
     }
 }

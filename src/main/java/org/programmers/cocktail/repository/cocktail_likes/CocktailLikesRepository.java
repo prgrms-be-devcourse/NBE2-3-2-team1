@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 public interface CocktailLikesRepository extends JpaRepository<CocktailLikes, Long> {
 
@@ -28,5 +29,8 @@ public interface CocktailLikesRepository extends JpaRepository<CocktailLikes, Lo
 
     @Query("SELECT cl FROM cocktails_likes cl WHERE cl.updatedAt > :lastSyncTime")
     List<CocktailLikes> findByUpdatedAtAfter(@Param("lastSyncTime") LocalDateTime lastSyncTime);
+
+    @Query("SELECT MAX(cl.updatedAt) FROM cocktails_likes cl")
+    LocalDateTime findMostRecentUpdatedAt();
 
 }
