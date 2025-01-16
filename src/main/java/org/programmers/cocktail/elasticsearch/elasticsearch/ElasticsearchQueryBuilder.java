@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ElasticsearchQueryBuilder {
 
     private final ElasticsearchClientComponent elasticsearchClientComponent;
+    private static final Logger log = LoggerFactory.getLogger(ElasticsearchQueryBuilder.class);
 
 
     public ElasticsearchQueryBuilder(ElasticsearchClientComponent elasticsearchClientComponent) {
@@ -19,6 +23,8 @@ public class ElasticsearchQueryBuilder {
     public Map<String, Long> fetchWordCloudData(String gender, String ageGroup) throws IOException {
         int ageStart = Integer.parseInt(ageGroup);
         int ageEnd = ageStart + 9;
+
+        log.info("Fetching word cloud data");
 
         SearchResponse<Void> response = elasticsearchClientComponent.getClient().search(s -> s
                 .index("cocktail_interactions") // Elasticsearch 인덱스
@@ -38,19 +44,26 @@ public class ElasticsearchQueryBuilder {
                 ))
                 .aggregations("wordcloud", a -> a
                     .terms(t -> t
-                        .field("commentContent.keyword") // 댓글 키워드
+                        .field("cocktailName.keyword") // 댓글 키워드
                         .size(100) // 상위 100개
                     )
                 ),
             Void.class);
 
+        log.info("Search response received. Parsing results...");
+
         Map<String, Long> wordCloudData = new HashMap<>();
         StringTermsAggregate wordCloudAgg = response.aggregations().get("wordcloud").sterms();
 
         for (StringTermsBucket bucket : wordCloudAgg.buckets().array()) {
-            wordCloudData.put(bucket.key().toString(), bucket.docCount());
+            String key = bucket.key().stringValue();
+            long docCount = bucket.docCount();
+            wordCloudData.put(key, docCount);
+
+            log.debug("Word: {}, Count: {}", key, docCount);
         }
 
+        log.info("Word cloud data fetching completed. Total words: {}", wordCloudData.size());
         return wordCloudData;
     }
 }
