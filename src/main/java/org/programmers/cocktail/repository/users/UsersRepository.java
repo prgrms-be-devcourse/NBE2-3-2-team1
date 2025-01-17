@@ -21,7 +21,7 @@ public interface UsersRepository extends JpaRepository<Users, Long>, UsersReposi
 
     Page<Users> findAllByAuthorities_Role(String role, Pageable pageable);
 
-    void deleteById(long id);
+    boolean deleteById(long id);
 
 
     Optional<Users> findByEmail(@NonNull String email);

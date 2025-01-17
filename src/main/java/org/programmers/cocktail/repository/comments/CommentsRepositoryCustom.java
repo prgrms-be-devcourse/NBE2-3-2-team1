@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface CommentsRepositoryCustom {
 
+    boolean deleteCommentById(Long id);
+
     Long countTotalCommentsUntilYesterday(LocalDateTime today);
 
     List<Long> countCommentsList(LocalDateTime today);

@@ -8,6 +8,8 @@ import org.programmers.cocktail.entity.Users;
 import org.programmers.cocktail.exception.ErrorCode;
 import org.programmers.cocktail.global.exception.BadRequestException;
 import org.programmers.cocktail.global.exception.NotFoundException;
+import org.programmers.cocktail.global.exception.DataAccessException;
+import org.programmers.cocktail.global.exception.RunTimeException;
 import org.programmers.cocktail.global.response.ApiResponse;
 import org.programmers.cocktail.repository.authorities.AuthoritiesRepository;
 import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepository;
@@ -15,7 +17,6 @@ import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepositor
 import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.programmers.cocktail.repository.users.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,9 @@ public class AdminUserService {
     @Transactional
     public void deleteById(long id) {
 
-        Users user = usersRepository.findById(id).orElseThrow();
+        Users user = usersRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
         try {
             cocktailLikesRepository.deleteAllByUsers(user);
             commentsRepository.deleteAllByUsers(user);
@@ -65,9 +68,10 @@ public class AdminUserService {
 
             usersRepository.delete(user);
 
+        } catch (DataAccessException e) {
+            throw new DataAccessException(ErrorCode.DATABASE_ERROR);
         } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
+            throw new RunTimeException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.programmers.cocktail.admin.dto.CommentResponse;
 import org.programmers.cocktail.entity.Comments;
+import org.programmers.cocktail.exception.ErrorCode;
+import org.programmers.cocktail.global.exception.BadRequestException;
+import org.programmers.cocktail.global.exception.NotFoundException;
 import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,11 +34,15 @@ public class AdminCommentService {
 
     @Transactional
     public void deleteById(Long id) {
-        try {
-            commentsRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (id == null || id <=0) {
+            throw new BadRequestException(ErrorCode.BAD_REQUEST);
         }
+
+        boolean isDeleted = commentsRepository.deleteCommentById(id);
+        if (!isDeleted) {
+            throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+        }
+
     }
 
     public Page<CommentResponse> searchByKeyword(String keyword, Pageable pageable) {

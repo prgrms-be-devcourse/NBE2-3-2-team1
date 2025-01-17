@@ -34,10 +34,12 @@ public class AdminAuthController {
             if (authenticated) {
                 return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoData());
             } else {
-                return ResponseEntity.badRequest().body(ApiResponse.createErrorWithMsg("비밀번호가 올바르지 않습니다."));
+                return ResponseEntity.status(ErrorCode.INVALID_PASSWORD.getStatus())
+                    .body(ApiResponse.createErrorWithMsg(ErrorCode.INVALID_PASSWORD.getMessage()));
             }
         } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.createErrorWithMsg("일치하는 아이디가 없습니다."));
+            return ResponseEntity.status(ErrorCode.USER_NOT_FOUND.getStatus())
+                .body(ApiResponse.createErrorWithMsg(ErrorCode.USER_NOT_FOUND.getMessage()));
         }
 
     }

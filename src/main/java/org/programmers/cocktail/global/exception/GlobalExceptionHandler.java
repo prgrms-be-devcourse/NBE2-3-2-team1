@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.programmers.cocktail.exception.ErrorCode;
 import org.programmers.cocktail.global.response.ApiResponse;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -117,6 +118,16 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         return ResponseEntity.status(errorCode.getStatus())
                 .body(ApiResponse.createError(errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDataAccessException(DataAccessException e) {
+        log.error("[DataAccessException] Database error: {}", e.getMessage());
+
+        // ErrorCode.DATABASE_ERROR를 사용하여 응답 반환
+        ErrorCode errorCode = ErrorCode.DATABASE_ERROR;
+        return ResponseEntity.status(errorCode.getStatus())
+            .body(ApiResponse.createError(errorCode.getMessage()));
     }
 
 }

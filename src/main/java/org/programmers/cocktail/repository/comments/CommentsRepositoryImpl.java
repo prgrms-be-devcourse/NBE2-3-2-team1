@@ -26,6 +26,18 @@ public class CommentsRepositoryImpl implements CommentsRepositoryCustom {
     }
 
     @Override
+    public boolean deleteCommentById(Long id) {
+        QComments comments = QComments.comments;
+
+        long deletedRows = queryFactory
+            .delete(comments)
+            .where(comments.id.eq(id))
+            .execute();
+
+        return deletedRows > 0;
+    }
+
+    @Override
     public Long countTotalCommentsUntilYesterday(LocalDateTime today) {
         QComments comments = QComments.comments;
 
