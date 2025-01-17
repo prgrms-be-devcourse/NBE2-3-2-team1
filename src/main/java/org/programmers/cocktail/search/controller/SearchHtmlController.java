@@ -1,7 +1,11 @@
 package org.programmers.cocktail.search.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import org.programmers.cocktail.elasticsearch.elasticsearch.ElasticsearchClientComponent;
+import org.programmers.cocktail.elasticsearch.elasticsearch.ElasticsearchQueryBuilder;
 import org.programmers.cocktail.search.dto.CocktailsTO;
 import org.programmers.cocktail.search.service.CocktailExternalApiService;
 import org.programmers.cocktail.search.service.CocktailsService;
@@ -23,8 +27,24 @@ public class SearchHtmlController {
 
     // 검색페이지 반환
     @RequestMapping("/search")
-    public String getCocktailSearchPage() {
-        // 검색페이지로 이동
+    public String getCocktailSearchPage(Model model) {
+        // Word Cloud 생성후 전송
+        ElasticsearchClientComponent elasticSearchClientComponent = new ElasticsearchClientComponent();
+        ElasticsearchQueryBuilder queryBuilder = new ElasticsearchQueryBuilder(elasticSearchClientComponent);
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            model.addAttribute("male20sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Male", "20")));
+            model.addAttribute("male30sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Male", "30")));
+            model.addAttribute("male40sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Male", "40")));
+            model.addAttribute("female20sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Female", "20")));
+            model.addAttribute("female30sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Female", "30")));
+            model.addAttribute("female40sWordCloudMap", objectMapper.writeValueAsString(queryBuilder.fetchWordCloudData("Female", "40")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return "user/search1";
     }
 

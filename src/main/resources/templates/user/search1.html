@@ -5,7 +5,182 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>칵테일 검색</title>
   <link rel="stylesheet" href="/css/search1.css">
+  <!-- ZingChart 라이브러리 -->
+  <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+
+      var male20sWordCloudMapData = JSON.parse('[[${male20sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+      var male30sWordCloudMapData = JSON.parse('[[${male30sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+      var male40sWordCloudMapData = JSON.parse('[[${male40sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+      var female20sWordCloudMapData = JSON.parse('[[${female20sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+      var female30sWordCloudMapData = JSON.parse('[[${female30sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+      var female40sWordCloudMapData = JSON.parse('[[${female40sWordCloudMap}]]'.replace(/&quot;/g, '"'));
+
+      // ZingChart에서 사용할 형식으로 데이터 변환
+      // 20대 남성 wordList생성
+      var wordListMale20s = Object.entries(male20sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+      // 30대 남성 wordList생성
+      var wordListMale30s = Object.entries(male30sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+      // 40대 남성 wordList생성
+      var wordListMale40s = Object.entries(male40sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+
+      // 20대 여성 wordList생성
+      var wordListFemale20s = Object.entries(female20sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+      // 30대 여성 wordList생성
+      var wordListFemale30s = Object.entries(female30sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+
+      // 40대 남성 wordList생성
+      var wordListFemale40s = Object.entries(female40sWordCloudMapData).map(function(entry) {
+        return {
+          text: entry[0],    // 단어
+          count: entry[1]    // 빈도수
+        };
+      });
+
+      // 워드클라우드 환경설정
+      var myConfig = {
+        type: 'wordcloud',
+        options: {
+          words: wordListMale20s,  // 변환된 단어 목록
+          minLength: 5,
+          maxItems: 40,
+          aspect: 'spiral',//'spiral', // 'flow-top' | 'flow-center'
+          colorType: 'palette',
+          palette: [
+            '#D32F2F', '#5D4037', '#1976D2', '#E53935', '#6D4C41',
+            '#1E88E5', '#F44336', '#795548', '#2196F3', '#EF5350',
+            '#8D6E63', '#42A5F5', '#FF5722', '#673AB7', '#009688',
+            '#FFEB3B', '#00BCD4', '#8BC34A', '#FFC107', '#9E9D24',
+            '#FF9800', '#3F51B5', '#FF4081', '#4CAF50'
+          ],
+          style: {
+            fontFamily: 'Crete Round',
+            hoverState: {
+              backgroundColor: '#D32F2F',
+              borderRadius: 2,
+              fontColor: 'white'
+            },
+            tooltip: {
+              text: '%text: %hits',
+              visible: true,
+              alpha: 0.9,
+              backgroundColor: '#1976D2',
+              borderRadius: 2,
+              borderColor: 'none',
+              fontColor: 'white',
+              fontFamily: 'Georgia',
+              textAlpha: 1
+            }
+          }
+        },
+        source: {
+          fontColor: '#64B5F6',
+          fontSize: 10,
+          fontFamily: 'Georgia',
+          fontWeight: 'normal',
+          marginBottom: '10%'
+        }
+      };
+
+      // 워드클라우드 렌더링
+      zingchart.render({
+        id: 'male20sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+
+      // 30대 남성 워드클라우드 환경설정
+      myConfig.options.words = wordListMale30s;  // 30대 데이터로 변경
+
+      // 30대 남성 워드클라우드 렌더링
+      zingchart.render({
+        id: 'male30sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+
+      // 40대 남성 워드클라우드 환경설정
+      myConfig.options.words = wordListMale40s;  // 30대 데이터로 변경
+
+      // 40대 남성 워드클라우드 렌더링
+      zingchart.render({
+        id: 'male40sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+
+      // 20대 여성 워드클라우드 환경설정
+      myConfig.options.words = wordListFemale20s;  // 20대 여성 데이터로 변경
+
+      // 20대 여성 워드클라우드 렌더링
+      zingchart.render({
+        id: 'female20sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+
+      // 30대 여성 워드클라우드 환경설정
+      myConfig.options.words = wordListFemale30s;  // 30대 여성 데이터로 변경
+
+      // 30대 여성 워드클라우드 렌더링
+      zingchart.render({
+        id: 'female30sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+
+      // 40대 여성 워드클라우드 환경설정
+      myConfig.options.words = wordListFemale40s;  // 40대 여성 데이터로 변경
+
+      // 40대 여성 워드클라우드 렌더링
+      zingchart.render({
+        id: 'female40sWordCloudMap',  // ZingChart를 렌더링할 div의 id
+        data: myConfig,             // 설정한 워드클라우드 데이터
+        height: 400,                // 차트 높이
+        width: '100%'               // 차트 너비
+      });
+    });
+
+  </script>
+
 </head>
 <body>
 <div class="navbar">
@@ -30,7 +205,7 @@
 
 <div class="container">
   <br><br>
-  <div class="main-text">당신의 칵테일을 찾아보세요!</div>
+  <div class="main-text">당신의 칵테일을 찾아보세요</div>
 
   <div class="buttons">
     <button id="sortByHits">조회순</button>
@@ -45,10 +220,42 @@
     <div class="text">#마가리타</div>
     <div class="text">#바카디</div>
   </div>
+
+  <h1 class="cocktail-word-cloud-title">워드클라우드로 확인하는 칵테일 선호</h1>
+
+  <!-- ZingChart가 렌더링될 div -->
+  <div class="wordcloud-container">
+    <h2>20대 남자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="male20sWordCloudMap"></div> <!-- ZingChart 워드클라우드를 여기서 렌더링 -->
+  </div>
+
+  <div class="wordcloud-container">
+    <h2>20대 여자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="female20sWordCloudMap"></div>
+  </div>
+
+  <div class="wordcloud-container">
+    <h2>30대 남자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="male30sWordCloudMap"></div>
+  </div>
+
+  <div class="wordcloud-container">
+    <h2>30대 여자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="female30sWordCloudMap"></div>
+  </div>
+
+  <div class="wordcloud-container">
+    <h2>40대 남자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="male40sWordCloudMap"></div>
+  </div>
+
+  <div class="wordcloud-container">
+    <h2>40대 여자는 어떤 칵테일을 좋아할까?</h2>
+    <div id="female40sWordCloudMap"></div>
+  </div>
+
 </div>
 
-<script src="/js/search1.js">
-
-</script>
+<script src="/js/search1.js"></script>
 </body>
 </html>

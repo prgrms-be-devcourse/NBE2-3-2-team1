@@ -22,6 +22,7 @@ body {
 }
 
 .main-text {
+  font-weight : bold;
   background-color: #dddddd;
   color: #000000;
   text-align: center;
@@ -116,5 +117,23 @@ body {
   width: 100%;
   border-radius: 15px;
   margin: 5px 0;
+  display: block;
+}
+
+.cocktail-word-cloud-title{
+  background-color: #dddddd;
+  color: #000000;
+  text-align: center;
+  padding: 10px 40px;
+  font-size: 30px;
+  width: 50%;
+  border-radius: 15px;
+  margin-bottom: 5px; /* 아래 간격을 좁힘 */
+}
+
+.wordcloud-container {
+  width: 600px; /* 크기를 키워보세요 */
+  margin: 5px;
+  /*border: 1px solid #ccc;*/
   display: block;
 }
