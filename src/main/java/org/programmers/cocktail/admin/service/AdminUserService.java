@@ -2,15 +2,12 @@ package org.programmers.cocktail.admin.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.programmers.cocktail.admin.dto.UserResponse;
 import org.programmers.cocktail.entity.Users;
 import org.programmers.cocktail.exception.ErrorCode;
-import org.programmers.cocktail.global.exception.BadRequestException;
 import org.programmers.cocktail.global.exception.NotFoundException;
-import org.programmers.cocktail.global.exception.DataAccessException;
-import org.programmers.cocktail.global.exception.RunTimeException;
-import org.programmers.cocktail.global.response.ApiResponse;
+import org.programmers.cocktail.global.exception.CustomDataAccessException;
+import org.programmers.cocktail.global.exception.CustomRuntimeException;
 import org.programmers.cocktail.repository.authorities.AuthoritiesRepository;
 import org.programmers.cocktail.repository.cocktail_likes.CocktailLikesRepository;
 import org.programmers.cocktail.repository.cocktail_lists.CocktailListsRepository;
@@ -19,7 +16,6 @@ import org.programmers.cocktail.repository.users.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -68,10 +64,10 @@ public class AdminUserService {
 
             usersRepository.delete(user);
 
-        } catch (DataAccessException e) {
-            throw new DataAccessException(ErrorCode.DATABASE_ERROR);
-        } catch (Exception e) {
-            throw new RunTimeException(ErrorCode.INTERNAL_SERVER_ERROR);
+        } catch (CustomDataAccessException e) {
+            throw new CustomDataAccessException(ErrorCode.DATABASE_ERROR.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw new CustomRuntimeException(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), e);
         }
     }
 

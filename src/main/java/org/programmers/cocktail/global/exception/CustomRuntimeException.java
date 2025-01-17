@@ -6,6 +6,8 @@ import org.programmers.cocktail.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Getter
-public class DataAccessException extends RuntimeException {
-    private final ErrorCode errorCode;
+public class CustomRuntimeException extends java.lang.RuntimeException {
+    public CustomRuntimeException(final String message, Throwable cause) {
+        super(message, cause);
+    }
 }

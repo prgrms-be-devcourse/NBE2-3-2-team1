@@ -1,5 +1,7 @@
 package org.programmers.cocktail.global.exception;
 
-public class UnauthorizedException extends RuntimeException{
+import java.lang.RuntimeException;
+
+public class UnauthorizedException extends RuntimeException {
 
 }

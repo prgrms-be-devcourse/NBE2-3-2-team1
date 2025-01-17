@@ -7,6 +7,8 @@ import org.programmers.cocktail.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Getter
-public class BadRequestException extends RuntimeException {
-    private final ErrorCode errorCode;
+public class CustomDataAccessException extends RuntimeException {
+    public CustomDataAccessException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

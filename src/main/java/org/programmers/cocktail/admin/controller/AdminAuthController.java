@@ -28,19 +28,8 @@ public class AdminAuthController {
         @RequestParam String email,
         @RequestParam String password
     ) {
-        UserRequest userRequest = new UserRequest(email, password);
-        try {
-            boolean authenticated = adminAuthService.findByEmailAndPassword(userRequest);
-            if (authenticated) {
-                return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoData());
-            } else {
-                return ResponseEntity.status(ErrorCode.INVALID_PASSWORD.getStatus())
-                    .body(ApiResponse.createErrorWithMsg(ErrorCode.INVALID_PASSWORD.getMessage()));
-            }
-        } catch (BadRequestException e) {
-            return ResponseEntity.status(ErrorCode.USER_NOT_FOUND.getStatus())
-                .body(ApiResponse.createErrorWithMsg(ErrorCode.USER_NOT_FOUND.getMessage()));
-        }
+        adminAuthService.authenticate(email, password);
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoData());
 
     }
 

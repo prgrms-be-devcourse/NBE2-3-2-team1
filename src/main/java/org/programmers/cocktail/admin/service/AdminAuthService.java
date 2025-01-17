@@ -21,11 +21,13 @@ public class AdminAuthService {
         this.usersRepository = usersRepository;
     }
 
-    public boolean findByEmailAndPassword(UserRequest userRequest) {
-        Users users = usersRepository.findByEmail(userRequest.getEmail())
-            .orElseThrow(() -> new BadRequestException(ErrorCode.NOT_FOUND));
+    public void authenticate(String email, String password) {
+        Users user = usersRepository.findByEmail(email)
+            .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
 
-        return passwordEncoder.matches(userRequest.getPassword(), users.getPassword());
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadRequestException(ErrorCode.INVALID_PASSWORD);
+        }
     }
 
 }
