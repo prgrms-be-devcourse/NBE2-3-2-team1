@@ -28,17 +28,8 @@ public class AdminAuthController {
         @RequestParam String email,
         @RequestParam String password
     ) {
-        UserRequest userRequest = new UserRequest(email, password);
-        try {
-            boolean authenticated = adminAuthService.findByEmailAndPassword(userRequest);
-            if (authenticated) {
-                return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoData());
-            } else {
-                return ResponseEntity.badRequest().body(ApiResponse.createErrorWithMsg("비밀번호가 올바르지 않습니다."));
-            }
-        } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().body(ApiResponse.createErrorWithMsg("일치하는 아이디가 없습니다."));
-        }
+        adminAuthService.authenticate(email, password);
+        return ResponseEntity.ok(ApiResponse.createSuccessWithNoData());
 
     }
 

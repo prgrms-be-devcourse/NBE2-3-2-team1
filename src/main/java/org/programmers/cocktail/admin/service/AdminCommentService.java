@@ -1,10 +1,14 @@
 package org.programmers.cocktail.admin.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import org.programmers.cocktail.admin.dto.CommentResponse;
 import org.programmers.cocktail.entity.Comments;
+import org.programmers.cocktail.exception.ErrorCode;
+import org.programmers.cocktail.global.exception.BadRequestException;
+import org.programmers.cocktail.global.exception.NotFoundException;
+import org.programmers.cocktail.global.exception.CustomDataAccessException;
+import org.programmers.cocktail.global.exception.CustomRuntimeException;
 import org.programmers.cocktail.repository.comments.CommentsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,11 +35,20 @@ public class AdminCommentService {
 
     @Transactional
     public void deleteById(Long id) {
-        try {
-            commentsRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (id == null || id <=0) {
+            throw new BadRequestException(ErrorCode.BAD_REQUEST);
         }
+        try {
+            boolean isDeleted = commentsRepository.deleteCommentById(id);
+            if (!isDeleted) {
+                throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+            }
+        } catch (CustomDataAccessException e) {
+            throw new CustomDataAccessException(ErrorCode.DATABASE_ERROR.getMessage(), e);
+        } catch (java.lang.RuntimeException e) {
+            throw new CustomRuntimeException(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), e);
+        }
+
     }
 
     public Page<CommentResponse> searchByKeyword(String keyword, Pageable pageable) {

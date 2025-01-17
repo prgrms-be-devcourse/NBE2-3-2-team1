@@ -23,16 +23,7 @@ public class AdminUserController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Object>> delete(@PathVariable long id) {
-        try {
-            adminUserService.deleteById(id);
-            ApiResponse<Object> response = ApiResponse.createSuccessWithNoData();
-            return ResponseEntity.ok(response);
-        } catch (BadRequestException e) {
-            ApiResponse<Object> response = ApiResponse.createErrorWithMsg(e.getMessage());
-            return ResponseEntity.ok(response);
-        } catch (NotFoundException e) {
-            ApiResponse<Object> response = ApiResponse.createErrorWithMsg(e.getMessage());
-            return ResponseEntity.ok(response);
-        }
+        adminUserService.deleteById(id);
+        return ResponseEntity.ok().body(ApiResponse.createSuccessWithNoData());
     }
 }
