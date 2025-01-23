@@ -110,6 +110,24 @@
 
     비밀번호<br>
     <input type="password" name="password" placeholder="password" required><br>
+
+    성별<br>
+    <div>
+      <button type="button" class="male" id="maleButton" onclick="selectGender('Male')">Male</button>
+      <button type="button" class="female" id="femaleButton" onclick="selectGender('Female')">Female</button>
+    </div>
+    <input type="hidden" id="genderInput" name="gender">
+    <div id="gender"></div><br>
+
+    연령<br>
+    <select name="age" id="ageInput" required>
+      <option value="" disabled selected>Select your age</option>
+      <script>
+        for (let i = 20; i <= 120; i++) {
+          document.write(`<option value="${i}">${i}</option>`);
+        }
+      </script>
+    </select><br><br>
   </div>
 
   <div class="sub-container">
@@ -133,7 +151,6 @@
       processData: false,   // 폼 데이터 그대로 전송
       contentType: false,   // 서버에서 받는 데이터의 형식 처리
       success: function(response) {
-        // 서버 응답 처리 (성공 시)
         if (response.flag === 0) {
           alert(response.message);
           window.location.href = '/login';
@@ -149,10 +166,9 @@
     });
   }
 
-  // 로그인 상태를 확인하여 mypage로 이동하거나 login으로 리디렉션
   function checkLogin() {
     $.ajax({
-      url: '/login_complete',  // 로그인 상태 확인 API
+      url: '/login_complete',
       type: 'POST',
       success: function(response) {
         if (response.flag === 0) {
@@ -160,28 +176,8 @@
           window.location.href = '/mypage';
 
         } else {
-          alert(response.message); // "로그인해야 합니다."
-          window.location.href = '/login';  // 로그인 페이지로 이동
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('로그인 상태 확인 실패: ' + error);
-        window.location.href = '/login';  // 로그인 페이지로 리디렉션
-      }
-    });
-  }
-
-  function checkLogin2() {
-    $.ajax({
-      url: '/login_complete',  // 로그인 상태 확인 API
-      type: 'POST',
-      success: function(response) {
-        if (response.flag === 0) {
-
-          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
-        } else {
           alert(response.message);
-          window.location.href = '/login';  // 로그인 페이지로 이동
+          window.location.href = '/login';
         }
       },
       error: function(xhr, status, error) {
@@ -189,6 +185,47 @@
         window.location.href = '/login';
       }
     });
+  }
+
+  function checkLogin2() {
+    $.ajax({
+      url: '/login_complete',
+      type: 'POST',
+      success: function(response) {
+        if (response.flag === 0) {
+
+          alert('로그인되어 있습니다. 마이 페이지로 이동하세요');
+        } else {
+          alert(response.message);
+          window.location.href = '/login';
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('로그인 상태 확인 실패: ' + error);
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  let selectedGenderButton = null;
+
+  function selectGender(gender) {
+    const maleButton = document.getElementById('maleButton');
+    const femaleButton = document.getElementById('femaleButton');
+
+    if (selectedGenderButton) {
+      selectedGenderButton.classList.remove('selected');
+    }
+
+    if (gender === 'Male') {
+      selectedGenderButton = maleButton;
+    } else {
+      selectedGenderButton = femaleButton;
+    }
+
+    document.getElementById('genderInput').value = gender;
+    selectedGenderButton.classList.add('selected');
+    document.getElementById('gender').textContent = `Selected gender: ${gender}`;
   }
 </script>
 </body>
