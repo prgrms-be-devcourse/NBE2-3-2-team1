@@ -45,7 +45,7 @@ public class AdminCommentService {
             }
         } catch (CustomDataAccessException e) {
             throw new CustomDataAccessException(ErrorCode.DATABASE_ERROR.getMessage(), e);
-        } catch (java.lang.RuntimeException e) {
+        } catch (RuntimeException e) {
             throw new CustomRuntimeException(ErrorCode.INTERNAL_SERVER_ERROR.getMessage(), e);
         }
 
