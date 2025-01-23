@@ -13,5 +13,7 @@ public class UserRegisterDto {
     private String name;
     private String email;
     private String password;
+    private String gender;
+    private int age;
 
 }

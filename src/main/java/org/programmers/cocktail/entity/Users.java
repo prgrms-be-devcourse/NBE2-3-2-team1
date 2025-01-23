@@ -59,11 +59,14 @@ public class Users {
     private List<CocktailLikes> cocktailLikes = new ArrayList<>();
 
     @Builder
-    public Users(String email, String name, String password) {
+    public Users(String email, String name, String password, String gender, int age) {
         this.email = email;
         this.name = name;
         this.password = password;
+        this.gender = gender;
+        this.age = age;
     }
+
 
     public void updateAuthorities(Authorities authorities) {this.authorities.add(authorities);}
 
