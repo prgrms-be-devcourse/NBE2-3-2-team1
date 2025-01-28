@@ -219,24 +219,50 @@
             </table>
         </div>
 
-        <!-- 페이지네이션(예시) -->
         <nav aria-label="Page navigation" th:if="${totalPages > 1}">
             <ul class="pagination justify-content-center mt-3">
-                <li class="page-item" th:classappend="${page == 1} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/comments/search(page=${page-1}, keyword=${keyword})}" aria-label="Previous">
+                <!-- 처음 페이지 버튼 -->
+                <li class="page-item" th:if="${page > maxPagesToShow}">
+                    <a class="page-link"
+                       th:href="@{/admin/comments/search(page=1, keyword=${keyword})}"
+                       aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- 이전 페이지 그룹 버튼 -->
+                <li class="page-item" th:if="${startPage > 1}">
+                    <a class="page-link"
+                       th:href="@{/admin/comments/search(page=${startPage - 1}, keyword=${keyword})}"
+                       aria-label="Previous Group">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
 
-                <li class="page-item" th:each="p : ${#numbers.sequence(1, totalPages)}"
-                    th:classappend="${p == page} ? ' active'">
-                    <a class="page-link" th:href="@{/admin/comments/search(page=${p}, keyword=${keyword})}"
+                <!-- 페이지 번호 -->
+                <li class="page-item"
+                    th:each="p : ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${p == page} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/admin/comments/search(page=${p}, keyword=${keyword})}"
                        th:text="${p}">1</a>
                 </li>
 
-                <li class="page-item" th:classappend="${page == totalPages} ? ' disabled'">
-                    <a class="page-link" th:href="@{/admin/comments/search(page=${page+1}, keyword=${keyword})}" aria-label="Next">
+                <!-- 다음 페이지 그룹 버튼 -->
+                <li class="page-item" th:if="${endPage < totalPages}">
+                    <a class="page-link"
+                       th:href="@{/admin/comments/search(page=${endPage + 1}, keyword=${keyword})}"
+                       aria-label="Next Group">
                         <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+
+                <!-- 마지막 페이지 버튼 -->
+                <li class="page-item" th:if="${endPage < totalPages}">
+                    <a class="page-link"
+                       th:href="@{/admin/comments/search(page=${totalPages}, keyword=${keyword})}"
+                       aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
                     </a>
                 </li>
             </ul>
